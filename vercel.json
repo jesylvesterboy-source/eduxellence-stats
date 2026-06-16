@@ -20,6 +20,9 @@
     { "src": "/data/(.*)", "dest": "/data/$1" },
     { "src": "/stats", "dest": "/public/stats.html" },
     { "src": "/", "dest": "/public/index.html" },
+    { "src": "/upload", "dest": "https://eduxellence.org/free-tools.html", "status": 302 },
+    { "src": "/services", "dest": "https://eduxellence.org/services", "status": 302 },
+    { "src": "/free-tools", "dest": "https://eduxellence.org/free-tools.html", "status": 302 },
     { "src": "/(.*)", "dest": "/public/$1" }
   ],
   "headers": [
