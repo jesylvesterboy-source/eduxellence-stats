@@ -2007,32 +2007,86 @@ def api_root():
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# SERVE HTML PAGES — ADDED TO FIX 404 ERROR
+# DEBUG ENDPOINT - Check where files are located
+# ═══════════════════════════════════════════════════════════════════════════
+
+@app.route('/debug')
+def debug():
+    """Debug endpoint to check file locations."""
+    import os
+    import json
+    
+    debug_info = {
+        'current_directory': os.getcwd(),
+        'files_in_current': os.listdir('.') if os.path.exists('.') else [],
+        'files_in_public': os.listdir('public') if os.path.exists('public') else [],
+        'files_in_parent_public': os.listdir('../public') if os.path.exists('../public') else [],
+        'files_in_parent': os.listdir('..') if os.path.exists('..') else [],
+        'python_path': sys.path[:5],
+    }
+    
+    return jsonify(debug_info)
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SERVE HTML PAGES — FIXED WITH MULTIPLE PATH ATTEMPTS
 # ═══════════════════════════════════════════════════════════════════════════
 
 @app.route('/')
 def serve_index():
     """Serve the main index.html page."""
-    try:
-        return send_from_directory('../public', 'index.html')
-    except Exception as e:
-        return f"Error loading index.html: {str(e)}", 404
+    # Try multiple possible paths
+    possible_paths = [
+        ('public', 'index.html'),
+        ('.', 'public/index.html'),
+        ('../public', 'index.html'),
+        ('.', 'index.html'),
+        ('..', 'public/index.html'),
+    ]
+    
+    for directory, filename in possible_paths:
+        try:
+            return send_from_directory(directory, filename)
+        except:
+            continue
+    
+    return "index.html not found in any location", 404
 
 @app.route('/stats')
 def serve_stats():
     """Serve the stats.html page."""
-    try:
-        return send_from_directory('../public', 'stats.html')
-    except Exception as e:
-        return f"Error loading stats.html: {str(e)}", 404
+    possible_paths = [
+        ('public', 'stats.html'),
+        ('.', 'public/stats.html'),
+        ('../public', 'stats.html'),
+        ('.', 'stats.html'),
+    ]
+    
+    for directory, filename in possible_paths:
+        try:
+            return send_from_directory(directory, filename)
+        except:
+            continue
+    
+    return "stats.html not found", 404
 
 @app.route('/upload')
 def serve_upload():
     """Serve the upload.html page."""
-    try:
-        return send_from_directory('../public', 'upload.html')
-    except Exception as e:
-        return f"Error loading upload.html: {str(e)}", 404
+    possible_paths = [
+        ('public', 'upload.html'),
+        ('.', 'public/upload.html'),
+        ('../public', 'upload.html'),
+        ('.', 'upload.html'),
+    ]
+    
+    for directory, filename in possible_paths:
+        try:
+            return send_from_directory(directory, filename)
+        except:
+            continue
+    
+    return "upload.html not found", 404
 
 @app.route('/<path:path>')
 def serve_static(path):
@@ -2041,15 +2095,20 @@ def serve_static(path):
     if path.startswith('api/'):
         return jsonify({"error": "Not found"}), 404
     
-    # Try to serve from public folder
-    try:
-        return send_from_directory('../public', path)
-    except Exception:
-        # If file not found, return index.html (for SPA routing)
+    # Try multiple paths
+    possible_paths = [
+        ('public', path),
+        ('.', 'public/' + path),
+        ('../public', path),
+    ]
+    
+    for directory, filename in possible_paths:
         try:
-            return send_from_directory('../public', 'index.html')
+            return send_from_directory(directory, filename)
         except:
-            return "File not found", 404
+            continue
+    
+    return "File not found", 404
 
 
 # ─── Vercel Handler ──────────────────────────────────────────────────────
