@@ -1610,3 +1610,409 @@ def run_analysis(df, analysis_type, params, client_ip=None):
             "cta_text": "📞 Contact our support team",
             "cta_url": "https://www.eduxellence.org/#contact"
         }
+        # ═══════════════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════════════════
+# FLASK WEB APPLICATION — ADD THIS TO THE BOTTOM OF YOUR FILE
+# ═══════════════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════════════════
+
+from flask import Flask, request, jsonify, send_file
+import io
+import tempfile
+import os
+
+app = Flask(__name__)
+
+# ─── File Upload Endpoint ────────────────────────────────────────────────
+@app.route('/api/upload', methods=['POST'])
+def api_upload():
+    """Handle file upload, parse data, return column metadata."""
+    if 'file' not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "Empty filename"}), 400
+    
+    # Check file size (10 MB limit)
+    file.seek(0, 2)
+    file_size = file.tell()
+    file.seek(0)
+    if file_size > 10 * 1024 * 1024:
+        return jsonify({"error": "large_file"}), 413
+    
+    try:
+        # Parse based on extension
+        ext = file.filename.split('.')[-1].lower()
+        if ext == 'csv':
+            df = pd.read_csv(file)
+        elif ext in ['xlsx', 'xls']:
+            df = pd.read_excel(file)
+        else:
+            return jsonify({"error": f"Unsupported file type: {ext}"}), 400
+        
+        # Clean and validate
+        df = prepare_dataframe(df)
+        
+        # Generate metadata path (store temporarily)
+        meta_id = str(uuid.uuid4())[:8]
+        temp_dir = tempfile.mkdtemp()
+        meta_path = os.path.join(temp_dir, f"{meta_id}.parquet")
+        df.to_parquet(meta_path, index=False)
+        
+        # Build column metadata
+        columns = []
+        for col in df.columns:
+            is_numeric = pd.to_numeric(df[col], errors='coerce').notna().sum() > len(df) * 0.5
+            dtype = "numeric" if is_numeric else "categorical"
+            n_unique = df[col].nunique()
+            missing = df[col].isna().sum()
+            missing_pct = round((missing / len(df)) * 100, 2)
+            
+            columns.append({
+                "name": col,
+                "dtype": dtype,
+                "n_unique": n_unique,
+                "missing": int(missing),
+                "missing_pct": missing_pct
+            })
+        
+        # Preview
+        preview = df.head(10).replace({np.nan: None}).to_dict('records')
+        
+        # Recommendations
+        recommendations = recommend_tests(df, columns)
+        
+        return jsonify({
+            "meta_path": meta_path,
+            "filename": file.filename,
+            "rows": len(df),
+            "cols": len(df.columns),
+            "columns": columns,
+            "preview": preview,
+            "recommendations": recommendations[:5]
+        })
+        
+    except Exception as e:
+        logger.error(f"Upload error: {str(e)}\n{traceback.format_exc()}")
+        return jsonify({"error": str(e)}), 500
+
+
+# ─── Assumptions Check Endpoint ──────────────────────────────────────────
+@app.route('/api/assumptions', methods=['POST'])
+def api_assumptions():
+    """Check assumptions for a given test."""
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    
+    meta_path = data.get('meta_path')
+    analysis_type = data.get('analysis_type')
+    params = data.get('params', {})
+    
+    if not meta_path or not analysis_type:
+        return jsonify({"error": "Missing meta_path or analysis_type"}), 400
+    
+    try:
+        df = pd.read_parquet(meta_path)
+        df = prepare_dataframe(df)
+        
+        checks = check_assumptions(df, analysis_type, params)
+        all_passed = all(c['passed'] for c in checks) if checks else True
+        
+        return jsonify({
+            "checks": checks,
+            "all_passed": all_passed
+        })
+        
+    except Exception as e:
+        logger.error(f"Assumptions error: {str(e)}\n{traceback.format_exc()}")
+        return jsonify({"error": str(e)}), 500
+
+
+# ─── Analysis Endpoint ────────────────────────────────────────────────────
+@app.route('/api/analyze', methods=['POST'])
+def api_analyze():
+    """Run statistical analysis."""
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    
+    meta_path = data.get('meta_path')
+    analysis_type = data.get('analysis_type')
+    params = data.get('params', {})
+    ai_mode = data.get('ai_mode', 'simple')
+    
+    if not meta_path or not analysis_type:
+        return jsonify({"error": "Missing meta_path or analysis_type"}), 400
+    
+    # Rate limiting
+    client_ip = request.remote_addr
+    
+    try:
+        df = pd.read_parquet(meta_path)
+        df = prepare_dataframe(df)
+        
+        # Check limits
+        check_analysis_limits(df, analysis_type, params)
+        
+        # Run analysis
+        result = run_analysis(df, analysis_type, params, client_ip)
+        
+        # Add metadata
+        result['analysis_label'] = ANALYSIS_LABELS.get(analysis_type, analysis_type)
+        result['generated_at'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        result['ai_mode'] = ai_mode
+        
+        # Generate AI interpretation if available
+        if 'interpretation' in result and result['interpretation']:
+            result['ai_interpretation'] = result['interpretation']
+            result['ai_source'] = 'template'
+        
+        # Cleanup temp file
+        try:
+            os.remove(meta_path)
+            os.rmdir(os.path.dirname(meta_path))
+        except:
+            pass
+        
+        return jsonify(result)
+        
+    except AnalysisTooLargeError as e:
+        return jsonify({
+            "error": "analysis_too_large",
+            "message": str(e),
+            "cta_text": "📞 Book a Free Expert Consultation",
+            "cta_url": "https://www.eduxellence.org/#contact"
+        }), 413
+        
+    except Exception as e:
+        logger.error(f"Analysis error: {str(e)}\n{traceback.format_exc()}")
+        return jsonify({
+            "error": "internal_server_error",
+            "message": str(e)
+        }), 500
+
+
+# ─── Export Endpoint ──────────────────────────────────────────────────────
+@app.route('/api/export', methods=['POST'])
+def api_export():
+    """Export results as Excel, Word, or PDF."""
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    
+    meta_path = data.get('meta_path')
+    analysis_type = data.get('analysis_type')
+    params = data.get('params', {})
+    format_type = data.get('format', 'xlsx')
+    
+    if not meta_path or not analysis_type:
+        return jsonify({"error": "Missing meta_path or analysis_type"}), 400
+    
+    try:
+        df = pd.read_parquet(meta_path)
+        df = prepare_dataframe(df)
+        
+        # Run analysis to get results
+        result = run_analysis(df, analysis_type, params)
+        
+        if format_type == 'xlsx':
+            # Create Excel export
+            import pandas as pd
+            from openpyxl.styles import Font, PatternFill, Alignment
+            
+            output = io.BytesIO()
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                # Summary sheet
+                summary = {
+                    'Analysis': analysis_type,
+                    'Generated': datetime.now().strftime("%Y-%m-%d %H:%M"),
+                    'Website': 'https://eduxellence.org'
+                }
+                pd.DataFrame([summary]).T.to_excel(writer, sheet_name='Summary', header=False)
+                
+                # Results tables
+                table_keys = ['numeric_summary', 'summary_table', 'coef_table', 'pairs_table', 'posthoc_table']
+                for key in table_keys:
+                    if result.get(key):
+                        pd.DataFrame(result[key]).to_excel(writer, sheet_name=key[:31], index=False)
+                
+                # Clean up
+                for ws in writer.book.worksheets:
+                    for row in ws.iter_rows():
+                        for cell in row:
+                            if cell.row == 1:
+                                cell.font = Font(bold=True, color='FFFFFF')
+                                cell.fill = PatternFill(start_color='0B1829', end_color='0B1829', fill_type='solid')
+                                cell.alignment = Alignment(horizontal='center')
+            
+            output.seek(0)
+            return send_file(
+                output,
+                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                download_name=f'eduxellence_{analysis_type}.xlsx'
+            )
+        
+        elif format_type == 'docx':
+            # Word export - requires python-docx
+            try:
+                from docx import Document
+                from docx.shared import Pt, Inches
+                
+                doc = Document()
+                doc.add_heading('Statistical Analysis Report', 0)
+                doc.add_heading(f'Test: {analysis_type}', level=1)
+                doc.add_paragraph(f'Generated: {datetime.now().strftime("%Y-%m-%d %H:%M")}')
+                doc.add_paragraph(f'Powered by Eduxellence Analytics')
+                
+                if result.get('apa_citation'):
+                    doc.add_heading('APA Citation', level=2)
+                    doc.add_paragraph(result['apa_citation'])
+                
+                if result.get('interpretation'):
+                    doc.add_heading('Interpretation', level=2)
+                    doc.add_paragraph(result['interpretation'])
+                
+                output = io.BytesIO()
+                doc.save(output)
+                output.seek(0)
+                
+                return send_file(
+                    output,
+                    mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    download_name=f'eduxellence_{analysis_type}.docx'
+                )
+            except ImportError:
+                return jsonify({"error": "Word export requires python-docx"}), 500
+        
+        elif format_type == 'pdf':
+            # PDF export - requires reportlab
+            try:
+                from reportlab.lib.pagesizes import letter
+                from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+                from reportlab.lib.styles import getSampleStyleSheet
+                
+                output = io.BytesIO()
+                doc = SimpleDocTemplate(output, pagesize=letter)
+                styles = getSampleStyleSheet()
+                story = []
+                
+                story.append(Paragraph('Statistical Analysis Report', styles['Title']))
+                story.append(Paragraph(f'Test: {analysis_type}', styles['Heading1']))
+                story.append(Spacer(1, 12))
+                story.append(Paragraph(f'Generated: {datetime.now().strftime("%Y-%m-%d %H:%M")}', styles['Normal']))
+                story.append(Paragraph('Powered by Eduxellence Analytics', styles['Normal']))
+                
+                if result.get('apa_citation'):
+                    story.append(Spacer(1, 12))
+                    story.append(Paragraph('APA Citation', styles['Heading2']))
+                    story.append(Paragraph(result['apa_citation'], styles['Normal']))
+                
+                if result.get('interpretation'):
+                    story.append(Spacer(1, 12))
+                    story.append(Paragraph('Interpretation', styles['Heading2']))
+                    story.append(Paragraph(result['interpretation'], styles['Normal']))
+                
+                doc.build(story)
+                output.seek(0)
+                
+                return send_file(
+                    output,
+                    mimetype='application/pdf',
+                    download_name=f'eduxellence_{analysis_type}.pdf'
+                )
+            except ImportError:
+                return jsonify({"error": "PDF export requires reportlab"}), 500
+        
+        else:
+            return jsonify({"error": f"Unsupported format: {format_type}"}), 400
+        
+    except Exception as e:
+        logger.error(f"Export error: {str(e)}\n{traceback.format_exc()}")
+        return jsonify({"error": str(e)}), 500
+
+
+# ─── AI Interpretation Endpoint ──────────────────────────────────────────
+@app.route('/api/ai-interpret', methods=['POST'])
+def api_ai_interpret():
+    """Switch AI interpretation mode."""
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    
+    meta_path = data.get('meta_path')
+    analysis_type = data.get('analysis_type')
+    params = data.get('params', {})
+    mode = data.get('mode', 'simple')
+    
+    if not meta_path or not analysis_type:
+        return jsonify({"error": "Missing meta_path or analysis_type"}), 400
+    
+    try:
+        df = pd.read_parquet(meta_path)
+        df = prepare_dataframe(df)
+        
+        result = run_analysis(df, analysis_type, params)
+        
+        # Generate different interpretation based on mode
+        base_text = result.get('interpretation', '')
+        
+        if mode == 'simple':
+            interpretation = base_text.replace('statistically significant', '🌟 SIGNIFICANT')
+            interpretation = interpretation.replace('not statistically significant', '📌 NOT significant')
+        elif mode == 'executive':
+            interpretation = f"📊 **Executive Summary**: {base_text[:200]}..."
+        else:  # academic
+            interpretation = base_text
+        
+        return jsonify({
+            "ai_interpretation": interpretation,
+            "ai_mode": mode,
+            "ai_source": 'template'
+        })
+        
+    except Exception as e:
+        logger.error(f"AI interpret error: {str(e)}\n{traceback.format_exc()}")
+        return jsonify({"error": str(e)}), 500
+
+
+# ─── Health Check ─────────────────────────────────────────────────────────
+@app.route('/api/health', methods=['GET'])
+def api_health():
+    """Health check endpoint for Vercel."""
+    return jsonify({
+        "status": "healthy",
+        "engine_version": ENGINE_VERSION,
+        "timestamp": datetime.now().isoformat()
+    })
+
+
+# ─── Root Endpoint ────────────────────────────────────────────────────────
+@app.route('/api', methods=['GET'])
+def api_root():
+    """API root endpoint."""
+    return jsonify({
+        "name": "Eduxellence Statistical Analysis Engine",
+        "version": ENGINE_VERSION,
+        "endpoints": [
+            "/api/upload",
+            "/api/assumptions", 
+            "/api/analyze",
+            "/api/export",
+            "/api/ai-interpret",
+            "/api/health"
+        ]
+    })
+
+
+# ─── Vercel Handler ──────────────────────────────────────────────────────
+# This is what Vercel looks for
+app = app
+
+
+# ─── Local Development ────────────────────────────────────────────────────
+if __name__ == '__main__':
+    # Run locally for testing
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
