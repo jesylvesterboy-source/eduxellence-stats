@@ -1610,13 +1610,13 @@ def run_analysis(df, analysis_type, params, client_ip=None):
             "cta_text": "📞 Contact our support team",
             "cta_url": "https://www.eduxellence.org/#contact"
         }
-        # ═══════════════════════════════════════════════════════════════════════════
+
+
 # ═══════════════════════════════════════════════════════════════════════════
-# FLASK WEB APPLICATION — ADD THIS TO THE BOTTOM OF YOUR FILE
-# ═══════════════════════════════════════════════════════════════════════════
+# FLASK WEB APPLICATION
 # ═══════════════════════════════════════════════════════════════════════════
 
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, send_from_directory
 import io
 import tempfile
 import os
@@ -2004,6 +2004,52 @@ def api_root():
             "/api/health"
         ]
     })
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SERVE HTML PAGES — ADDED TO FIX 404 ERROR
+# ═══════════════════════════════════════════════════════════════════════════
+
+@app.route('/')
+def serve_index():
+    """Serve the main index.html page."""
+    try:
+        return send_from_directory('../public', 'index.html')
+    except Exception as e:
+        return f"Error loading index.html: {str(e)}", 404
+
+@app.route('/stats')
+def serve_stats():
+    """Serve the stats.html page."""
+    try:
+        return send_from_directory('../public', 'stats.html')
+    except Exception as e:
+        return f"Error loading stats.html: {str(e)}", 404
+
+@app.route('/upload')
+def serve_upload():
+    """Serve the upload.html page."""
+    try:
+        return send_from_directory('../public', 'upload.html')
+    except Exception as e:
+        return f"Error loading upload.html: {str(e)}", 404
+
+@app.route('/<path:path>')
+def serve_static(path):
+    """Serve static files from public folder."""
+    # Skip API routes (handled by other routes)
+    if path.startswith('api/'):
+        return jsonify({"error": "Not found"}), 404
+    
+    # Try to serve from public folder
+    try:
+        return send_from_directory('../public', path)
+    except Exception:
+        # If file not found, return index.html (for SPA routing)
+        try:
+            return send_from_directory('../public', 'index.html')
+        except:
+            return "File not found", 404
 
 
 # ─── Vercel Handler ──────────────────────────────────────────────────────
