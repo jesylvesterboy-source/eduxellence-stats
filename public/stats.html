@@ -177,6 +177,22 @@ code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:#f1f5f9;p
 .cc-img{width:100%;display:block}
 .dl-img{font-size:.72rem;color:var(--bl);cursor:pointer;padding:2px 8px;border:1px solid var(--bl);border-radius:6px}
 .dl-img:hover{background:rgba(30,107,255,.08)}
+/* AI STYLES (from stats.html2) */
+.ai-mode-btn{padding:6px 14px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:500;color:var(--sl);cursor:pointer;transition:all .15s}
+.ai-mode-btn:hover{border-color:var(--tl);color:var(--tl)}
+.ai-mode-btn.active{border-color:var(--tl);background:rgba(15,201,160,.1);color:var(--tl2);font-weight:600}
+.ai-box{background:linear-gradient(135deg,rgba(15,201,160,.06),rgba(30,107,255,.04));border:1.5px solid rgba(15,201,160,.3);border-radius:var(--r12);padding:1.1rem 1.4rem;margin-bottom:1.5rem}
+.ai-box-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;flex-wrap:wrap;gap:.5rem}
+.ai-box-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--ny);display:flex;align-items:center;gap:.4rem}
+.ai-badge{font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:10px}
+.ai-badge-gemini{background:linear-gradient(135deg,#4285F4,#0F9D58);color:#fff}
+.ai-badge-template{background:#F1F5F9;color:var(--sl)}
+.ai-text{font-size:.92rem;color:var(--tx);line-height:1.75}
+.ai-mode-row{display:flex;gap:.4rem;margin-top:.75rem;flex-wrap:wrap}
+.ai-switch-btn{font-size:.72rem;padding:3px 10px;border-radius:20px;border:1px solid var(--bd);background:#fff;color:var(--sl);cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif}
+.ai-switch-btn:hover{border-color:var(--bl);color:var(--bl)}
+.ai-switch-btn.active{border-color:var(--tl);color:var(--tl2);font-weight:600}
+/* END AI STYLES */
 /* LARGE FILE MODAL */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(11,24,41,.7);z-index:500;align-items:center;justify-content:center;padding:1rem}
 .modal-bg.show{display:flex}
@@ -296,12 +312,24 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
   <div class="btn-row"><button class="btn btn-s" onclick="gs(1)">← Back</button><button class="btn btn-p" id="btn3" onclick="gs(3)" disabled style="flex:1">Continue → Select Variables</button></div>
 </div>
 
-<!-- S3: VARIABLES -->
+<!-- S3: VARIABLES (with AI Mode from stats.html2) -->
 <div id="p3" class="panel">
   <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.35rem;margin-bottom:.35rem">Select Variables</h2>
   <p style="color:var(--sl);font-size:.9rem;margin-bottom:1.5rem" id="ctx-hint"></p>
   <div id="vb"></div>
   <div class="alert alert-e" id="ve"><span class="alert-ico">⚠</span><div class="al-body"><p id="ve-t"></p></div></div>
+
+  <!-- AI INTERPRETATION MODE (from stats.html2) -->
+  <div style="margin-top:1.25rem;padding:1rem 1.25rem;background:linear-gradient(135deg,rgba(15,201,160,.07),rgba(30,107,255,.05));border:1.5px solid rgba(15,201,160,.25);border-radius:var(--r12)">
+    <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;color:var(--ny);margin-bottom:.5rem">✦ AI Interpretation Mode</div>
+    <div style="font-size:.78rem;color:var(--sl);margin-bottom:.75rem">Choose how results are explained after the analysis runs.</div>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+      <button class="ai-mode-btn active" onclick="setAIMode('simple',this)">🎓 Simple</button>
+      <button class="ai-mode-btn"        onclick="setAIMode('academic',this)">📄 Academic</button>
+      <button class="ai-mode-btn"        onclick="setAIMode('executive',this)">💼 Executive</button>
+    </div>
+  </div>
+
   <div class="btn-row"><button class="btn btn-s" onclick="gs(2)">← Back</button><button class="btn btn-p" id="btn4" onclick="gs(4)" style="flex:1">Check Assumptions →</button></div>
 </div>
 
@@ -348,19 +376,19 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
   <p>For large datasets, advanced modelling, custom pipelines, or full thesis statistical support, our expert team at Eduxellence is ready.</p>
   <div class="cta-btns">
     <a href="https://eduxellence.org/#contact" class="btn-tl2">Book Free Audit →</a>
-    <a href="https://github.com/jesylvesterboy-source/eduxellence-stats" target="_blank" class="btn-gh">⭐ Star on GitHub</a>
+    <a href="https://github.com/eduxellence" target="_blank" class="btn-gh">⭐ Star on GitHub</a>
   </div>
 </section>
 
 <footer>
   <p><strong>Eduxellence Statistical Analysis Platform</strong> — free tool by <a href="https://eduxellence.org">Eduxellence Analytics</a></p>
-  <p style="margin-top:.35rem"><a href="https://eduxellence.org">Home</a> · <a href="/upload">Data Cleaner</a> · <a href="https://eduxellence.org/services">Services</a> · <a href="https://github.com/jesylvesterboy-source/eduxellence-stats">GitHub</a></p>
+  <p style="margin-top:.35rem"><a href="https://eduxellence.org">Home</a> · <a href="/upload">Data Cleaner</a> · <a href="https://eduxellence.org/services">Services</a> · <a href="https://github.com/eduxellence">GitHub</a></p>
   <p style="margin-top:.35rem;font-size:.75rem">🔒 Files are processed privately and deleted immediately · No data stored · No login required</p>
 </footer>
 
 <script>
 /* ═══════════ STATE ═══════════ */
-const S={metaPath:null,filename:null,cols:[],test:null,params:null,results:null,assumptions:[]};
+const S={metaPath:null,filename:null,cols:[],test:null,params:null,results:null,assumptions:[],aiMode:'simple'};
 
 /* ═══════════ TEST DEFS ═══════════ */
 const TESTS=[
@@ -526,7 +554,7 @@ async function runAnalysis(){
     const r=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({meta_path:S.metaPath,analysis_type:S.test,params:S.params})});
     const d=await r.json(); clearInterval(tm); hideP("anpw"); document.getElementById("btn-run").disabled=false;
     if(!r.ok||d.error){
-      // ── Check for analysis_too_large ──
+      // ── Check for analysis_too_large (from stats.html2) ──
       if(d.error === "analysis_too_large"){
         showConsultationPrompt(d.message, d.cta_text, d.cta_url);
         return;
@@ -538,7 +566,7 @@ async function runAnalysis(){
   }catch(e){clearInterval(tm);hideP("anpw");document.getElementById("btn-run").disabled=false;showA("aw","aw-t","Network error: "+e.message);}
 }
 
-// ── Show consultation prompt for large/complex analyses ──
+// ── Show consultation prompt for large/complex analyses (from stats.html2) ──
 function showConsultationPrompt(message, ctaText, ctaUrl){
   const container = document.getElementById("res-body");
   container.innerHTML = `
@@ -565,6 +593,32 @@ function renderResults(d){
   // Key stat chips
   const chips=buildChips(d);
   if(chips.length) h+=`<div class="chips">${chips.map(c=>`<div class="chip"><div class="cv ${c.cls}">${c.val}</div><div class="cl">${c.lbl}</div></div>`).join("")}</div>`;
+
+  // AI Interpretation (from stats.html2)
+  if(d.ai_interpretation){
+    const src = d.ai_source||'template';
+    const badge = src==='gemini'
+      ? '<span class="ai-badge ai-badge-gemini">✦ Gemini AI</span>'
+      : '<span class="ai-badge ai-badge-template">⚡ Smart Template</span>';
+    const modeLabels = {simple:'🎓 Student Mode',academic:'📄 Academic Mode',executive:'💼 Executive Mode'};
+    const modeLabel  = modeLabels[d.ai_mode||'simple']||'';
+    const isSimple   = (d.ai_mode||'simple')==='simple';
+    const isAcademic = (d.ai_mode||'simple')==='academic';
+    const isExec     = (d.ai_mode||'simple')==='executive';
+    h+=`<div class="ai-box">
+      <div class="ai-box-header">
+        <div class="ai-box-title">✦ AI Interpretation ${badge}</div>
+        <div style="font-size:.72rem;color:var(--sl)">${modeLabel}</div>
+      </div>
+      <div class="ai-text" id="ai-text-main">${d.ai_interpretation}</div>
+      <div class="ai-mode-row">
+        <span style="font-size:.72rem;color:var(--sl);margin-right:4px">Switch:</span>
+        <button class="ai-switch-btn ${isSimple?'active':''}"    onclick="switchAIMode('simple')">🎓 Simple</button>
+        <button class="ai-switch-btn ${isAcademic?'active':''}"  onclick="switchAIMode('academic')">📄 Academic</button>
+        <button class="ai-switch-btn ${isExec?'active':''}"      onclick="switchAIMode('executive')">💼 Executive</button>
+      </div>
+    </div>`;
+  }
 
   // APA
   if(d.apa_citation) h+=`<div class="rs"><div class="rs-title">📌 APA Citation <button onclick="copyAPA()" style="font-size:.72rem;padding:2px 8px;border:1px solid var(--bl);border-radius:6px;background:rgba(30,107,255,.08);color:var(--bl);cursor:pointer;font-family:'DM Sans',sans-serif">Copy</button></div><div class="apa"><div class="apa-l">Copy-paste into your Results section</div><div class="apa-t" id="apa-txt">${d.apa_citation}</div></div></div>`;
@@ -653,6 +707,43 @@ async function exportFmt(fmt){
   }finally{
     btn.disabled = false;
     btn.textContent = orig;
+  }
+}
+
+/* ═══════════ AI FUNCTIONS (from stats.html2) ═══════════ */
+function setAIMode(mode, el){
+  S.aiMode = mode;
+  document.querySelectorAll('.ai-mode-btn').forEach(b=>b.classList.remove('active'));
+  if(el) el.classList.add('active');
+}
+
+async function switchAIMode(mode){
+  if(!S.results||!S.metaPath) return;
+  S.aiMode = mode;
+  document.querySelectorAll('.ai-switch-btn').forEach(b=>{
+    const label = b.textContent.toLowerCase();
+    b.classList.toggle('active',
+      (mode==='simple' && label.includes('simple')) ||
+      (mode==='academic' && label.includes('academic')) ||
+      (mode==='executive' && label.includes('executive'))
+    );
+  });
+  const el = document.getElementById('ai-text-main');
+  if(el) el.textContent = 'Generating…';
+  try{
+    const r = await fetch('/api/ai-interpret',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        meta_path:S.metaPath, analysis_type:S.test,
+        params:S.params, mode
+      })
+    });
+    const d = await r.json();
+    if(el && d.ai_interpretation) el.textContent = d.ai_interpretation;
+    else if(el) el.textContent = d.error||'Could not generate interpretation.';
+  }catch(e){
+    if(el) el.textContent = 'Network error: '+e.message;
   }
 }
 
