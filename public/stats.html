@@ -326,7 +326,11 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
     <div class="rbtns">
       <button class="btn btn-s btn-sm" onclick="gs(2)">← New Test</button>
       <button class="btn btn-s btn-sm" onclick="gs(3)">Change Variables</button>
-      <button class="btn btn-ok btn-sm" id="btn-exp" onclick="exportXL()">⬇ Excel Report</button>
+      <div style="display:flex;gap:.4rem;flex-wrap:wrap">
+        <button class="btn btn-ok btn-sm" id="btn-xl"   onclick="exportFmt('xlsx')" title="Download Excel (.xlsx)">⬇ Excel</button>
+        <button class="btn btn-ok btn-sm" id="btn-docx" onclick="exportFmt('docx')" title="Download APA Word (.docx)" style="background:linear-gradient(135deg,#1E6BFF,#1452CC)">⬇ Word</button>
+        <button class="btn btn-ok btn-sm" id="btn-pdf"  onclick="exportFmt('pdf')"  title="Download PDF" style="background:linear-gradient(135deg,#DC2626,#991B1B)">⬇ PDF</button>
+      </div>
     </div>
   </div>
   <div id="res-body"></div>
@@ -344,13 +348,13 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
   <p>For large datasets, advanced modelling, custom pipelines, or full thesis statistical support, our expert team at Eduxellence is ready.</p>
   <div class="cta-btns">
     <a href="https://eduxellence.org/#contact" class="btn-tl2">Book Free Audit →</a>
-    <a href="https://github.com/eduxellence" target="_blank" class="btn-gh">⭐ Star on GitHub</a>
+    <a href="https://github.com/jesylvesterboy-source/eduxellence-stats" target="_blank" class="btn-gh">⭐ Star on GitHub</a>
   </div>
 </section>
 
 <footer>
   <p><strong>Eduxellence Statistical Analysis Platform</strong> — free tool by <a href="https://eduxellence.org">Eduxellence Analytics</a></p>
-  <p style="margin-top:.35rem"><a href="https://eduxellence.org">Home</a> · <a href="/upload">Data Cleaner</a> · <a href="https://eduxellence.org/services">Services</a> · <a href="https://github.com/eduxellence">GitHub</a></p>
+  <p style="margin-top:.35rem"><a href="https://eduxellence.org">Home</a> · <a href="/upload">Data Cleaner</a> · <a href="https://eduxellence.org/services">Services</a> · <a href="https://github.com/jesylvesterboy-source/eduxellence-stats">GitHub</a></p>
   <p style="margin-top:.35rem;font-size:.75rem">🔒 Files are processed privately and deleted immediately · No data stored · No login required</p>
 </footer>
 
@@ -521,9 +525,35 @@ async function runAnalysis(){
   try{
     const r=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({meta_path:S.metaPath,analysis_type:S.test,params:S.params})});
     const d=await r.json(); clearInterval(tm); hideP("anpw"); document.getElementById("btn-run").disabled=false;
-    if(!r.ok||d.error){showA("aw","aw-t",d.error||"Analysis failed.");return;}
+    if(!r.ok||d.error){
+      // ── Check for analysis_too_large ──
+      if(d.error === "analysis_too_large"){
+        showConsultationPrompt(d.message, d.cta_text, d.cta_url);
+        return;
+      }
+      showA("aw","aw-t",d.error||"Analysis failed.");
+      return;
+    }
     S.results=d; renderResults(d); gs(5);
   }catch(e){clearInterval(tm);hideP("anpw");document.getElementById("btn-run").disabled=false;showA("aw","aw-t","Network error: "+e.message);}
+}
+
+// ── Show consultation prompt for large/complex analyses ──
+function showConsultationPrompt(message, ctaText, ctaUrl){
+  const container = document.getElementById("res-body");
+  container.innerHTML = `
+    <div style="text-align:center;padding:2rem 1.5rem;background:linear-gradient(135deg,rgba(217,119,6,.08),rgba(217,119,6,.04));border:1.5px solid rgba(217,119,6,.25);border-radius:16px;margin:1rem 0;">
+      <div style="font-size:3rem;margin-bottom:1rem;">📦</div>
+      <h3 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--tx);margin-bottom:.75rem;">This Analysis Requires Expert Support</h3>
+      <p style="color:var(--sl);font-size:.95rem;line-height:1.7;max-width:540px;margin:0 auto 1.5rem;">${message}</p>
+      <a href="${ctaUrl}" target="_blank" class="btn-tl2" style="display:inline-flex;background:var(--wn);color:#fff;">${ctaText}</a>
+      <p style="margin-top:1.25rem;font-size:.8rem;color:var(--sl);">Our expert team handles large datasets, complex models, and full thesis support.</p>
+    </div>
+  `;
+  // Scroll to results section
+  document.getElementById("p5").scrollIntoView({behavior:"smooth"});
+  // Show results panel
+  gs(5);
 }
 
 /* ═══════════ RENDER RESULTS ═══════════ */
@@ -589,16 +619,41 @@ function bold(t){return t.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replac
 function copyAPA(){const t=document.getElementById("apa-txt")?.textContent;if(t){navigator.clipboard?.writeText(t).then(()=>{const b=event.target;b.textContent="Copied!";setTimeout(()=>b.textContent="Copy",2000);});}}
 function dlImg(i,title){const img=document.getElementById(`chart-${i}`);if(!img)return;const a=document.createElement("a");a.href=img.src;a.download=`eduxellence_${title.replace(/\s+/g,"_")}.png`;a.click();}
 
-/* ═══════════ EXPORT EXCEL ═══════════ */
-async function exportXL(){
-  const btn=document.getElementById("btn-exp"); btn.disabled=true; btn.textContent="Exporting…";
+/* ═══════════ EXPORT (xlsx / docx / pdf) ═══════════ */
+const FMT_LABELS = {xlsx:"⬇ Excel", docx:"⬇ Word", pdf:"⬇ PDF"};
+const FMT_IDS    = {xlsx:"btn-xl", docx:"btn-docx", pdf:"btn-pdf"};
+const FMT_EXT    = {xlsx:"xlsx", docx:"docx", pdf:"pdf"};
+
+async function exportFmt(fmt){
+  const btnId = FMT_IDS[fmt];
+  const btn   = document.getElementById(btnId);
+  if(!btn) return;
+  const orig = btn.textContent;
+  btn.disabled = true; btn.textContent = "Generating…";
   try{
-    const r=await fetch("/api/export",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({meta_path:S.metaPath,analysis_type:S.test,params:S.params})});
-    if(!r.ok){alert("Export failed.");return;}
-    const blob=await r.blob(); const url=URL.createObjectURL(blob); const a=document.createElement("a");
-    a.href=url; a.download=`eduxellence_${S.test}_results.xlsx`; a.click(); setTimeout(()=>URL.revokeObjectURL(url),5000);
-  }catch(e){alert("Error: "+e.message);}
-  finally{btn.disabled=false;btn.innerHTML="⬇ Excel Report";}
+    const r = await fetch("/api/export",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({meta_path:S.metaPath, analysis_type:S.test, params:S.params, format:fmt})
+    });
+    if(!r.ok){
+      const d = await r.json().catch(()=>({}));
+      alert("Export failed: " + (d.error||r.statusText));
+      return;
+    }
+    const blob = await r.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = `eduxellence_${S.test}_results.${FMT_EXT[fmt]}`;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(url), 5000);
+  }catch(e){
+    alert("Export error: " + e.message);
+  }finally{
+    btn.disabled = false;
+    btn.textContent = orig;
+  }
 }
 
 /* ═══════════ UTILS ═══════════ */
