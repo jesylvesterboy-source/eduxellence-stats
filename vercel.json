@@ -18,10 +18,10 @@
   "routes": [
     { "src": "/api/(.*)",   "dest": "api/stats_app.py" },
     { "src": "/data/(.*)",  "dest": "/data/$1" },
-    { "src": "/stats",      "dest": "api/stats_app.py" },
-    { "src": "/upload",     "dest": "api/stats_app.py" },
-    { "src": "/",           "dest": "api/stats_app.py" },
-    { "src": "/(.*)",       "dest": "public/stats.html" }
+    { "src": "/",           "dest": "public/index.html" },
+    { "src": "/stats",      "dest": "public/stats.html" },
+    { "src": "/upload",     "dest": "public/upload.html" },
+    { "src": "/(.*)",       "dest": "public/$1" }
   ],
   "headers": [
     {
