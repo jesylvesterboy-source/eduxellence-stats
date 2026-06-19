@@ -390,6 +390,11 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
 /* ═══════════ STATE ═══════════ */
 const S={metaPath:null,filename:null,cols:[],test:null,params:null,results:null,assumptions:[],aiMode:'simple'};
 
+// ===== API BASE URL - UPDATED TO HUGGING FACE =====
+// Old: const API_BASE = '';
+// New: Hugging Face Space URL
+const API_BASE = 'https://Eduxellence-eduxellence-api.hf.space';
+
 /* ═══════════ TEST DEFS ═══════════ */
 const TESTS=[
   {id:"descriptive",ico:"📊",name:"Descriptive Statistics",bdg:"dsc",bl:"Descriptive",
@@ -448,7 +453,8 @@ async function handleFile(file){
   showP("upw"); animP("up-fill","up-pct",3500,"up-lbl","Uploading…");
   const fd=new FormData(); fd.append("file",file);
   try{
-    const r=await fetch("/api/upload",{method:"POST",body:fd}); const d=await r.json();
+    // Updated to use Hugging Face API
+    const r=await fetch(`${API_BASE}/api/upload`,{method:"POST",body:fd}); const d=await r.json();
     hideP("upw");
     if(d.error==="large_file"){document.getElementById("large-modal").classList.add("show");return;}
     if(!r.ok||d.error){showA("ue","ue-t",d.error||"Upload failed.");return;}
@@ -530,7 +536,8 @@ async function checkAssumptions(){
   hideA("ve"); S.params=vp.p;
   showP("apw"); animP("ap-fill","ap-pct",2000);
   try{
-    const r=await fetch("/api/assumptions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({meta_path:S.metaPath,analysis_type:S.test,params:S.params})});
+    // Updated to use Hugging Face API
+    const r=await fetch(`${API_BASE}/api/assumptions`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({meta_path:S.metaPath,analysis_type:S.test,params:S.params})});
     const d=await r.json(); hideP("apw");
     if(d.checks?.length) renderAssumptions(d.checks,d.all_passed);
     else document.getElementById("asum-results").innerHTML=`<div class="alert alert-i show" style="margin:0"><span class="alert-ico">ℹ</span><div class="al-body"><p>No specific assumption checks for this test type. You may proceed.</p></div></div>`;
@@ -551,10 +558,10 @@ async function runAnalysis(){
   showP("anpw"); const stages=["Loading data…","Parsing columns…","Running test…","Computing effect sizes…","Generating charts…","Building interpretation…","Finalising…"];
   let t=0; const tm=setInterval(()=>{t+=100;const pct=Math.min(92,Math.round(92*(1-Math.pow(1-t/9000,2))));document.getElementById("an-fill").style.width=pct+"%";document.getElementById("an-pct").textContent=pct+"%";document.getElementById("an-sub").textContent=stages[Math.min(Math.floor(pct/(92/stages.length)),stages.length-1)];if(t>=9000)clearInterval(tm);},100);
   try{
-    const r=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({meta_path:S.metaPath,analysis_type:S.test,params:S.params})});
+    // Updated to use Hugging Face API
+    const r=await fetch(`${API_BASE}/api/analyze`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({meta_path:S.metaPath,analysis_type:S.test,params:S.params,ai_mode:S.aiMode})});
     const d=await r.json(); clearInterval(tm); hideP("anpw"); document.getElementById("btn-run").disabled=false;
     if(!r.ok||d.error){
-      // ── Check for analysis_too_large (from stats.html2) ──
       if(d.error === "analysis_too_large"){
         showConsultationPrompt(d.message, d.cta_text, d.cta_url);
         return;
@@ -566,7 +573,7 @@ async function runAnalysis(){
   }catch(e){clearInterval(tm);hideP("anpw");document.getElementById("btn-run").disabled=false;showA("aw","aw-t","Network error: "+e.message);}
 }
 
-// ── Show consultation prompt for large/complex analyses (from stats.html2) ──
+// ── Show consultation prompt for large/complex analyses ──
 function showConsultationPrompt(message, ctaText, ctaUrl){
   const container = document.getElementById("res-body");
   container.innerHTML = `
@@ -578,9 +585,7 @@ function showConsultationPrompt(message, ctaText, ctaUrl){
       <p style="margin-top:1.25rem;font-size:.8rem;color:var(--sl);">Our expert team handles large datasets, complex models, and full thesis support.</p>
     </div>
   `;
-  // Scroll to results section
   document.getElementById("p5").scrollIntoView({behavior:"smooth"});
-  // Show results panel
   gs(5);
 }
 
@@ -594,7 +599,7 @@ function renderResults(d){
   const chips=buildChips(d);
   if(chips.length) h+=`<div class="chips">${chips.map(c=>`<div class="chip"><div class="cv ${c.cls}">${c.val}</div><div class="cl">${c.lbl}</div></div>`).join("")}</div>`;
 
-  // AI Interpretation (from stats.html2)
+  // AI Interpretation
   if(d.ai_interpretation){
     const src = d.ai_source||'template';
     const badge = src==='gemini'
@@ -685,7 +690,8 @@ async function exportFmt(fmt){
   const orig = btn.textContent;
   btn.disabled = true; btn.textContent = "Generating…";
   try{
-    const r = await fetch("/api/export",{
+    // Updated to use Hugging Face API
+    const r = await fetch(`${API_BASE}/api/export`,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body: JSON.stringify({meta_path:S.metaPath, analysis_type:S.test, params:S.params, format:fmt})
@@ -710,7 +716,7 @@ async function exportFmt(fmt){
   }
 }
 
-/* ═══════════ AI FUNCTIONS (from stats.html2) ═══════════ */
+/* ═══════════ AI FUNCTIONS ═══════════ */
 function setAIMode(mode, el){
   S.aiMode = mode;
   document.querySelectorAll('.ai-mode-btn').forEach(b=>b.classList.remove('active'));
@@ -731,7 +737,8 @@ async function switchAIMode(mode){
   const el = document.getElementById('ai-text-main');
   if(el) el.textContent = 'Generating…';
   try{
-    const r = await fetch('/api/ai-interpret',{
+    // Updated to use Hugging Face API
+    const r = await fetch(`${API_BASE}/api/ai-interpret`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
