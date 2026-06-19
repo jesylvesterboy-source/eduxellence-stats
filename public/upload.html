@@ -11,9 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
-/* ═══════════════════════════════════════════════
-   RESET & BASE
-═══════════════════════════════════════════════ */
+/* ===== RESET & BASE ===== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -55,9 +53,7 @@ body {
 a { color: var(--blue); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-/* ═══════════════════════════════════════════════
-   NAV
-═══════════════════════════════════════════════ */
+/* ===== NAV ===== */
 .nav {
   background: var(--navy);
   padding: 0 2rem;
@@ -107,9 +103,7 @@ a:hover { text-decoration: underline; }
   font-weight: 600 !important;
 }
 
-/* ═══════════════════════════════════════════════
-   HERO
-═══════════════════════════════════════════════ */
+/* ===== HERO ===== */
 .hero {
   background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
   padding: 5rem 2rem 4rem;
@@ -189,9 +183,7 @@ a:hover { text-decoration: underline; }
 
 .stat-pill strong { color: var(--teal); }
 
-/* ═══════════════════════════════════════════════
-   MAIN TOOL CARD
-═══════════════════════════════════════════════ */
+/* ===== MAIN TOOL CARD ===== */
 .main-container {
   max-width: 860px;
   margin: -2rem auto 4rem;
@@ -633,9 +625,7 @@ a:hover { text-decoration: underline; }
 
 .error-box.show { display: flex; }
 
-/* ═══════════════════════════════════════════════
-   CTA SECTION
-═══════════════════════════════════════════════ */
+/* ===== CTA SECTION ===== */
 .cta-section {
   background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
   padding: 4rem 2rem;
@@ -698,9 +688,7 @@ a:hover { text-decoration: underline; }
 
 .btn-ghost:hover { background: rgba(255,255,255,.15); text-decoration: none; }
 
-/* ═══════════════════════════════════════════════
-   FOOTER
-═══════════════════════════════════════════════ */
+/* ===== FOOTER ===== */
 footer {
   background: var(--navy);
   color: rgba(255,255,255,.5);
@@ -712,9 +700,7 @@ footer {
 
 footer a { color: var(--teal); }
 
-/* ═══════════════════════════════════════════════
-   RESPONSIVE
-═══════════════════════════════════════════════ */
+/* ===== RESPONSIVE ===== */
 @media (max-width: 640px) {
   .hero { padding: 3rem 1.25rem 3rem; }
   .panel { padding: 1.5rem; }
@@ -726,7 +712,7 @@ footer a { color: var(--teal); }
 </head>
 <body>
 
-<!-- ── Nav ── -->
+<!-- Nav -->
 <nav class="nav">
   <a class="nav-logo" href="https://eduxellence.org">
     Eduxellence<span>.</span>
@@ -739,7 +725,7 @@ footer a { color: var(--teal); }
   </div>
 </nav>
 
-<!-- ── Hero ── -->
+<!-- Hero -->
 <section class="hero">
   <div class="hero-badge">✦ Free Online Tool</div>
   <h1>Clean Messy Data in<br><span>4 Seconds Flat.</span></h1>
@@ -755,7 +741,7 @@ footer a { color: var(--teal); }
   </div>
 </section>
 
-<!-- ── Main Tool ── -->
+<!-- Main Tool -->
 <div class="main-container">
   <div class="tool-card">
     <div class="tool-tabs">
@@ -909,7 +895,7 @@ footer a { color: var(--teal); }
   </div>
 </div>
 
-<!-- ── CTA ── -->
+<!-- CTA -->
 <section class="cta-section">
   <h2>Need more than a script?</h2>
   <p>Eduxellence helps research teams and enterprises with the full analytical layer — modelling, pipelines, dashboards, and insight delivery.</p>
@@ -919,7 +905,7 @@ footer a { color: var(--teal); }
   </div>
 </section>
 
-<!-- ── Footer ── -->
+<!-- Footer -->
 <footer>
   <p>
     <strong style="color:rgba(255,255,255,.7)">DataClean Pro</strong> is a free tool by
@@ -935,12 +921,15 @@ footer a { color: var(--teal); }
 </footer>
 
 <script>
-/* ═══════════════════════════════════════════════
-   STATE
-═══════════════════════════════════════════════ */
+/* ===== STATE ===== */
 let selectedFile = null;
 let cleanedBlob = null;
 let downloadFilename = "cleaned_data.xlsx";
+
+// ===== API BASE URL - UPDATED TO HUGGING FACE =====
+// Old: const API_BASE = '';
+// New: Hugging Face Space URL
+const API_BASE = 'https://Eduxellence-eduxellence-api.hf.space';
 
 const STAGES = [
   "Stripping whitespace",
@@ -956,9 +945,7 @@ const STAGES = [
   "Generating column report",
 ];
 
-/* ═══════════════════════════════════════════════
-   TAB SWITCHER
-═══════════════════════════════════════════════ */
+/* ===== TAB SWITCHER ===== */
 function switchTab(id) {
   document.querySelectorAll(".tool-tab").forEach((t, i) => {
     const ids = ["upload","howto","faq"];
@@ -968,9 +955,7 @@ function switchTab(id) {
   document.getElementById("tab-" + id).classList.add("active");
 }
 
-/* ═══════════════════════════════════════════════
-   FILE HANDLING
-═══════════════════════════════════════════════ */
+/* ===== FILE HANDLING ===== */
 const dropZone  = document.getElementById("drop-zone");
 const fileInput = document.getElementById("file-input");
 
@@ -1024,15 +1009,14 @@ function removeFile() {
   hideSuccess();
 }
 
-/* ═══════════════════════════════════════════════
-   PREVIEW
-═══════════════════════════════════════════════ */
+/* ===== PREVIEW ===== */
 async function fetchPreview(file) {
   const formData = new FormData();
   formData.append("file", file);
 
   try {
-    const resp = await fetch("/api/preview", { method: "POST", body: formData });
+    // Updated to use Hugging Face API
+    const resp = await fetch(`${API_BASE}/api/preview`, { method: "POST", body: formData });
     if (!resp.ok) return;
     const data = await resp.json();
     renderPreview(data);
@@ -1088,9 +1072,7 @@ function renderPreview(data) {
   table.innerHTML = thead + `<tbody>${tbody}</tbody>`;
 }
 
-/* ═══════════════════════════════════════════════
-   CLEANING
-═══════════════════════════════════════════════ */
+/* ===== CLEANING ===== */
 async function startCleaning() {
   if (!selectedFile) return;
 
@@ -1112,7 +1094,8 @@ async function startCleaning() {
   formData.append("file", selectedFile);
 
   try {
-    const resp = await fetch("/api/clean", { method: "POST", body: formData });
+    // Updated to use Hugging Face API
+    const resp = await fetch(`${API_BASE}/api/clean`, { method: "POST", body: formData });
 
     if (!resp.ok) {
       const errData = await resp.json().catch(() => ({ error: "Unknown error." }));
@@ -1167,9 +1150,7 @@ function resetTool() {
   cleanedBlob = null;
 }
 
-/* ═══════════════════════════════════════════════
-   PROGRESS ANIMATION
-═══════════════════════════════════════════════ */
+/* ===== PROGRESS ANIMATION ===== */
 let progressTimer = null;
 let currentProgress = 0;
 
@@ -1224,9 +1205,7 @@ function markAllStagesDone() {
   });
 }
 
-/* ═══════════════════════════════════════════════
-   SUCCESS / ERROR UI
-═══════════════════════════════════════════════ */
+/* ===== SUCCESS / ERROR UI ===== */
 function showSuccess({ rowsIn, rowsOut, rowsRemoved, missBefore, missAfter, missFixed }) {
   const section = document.getElementById("success-section");
   document.getElementById("result-grid").innerHTML = `
@@ -1255,9 +1234,7 @@ function hideError() {
   document.getElementById("error-box").classList.remove("show");
 }
 
-/* ═══════════════════════════════════════════════
-   UTILS
-═══════════════════════════════════════════════ */
+/* ===== UTILS ===== */
 function formatBytes(bytes) {
   if (bytes < 1024) return bytes + " B";
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
