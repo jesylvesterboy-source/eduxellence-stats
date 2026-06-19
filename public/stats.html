@@ -388,12 +388,22 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
 
 <script>
 /* ═══════════ STATE ═══════════ */
-const S={metaPath:null,filename:null,cols:[],test:null,params:null,results:null,assumptions:[],aiMode:'simple'};
+const S={metaPath:null,filename:null,cols:[],test:null,params:null,results:null,assumptions:[],aiMode:'simple',fileData:null};
 
 // ===== API BASE URL - UPDATED TO HUGGING FACE =====
 // Old: const API_BASE = '';
 // New: Hugging Face Space URL
 const API_BASE = 'https://Eduxellence-eduxellence-api.hf.space';
+
+// ===== Helper: Convert file to base64 =====
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = error => reject(error);
+  });
+}
 
 /* ═══════════ TEST DEFS ═══════════ */
 const TESTS=[
@@ -451,6 +461,10 @@ async function handleFile(file){
   if(!["csv","xlsx","xls"].includes(ext)){showA("ue","ue-t","Unsupported type. Use .csv, .xlsx or .xls.");return;}
   hideA("ue"); document.getElementById("finfo").style.display="none"; document.getElementById("btn2").disabled=true;
   showP("upw"); animP("up-fill","up-pct",3500,"up-lbl","Uploading…");
+  
+  // Store file data for later use in analysis
+  S.fileData = await fileToBase64(file);
+  
   const fd=new FormData(); fd.append("file",file);
   try{
     // Updated to use Hugging Face API
@@ -490,7 +504,16 @@ function renderRecs(recs){
   rb.style.display="block";
 }
 
-function resetUp(){S.metaPath=null;S.filename=null;S.cols=[];fi.value="";document.getElementById("finfo").style.display="none";document.getElementById("btn2").disabled=true;hideA("ue");}
+function resetUp(){
+  S.metaPath=null;
+  S.filename=null;
+  S.cols=[];
+  S.fileData=null;
+  fi.value="";
+  document.getElementById("finfo").style.display="none";
+  document.getElementById("btn2").disabled=true;
+  hideA("ue");
+}
 
 /* ═══════════ S2: TESTS ═══════════ */
 function renderTests(){
@@ -558,8 +581,18 @@ async function runAnalysis(){
   showP("anpw"); const stages=["Loading data…","Parsing columns…","Running test…","Computing effect sizes…","Generating charts…","Building interpretation…","Finalising…"];
   let t=0; const tm=setInterval(()=>{t+=100;const pct=Math.min(92,Math.round(92*(1-Math.pow(1-t/9000,2))));document.getElementById("an-fill").style.width=pct+"%";document.getElementById("an-pct").textContent=pct+"%";document.getElementById("an-sub").textContent=stages[Math.min(Math.floor(pct/(92/stages.length)),stages.length-1)];if(t>=9000)clearInterval(tm);},100);
   try{
-    // Updated to use Hugging Face API
-    const r=await fetch(`${API_BASE}/api/analyze`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({meta_path:S.metaPath,analysis_type:S.test,params:S.params,ai_mode:S.aiMode})});
+    // Updated to use Hugging Face API - NOW INCLUDING file_data
+    const r=await fetch(`${API_BASE}/api/analyze`,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        meta_path:S.metaPath,
+        analysis_type:S.test,
+        params:S.params,
+        ai_mode:S.aiMode,
+        file_data:S.fileData  // Add file data for the analysis
+      })
+    });
     const d=await r.json(); clearInterval(tm); hideP("anpw"); document.getElementById("btn-run").disabled=false;
     if(!r.ok||d.error){
       if(d.error === "analysis_too_large"){
