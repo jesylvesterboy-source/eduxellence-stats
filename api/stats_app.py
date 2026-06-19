@@ -200,7 +200,6 @@ def _store_chart(fig, chart_name, dpi=110, use_storage=True):
     
     size_mb = len(img_data) / (1024 * 1024)
     
-    # ── FIXED: Thread-safe filenames with UUID ──────────────────────────
     try:
         if use_storage and size_mb > 1.0 and supabase_available and supabase:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -227,7 +226,6 @@ def _store_chart(fig, chart_name, dpi=110, use_storage=True):
         return {"type": "base64", "data": result, "size_mb": round(size_mb, 2)}
     
     finally:
-        # ── FIXED: Always close figure to prevent memory leak ──────────
         plt.close(fig)
 
 def _b64(fig, dpi=110):
@@ -245,6 +243,13 @@ def _style(ax_list):
 def sp(p): return "***" if p<.001 else "**" if p<.01 else "*" if p<.05 else "ns"
 def fp(p): return "p < .001" if p<.001 else f"p = {p:.3f}"
 def verdict(p,a=.05): sig=p<a; return ("statistically significant" if sig else "not statistically significant"),("reject" if sig else "fail to reject")
+
+def get_effect_size_label(r):
+    """Return effect size label with direction."""
+    abs_r = abs(r)
+    strength = "negligible" if abs_r < 0.1 else "weak" if abs_r < 0.3 else "moderate" if abs_r < 0.5 else "strong" if abs_r < 0.7 else "very strong"
+    direction = "positive" if r > 0 else "negative"
+    return f"{direction} {strength}"
 
 # ── Validation Functions ──────────────────────────────────────────────────
 def validate_numeric_column(df, column, context=""):
@@ -701,7 +706,6 @@ def independent_ttest(df, numeric_var, group_var, alpha=.05):
     _style(ax); plt.tight_layout(); charts.append({"title":"Means with 95% CI","img":_store_chart(fig2, "ttest_means", 110)})
     
     stbl=[{"Group":str(gs[i]),"N":int(len(g)),"Mean":round(float(g.mean()),4),"Std Dev":round(float(g.std()),4),"Std Error":round(float(g.sem()),4)} for i,g in [(0,g1),(1,g2)]]
-    # ── FIXED: Correct rows_removed calculation ──────────────────────────
     rows_removed = original_rows - (len(g1) + len(g2))
     assumptions = [{"name":"Normality","passed":True,"note":"Check Q-Q plot"}]
     return {
@@ -766,10 +770,11 @@ def one_way_anova(df, numeric_var, group_var):
     _style([a1,a2]); fig.suptitle(f"ANOVA: {numeric_var} by {group_var} | F({k-1},{n_t-k})={F:.3f}, {fp(p)}, η²={eta:.3f}",fontsize=11,fontweight="bold",color=P["navy"],y=1.02)
     plt.tight_layout(); charts.append({"title":"ANOVA Group Plots","img":_store_chart(fig, "anova_plots", 110)})
     
-    from statsmodels.stats.multicomp import pairwise_tukeyhsd
+    # ── FIXED ISSUE 5: Tukey HSD Post-Hoc Tests ──────────────────────────
     posthoc = []
     if p < 0.05 and k > 2:
         try:
+            from statsmodels.stats.multicomp import pairwise_tukeyhsd
             tukey = pairwise_tukeyhsd(endog=pdf[numeric_var], groups=pdf[group_var], alpha=0.05)
             summary_data = tukey.summary().data[1:]
             for row in summary_data:
@@ -788,7 +793,6 @@ def one_way_anova(df, numeric_var, group_var):
                 posthoc.append({"Group 1":str(g_a),"Group 2":str(g_b),"Mean Diff":round(float(gdata[i].mean()-gdata[j].mean()),4),"p (Bonferroni)":round(float(tadj),4),"Significant":"Yes" if tadj<.05 else "No"})
     
     stbl=[{"Group":str(g),"N":int(len(gd)),"Mean":round(float(gd.mean()),4),"Std Dev":round(float(gd.std()),4),"Std Error":round(float(stats.sem(gd)),4),"Min":round(float(gd.min()),4),"Max":round(float(gd.max()),4)} for g,gd in zip(gs,gdata)]
-    # ── FIXED: Correct rows_removed calculation ──────────────────────────
     rows_removed = original_rows - n_t
     assumptions = [{"name":"Normality","passed":True,"note":"Check Q-Q plots per group"}]
     return {
@@ -835,7 +839,6 @@ def correlation_analysis(df, columns, method="pearson"):
         if len(num) < 2:
             return {"error": ERROR_CODES["VAL_009"], "message": "After removing constant columns, fewer than 2 numeric columns remain."}
     
-    # ── FIXED: Initialize matrices with float dtype ──────────────────────
     corr_matrix = pd.DataFrame(np.nan, index=num, columns=num, dtype=float)
     p_matrix = pd.DataFrame(np.nan, index=num, columns=num, dtype=float)
     n_matrix = pd.DataFrame(np.nan, index=num, columns=num, dtype=float)
@@ -854,8 +857,9 @@ def correlation_analysis(df, columns, method="pearson"):
             p_matrix.loc[c2, c1] = p
             n_matrix.loc[c1, c2] = len(pair_data)
             n_matrix.loc[c2, c1] = len(pair_data)
-            st = "negligible" if abs(r)<.1 else "weak" if abs(r)<.3 else "moderate" if abs(r)<.5 else "strong" if abs(r)<.7 else "very strong"
-            pairs.append({"Variable 1":c1,"Variable 2":c2,"r":round(float(r),4),"p-value":round(float(p),4),"p_display":fp(p),"Significance":sp(p),"Strength":f"{'positive' if r>0 else 'negative'} {st}"})
+            # ── FIXED ISSUE 4: Direction + Strength ──────────────────────
+            strength_label = get_effect_size_label(r)
+            pairs.append({"Variable 1":c1,"Variable 2":c2,"r":round(float(r),4),"p-value":round(float(p),4),"p_display":fp(p),"Significance":sp(p),"Strength":strength_label})
     
     for c in num:
         corr_matrix.loc[c, c] = 1.0
@@ -880,7 +884,6 @@ def correlation_analysis(df, columns, method="pearson"):
     ax.set_title(f"{method.title()} Correlation Matrix", fontsize=13, fontweight="bold", color=P["navy"])
     plt.tight_layout(); charts.append({"title":"Correlation Heatmap","img":_store_chart(fig, "correlation_heatmap", 110)})
     
-    # ── FIXED: Skip pairplot for >4 variables ─────────────────────────────
     if 2 <= len(num) <= MAX_PAIRPLOT_VARS:
         sample_size = min(MAX_PAIRPLOT_SAMPLE, len(sub))
         if len(sub) > sample_size:
@@ -892,7 +895,6 @@ def correlation_analysis(df, columns, method="pearson"):
         g.figure.patch.set_facecolor(P["white"])
         charts.append({"title":"Scatter Matrix","img":_store_chart(g.figure, "correlation_scatter", 110)})
     elif len(num) > MAX_PAIRPLOT_VARS:
-        # Skip pairplot to save memory
         charts.append({"title":"Scatter Matrix","note":"Skipped - too many variables (>4)"})
     
     if pairs:
@@ -904,7 +906,6 @@ def correlation_analysis(df, columns, method="pearson"):
         ax3.set_ylabel("r value"); ax3.set_title("Correlation Bubble Chart",fontweight="bold",color=P["navy"])
         _style(ax3); plt.tight_layout(); charts.append({"title":"Correlation Bubble Chart","img":_store_chart(fig3, "correlation_bubble", 110)})
     
-    # ── FIXED: Correct rows_removed calculation ──────────────────────────
     rows_removed = original_rows - len(sub)
     return {
         "test":f"{method.title()} Correlation","method":method,"n":int(len(sub)),"variables":num,
@@ -976,6 +977,9 @@ def linear_regression(df, dependent, predictors, robust=True, n_bootstrap=1000):
     F_stat = model.fvalue
     p_f = model.f_pvalue
     
+    # ── FIXED ISSUE 7: Get confidence intervals ──────────────────────────
+    conf_int = model.conf_int()
+    
     coef = []
     coef.append({
         "Predictor": "(Intercept)",
@@ -983,24 +987,26 @@ def linear_regression(df, dependent, predictors, robust=True, n_bootstrap=1000):
         "Std Error": round(float(model.bse[0]), 4),
         "t": round(float(model.tvalues[0]), 4),
         "p": round(float(model.pvalues[0]), 4),
-        "Significance": sp(model.pvalues[0])
+        "Significance": sp(model.pvalues[0]),
+        "CI Lower": round(float(conf_int[0][0]), 4),
+        "CI Upper": round(float(conf_int[0][1]), 4)
     })
     for i, pred in enumerate(predictors):
+        beta = model.params[i+1] * (sub[pred].std() / sub[dependent].std())
         coef.append({
             "Predictor": pred,
             "B": round(float(model.params[i+1]), 4),
             "Std Error": round(float(model.bse[i+1]), 4),
             "t": round(float(model.tvalues[i+1]), 4),
             "p": round(float(model.pvalues[i+1]), 4),
-            "Significance": sp(model.pvalues[i+1])
+            "Significance": sp(model.pvalues[i+1]),
+            "Beta": round(float(beta), 4),
+            "CI Lower": round(float(conf_int[i+1][0]), 4),
+            "CI Upper": round(float(conf_int[i+1][1]), 4)
         })
-        # ── FIXED: Add standardized coefficients (Beta) ──────────────────
-        beta = model.params[i+1] * (sub[pred].std() / sub[dependent].std())
-        coef[i+1]["Beta"] = round(float(beta), 4)
     
-    # ── FIXED: Bootstrap with dynamic iterations ──────────────────────────
+    # Bootstrap
     if n_bootstrap > 0:
-        # Dynamic bootstrap iterations based on sample size
         if n_obs > 5000:
             n_bootstrap_iter = 200
         elif n_obs > 1000:
@@ -1027,39 +1033,73 @@ def linear_regression(df, dependent, predictors, robust=True, n_bootstrap=1000):
             lower = np.percentile(boot_params, 2.5, axis=0)
             upper = np.percentile(boot_params, 97.5, axis=0)
             for i, c in enumerate(coef):
-                c["CI_lower"] = round(float(lower[i]), 4)
-                c["CI_upper"] = round(float(upper[i]), 4)
+                c["CI_lower_boot"] = round(float(lower[i]), 4)
+                c["CI_upper_boot"] = round(float(upper[i]), 4)
         else:
             warnings_list.append("Bootstrap failed - too many singular samples")
     
     influence = model.get_influence()
     cooks_d = influence.cooks_distance[0]
     
+    # ── FIXED ISSUE 3: Cook's Distance threshold ──────────────────────────
     cooks_threshold = 4 / n_obs
     cooks_passed = float(cooks_d.max()) < cooks_threshold
     
+    # ── FIXED ISSUE 2: Safe VIF calculation ──────────────────────────────
     from statsmodels.stats.outliers_influence import variance_inflation_factor
     vif_data = []
     for i in range(X.shape[1]):
         if i == 0:
             continue
-        vif = variance_inflation_factor(X, i)
+        try:
+            vif = variance_inflation_factor(X, i)
+        except:
+            vif = np.inf
+            warnings_list.append(f"VIF calculation failed for {predictors[i-1]}. Setting to infinity.")
         vif_data.append({
             "Variable": predictors[i-1],
-            "VIF": round(float(vif), 3),
-            "Interpretation": get_vif_label(vif)
+            "VIF": round(float(vif), 3) if vif != np.inf else "∞",
+            "Interpretation": get_vif_label(vif) if vif != np.inf else "severe"
         })
     
-    # ── FIXED: Add Durbin-Watson test ──────────────────────────────────────
+    # ── FIXED ISSUE 6: Add numerical assumption tests ──────────────────────
     from statsmodels.stats.stattools import durbin_watson
     dw_stat = durbin_watson(model.resid)
     
-    # Regression diagnostics plots
+    # Shapiro-Wilk for residual normality
+    if len(model.resid) < 5000:
+        try:
+            sw_s, sw_p2 = stats.shapiro(model.resid)
+            normality_passed = sw_p2 > 0.05
+            normality_stat = round(float(sw_s), 4)
+            normality_test = "Shapiro-Wilk"
+        except:
+            sw_s, sw_p2 = np.nan, np.nan
+            normality_passed = False
+            normality_stat = None
+            normality_test = "Shapiro-Wilk (failed)"
+    else:
+        from scipy.stats import normaltest
+        k2_stat, k2_p = normaltest(model.resid)
+        normality_passed = k2_p > 0.05
+        normality_stat = round(float(k2_stat), 4)
+        normality_test = "D'Agostino K²"
+    
+    # Breusch-Pagan for homoscedasticity
+    from statsmodels.stats.diagnostic import het_breuschpagan
+    bp_test = het_breuschpagan(model.resid, model.model.exog)
+    homoscedasticity_passed = bp_test[1] > 0.05
+    
+    # ── FIXED ISSUE 1: Fixed Actual vs Predicted plot ─────────────────────
     fig, axes = plt.subplots(2, 2, figsize=(12, 10))
     fig.patch.set_facecolor(P["white"])
     
+    # Fixed: Use min/max of both actual and predicted for the reference line
+    mn = min(model.fittedvalues.min(), y.min())
+    mx = max(model.fittedvalues.max(), y.max())
+    
     axes[0, 0].scatter(model.fittedvalues, y, alpha=0.6, color=P["blue"], s=40)
-    axes[0, 0].plot([y.min(), y.max()], [y.min(), y.max()], linestyle='--', color=P["err"], lw=2)
+    axes[0, 0].plot([mn, mx], [mn, mx], linestyle='--', color=P["err"], lw=2)
     axes[0, 0].set_xlabel("Predicted"); axes[0, 0].set_ylabel("Actual")
     axes[0, 0].set_title("Actual vs Predicted", fontweight="bold", color=P["navy"])
     
@@ -1108,32 +1148,20 @@ def linear_regression(df, dependent, predictors, robust=True, n_bootstrap=1000):
     vrd, h0 = verdict(p_f)
     label = "Simple" if len(predictors) == 1 else "Multiple"
     
-    # ── FIXED: Correct rows_removed calculation ──────────────────────────
     rows_removed = original_rows - len(sub)
     
-    # Assumptions diagnostics with Durbin-Watson
-    assumptions = []
-    if len(model.resid) < 5000:
-        try:
-            sw_s, sw_p2 = stats.shapiro(model.resid)
-            assumptions.append({"name":"Normality of Residuals","test":"Shapiro-Wilk","statistic":round(float(sw_s),4),"p_value":round(float(sw_p2),4),"passed":sw_p2>0.05})
-        except:
-            assumptions.append({"name":"Normality of Residuals","test":"Shapiro-Wilk","passed":False,"note":"Could not compute"})
-    else:
-        from scipy.stats import normaltest
-        k2_stat, k2_p = normaltest(model.resid)
-        assumptions.append({"name":"Normality of Residuals","test":"D'Agostino K²","statistic":round(float(k2_stat),4),"p_value":round(float(k2_p),4),"passed":k2_p>0.05})
-    
-    from statsmodels.stats.diagnostic import het_breuschpagan
-    bp_test = het_breuschpagan(model.resid, model.model.exog)
-    assumptions.append({"name":"Homoscedasticity","test":"Breusch-Pagan","p_value":round(float(bp_test[1]),4),"passed":bp_test[1]>0.05})
+    # ── FIXED ISSUE 6: Updated assumptions with numerical tests ──────────
+    assumptions = [
+        {"name":"Normality of Residuals","test":normality_test,"statistic":normality_stat,"passed":normality_passed},
+        {"name":"Homoscedasticity","test":"Breusch-Pagan","p_value":round(float(bp_test[1]),4),"passed":homoscedasticity_passed},
+        {"name":"No Autocorrelation","test":"Durbin-Watson","statistic":round(float(dw_stat),3),"passed":1.5 < dw_stat < 2.5}
+    ]
     
     if len(predictors) > 1:
-        max_vif = max([v["VIF"] for v in vif_data]) if vif_data else 0
-        assumptions.append({"name":"Multicollinearity","test":"VIF","max_vif":round(float(max_vif),3),"passed":max_vif<10 if max_vif else True})
+        max_vif = max([v["VIF"] for v in vif_data if v["VIF"] != "∞"]) if vif_data else 0
+        assumptions.append({"name":"Multicollinearity","test":"VIF","max_vif":max_vif,"passed":max_vif < 10 if max_vif else True})
     
     assumptions.append({"name":"Influential Points","test":"Cook's Distance","max_cooks":round(float(cooks_d.max()),4),"passed":cooks_passed})
-    assumptions.append({"name":"No Autocorrelation","test":"Durbin-Watson","statistic":round(float(dw_stat),3),"passed":1.5 < dw_stat < 2.5})
     
     return {
         "test": f"{label} Linear Regression",
@@ -1217,7 +1245,6 @@ def logistic_regression(df, dependent, predictors):
     if np.linalg.matrix_rank(X) < X.shape[1]:
         raise SingularMatrixError(ERROR_CODES["ERR_003"])
     
-    # ── FIXED: Convergence fallback hierarchy ──────────────────────────────
     model = None
     methods = ['bfgs', 'lbfgs', 'newton']
     for method in methods:
@@ -1235,7 +1262,9 @@ def logistic_regression(df, dependent, predictors):
     if not model.mle_retvals['converged']:
         warnings_list.append("Model did not converge. Results may be unreliable.")
     
-    # Coefficient table
+    # Coefficient table with confidence intervals
+    conf_int = model.conf_int()
+    
     coef = []
     coef.append({
         "Predictor": "(Intercept)",
@@ -1243,32 +1272,39 @@ def logistic_regression(df, dependent, predictors):
         "Std Error": round(float(model.bse[0]), 4),
         "z": round(float(model.tvalues[0]), 4),
         "p-value": round(float(model.pvalues[0]), 4),
-        "Odds Ratio": round(float(np.exp(model.params[0])), 4)
+        "Odds Ratio": round(float(np.exp(model.params[0])), 4),
+        "CI Lower": round(float(conf_int[0][0]), 4),
+        "CI Upper": round(float(conf_int[0][1]), 4)
     })
     for i, pred in enumerate(predictors):
+        beta = model.params[i+1] * (sub[pred].std())
         coef.append({
             "Predictor": pred,
             "Coefficient": round(float(model.params[i+1]), 4),
             "Std Error": round(float(model.bse[i+1]), 4),
             "z": round(float(model.tvalues[i+1]), 4),
             "p-value": round(float(model.pvalues[i+1]), 4),
-            "Odds Ratio": round(float(np.exp(model.params[i+1])), 4)
+            "Odds Ratio": round(float(np.exp(model.params[i+1])), 4),
+            "Beta": round(float(beta), 4),
+            "CI Lower": round(float(conf_int[i+1][0]), 4),
+            "CI Upper": round(float(conf_int[i+1][1]), 4)
         })
-        # Standardized coefficients
-        beta = model.params[i+1] * (sub[pred].std())
-        coef[i+1]["Beta"] = round(float(beta), 4)
     
-    # VIF
+    # VIF with safe calculation
     from statsmodels.stats.outliers_influence import variance_inflation_factor
     vif_data = []
     for i in range(X.shape[1]):
         if i == 0:
             continue
-        vif = variance_inflation_factor(X, i)
+        try:
+            vif = variance_inflation_factor(X, i)
+        except:
+            vif = np.inf
+            warnings_list.append(f"VIF calculation failed for {predictors[i-1]}. Setting to infinity.")
         vif_data.append({
             "Variable": predictors[i-1],
-            "VIF": round(float(vif), 3),
-            "Interpretation": get_vif_label(vif)
+            "VIF": round(float(vif), 3) if vif != np.inf else "∞",
+            "Interpretation": get_vif_label(vif) if vif != np.inf else "severe"
         })
     
     # Predictions
@@ -1284,7 +1320,6 @@ def logistic_regression(df, dependent, predictors):
     f1 = f1_score(y, y_pred, zero_division=0)
     auc = roc_auc_score(y, y_pred_proba)
     
-    # ── FIXED: Hosmer-Lemeshow with import fallback ──────────────────────
     try:
         from statsmodels.stats.diagnostic import hosmer_lemeshow
         hl_stat, hl_p = hosmer_lemeshow(y, y_pred_proba)
@@ -1292,7 +1327,6 @@ def logistic_regression(df, dependent, predictors):
         hl_stat, hl_p = None, None
         warnings_list.append("Could not compute Hosmer-Lemeshow test")
     
-    # ── FIXED: Correct rows_removed calculation ──────────────────────────
     rows_removed = original_rows - len(sub)
     
     return {
@@ -1377,7 +1411,6 @@ def mann_whitney(df, numeric_var, group_var):
     _style(ax); plt.tight_layout()
     charts.append({"title":"Mann-Whitney Violin","img":_store_chart(fig, "mannwhitney_violin", 110)})
     
-    # ── FIXED: Correct rows_removed calculation ──────────────────────────
     rows_removed = original_rows - (len(g1) + len(g2))
     return {
         "test":"Mann-Whitney U Test","u_statistic":round(float(U),2),"p_value":round(float(p),4),
@@ -1432,7 +1465,7 @@ def kruskal_wallis(df, numeric_var, group_var):
     _style(ax); plt.tight_layout()
     charts.append({"title":"Kruskal-Wallis Box Plot","img":_store_chart(fig, "kruskal_boxplot", 110)})
     
-    # Dunn's post-hoc test
+    # ── FIXED ISSUE 5: Dunn's Post-Hoc Test ──────────────────────────────
     posthoc = []
     if p < 0.05 and len(gs) > 2:
         try:
@@ -1463,7 +1496,6 @@ def kruskal_wallis(df, numeric_var, group_var):
         except Exception as e:
             warnings_list.append(f"Post-hoc test failed: {str(e)}")
     
-    # ── FIXED: Correct rows_removed calculation ──────────────────────────
     rows_removed = original_rows - n_t
     return {
         "test":"Kruskal-Wallis H Test","h_statistic":round(float(H),4),"p_value":round(float(p),4),
@@ -1623,6 +1655,38 @@ import os
 
 app = Flask(__name__)
 
+# ─── Determine the correct public directory path ────────────────────────
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PUBLIC_DIR = None
+
+possible_public_paths = [
+    os.path.join(BASE_DIR, 'public'),
+    os.path.join(os.path.dirname(BASE_DIR), 'public'),
+    os.path.join(BASE_DIR, '..', 'public'),
+    os.path.join(BASE_DIR, '..', '..', 'public'),
+    'public',
+    '../public',
+]
+
+for path in possible_public_paths:
+    if os.path.exists(path) and os.path.isdir(path):
+        PUBLIC_DIR = path
+        logger.info(f"✅ Found public directory: {PUBLIC_DIR}")
+        break
+
+if PUBLIC_DIR is None:
+    PUBLIC_DIR = os.path.join(BASE_DIR, 'public')
+    logger.warning(f"⚠️ Public directory not found, using: {PUBLIC_DIR}")
+
+try:
+    if os.path.exists(PUBLIC_DIR):
+        logger.info(f"📁 Files in public dir: {os.listdir(PUBLIC_DIR)}")
+    else:
+        logger.error(f"❌ Public directory does not exist: {PUBLIC_DIR}")
+except Exception as e:
+    logger.error(f"Error listing public dir: {e}")
+
+
 # ─── File Upload Endpoint ────────────────────────────────────────────────
 @app.route('/api/upload', methods=['POST'])
 def api_upload():
@@ -1634,7 +1698,6 @@ def api_upload():
     if file.filename == '':
         return jsonify({"error": "Empty filename"}), 400
     
-    # Check file size (10 MB limit)
     file.seek(0, 2)
     file_size = file.tell()
     file.seek(0)
@@ -1642,7 +1705,6 @@ def api_upload():
         return jsonify({"error": "large_file"}), 413
     
     try:
-        # Parse based on extension
         ext = file.filename.split('.')[-1].lower()
         if ext == 'csv':
             df = pd.read_csv(file)
@@ -1651,16 +1713,13 @@ def api_upload():
         else:
             return jsonify({"error": f"Unsupported file type: {ext}"}), 400
         
-        # Clean and validate
         df = prepare_dataframe(df)
         
-        # Generate metadata path (store temporarily)
         meta_id = str(uuid.uuid4())[:8]
         temp_dir = tempfile.mkdtemp()
         meta_path = os.path.join(temp_dir, f"{meta_id}.parquet")
         df.to_parquet(meta_path, index=False)
         
-        # Build column metadata
         columns = []
         for col in df.columns:
             is_numeric = pd.to_numeric(df[col], errors='coerce').notna().sum() > len(df) * 0.5
@@ -1677,10 +1736,7 @@ def api_upload():
                 "missing_pct": missing_pct
             })
         
-        # Preview
         preview = df.head(10).replace({np.nan: None}).to_dict('records')
-        
-        # Recommendations
         recommendations = recommend_tests(df, columns)
         
         return jsonify({
@@ -1746,30 +1802,24 @@ def api_analyze():
     if not meta_path or not analysis_type:
         return jsonify({"error": "Missing meta_path or analysis_type"}), 400
     
-    # Rate limiting
     client_ip = request.remote_addr
     
     try:
         df = pd.read_parquet(meta_path)
         df = prepare_dataframe(df)
         
-        # Check limits
         check_analysis_limits(df, analysis_type, params)
         
-        # Run analysis
         result = run_analysis(df, analysis_type, params, client_ip)
         
-        # Add metadata
         result['analysis_label'] = ANALYSIS_LABELS.get(analysis_type, analysis_type)
         result['generated_at'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         result['ai_mode'] = ai_mode
         
-        # Generate AI interpretation if available
         if 'interpretation' in result and result['interpretation']:
             result['ai_interpretation'] = result['interpretation']
             result['ai_source'] = 'template'
         
-        # Cleanup temp file
         try:
             os.remove(meta_path)
             os.rmdir(os.path.dirname(meta_path))
@@ -1814,17 +1864,14 @@ def api_export():
         df = pd.read_parquet(meta_path)
         df = prepare_dataframe(df)
         
-        # Run analysis to get results
         result = run_analysis(df, analysis_type, params)
         
         if format_type == 'xlsx':
-            # Create Excel export
             import pandas as pd
             from openpyxl.styles import Font, PatternFill, Alignment
             
             output = io.BytesIO()
             with pd.ExcelWriter(output, engine='openpyxl') as writer:
-                # Summary sheet
                 summary = {
                     'Analysis': analysis_type,
                     'Generated': datetime.now().strftime("%Y-%m-%d %H:%M"),
@@ -1832,13 +1879,11 @@ def api_export():
                 }
                 pd.DataFrame([summary]).T.to_excel(writer, sheet_name='Summary', header=False)
                 
-                # Results tables
                 table_keys = ['numeric_summary', 'summary_table', 'coef_table', 'pairs_table', 'posthoc_table']
                 for key in table_keys:
                     if result.get(key):
                         pd.DataFrame(result[key]).to_excel(writer, sheet_name=key[:31], index=False)
                 
-                # Clean up
                 for ws in writer.book.worksheets:
                     for row in ws.iter_rows():
                         for cell in row:
@@ -1855,7 +1900,6 @@ def api_export():
             )
         
         elif format_type == 'docx':
-            # Word export - requires python-docx
             try:
                 from docx import Document
                 from docx.shared import Pt, Inches
@@ -1887,7 +1931,6 @@ def api_export():
                 return jsonify({"error": "Word export requires python-docx"}), 500
         
         elif format_type == 'pdf':
-            # PDF export - requires reportlab
             try:
                 from reportlab.lib.pagesizes import letter
                 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
@@ -1955,7 +1998,6 @@ def api_ai_interpret():
         
         result = run_analysis(df, analysis_type, params)
         
-        # Generate different interpretation based on mode
         base_text = result.get('interpretation', '')
         
         if mode == 'simple':
@@ -1963,7 +2005,7 @@ def api_ai_interpret():
             interpretation = interpretation.replace('not statistically significant', '📌 NOT significant')
         elif mode == 'executive':
             interpretation = f"📊 **Executive Summary**: {base_text[:200]}..."
-        else:  # academic
+        else:
             interpretation = base_text
         
         return jsonify({
@@ -2007,7 +2049,7 @@ def api_root():
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# DEBUG ENDPOINT - Check where files are located
+# DEBUG ENDPOINT
 # ═══════════════════════════════════════════════════════════════════════════
 
 @app.route('/debug')
@@ -2017,107 +2059,63 @@ def debug():
     import json
     
     debug_info = {
+        'base_directory': BASE_DIR,
+        'public_directory': PUBLIC_DIR,
+        'public_exists': os.path.exists(PUBLIC_DIR),
+        'files_in_public': os.listdir(PUBLIC_DIR) if os.path.exists(PUBLIC_DIR) else [],
         'current_directory': os.getcwd(),
         'files_in_current': os.listdir('.') if os.path.exists('.') else [],
-        'files_in_public': os.listdir('public') if os.path.exists('public') else [],
-        'files_in_parent_public': os.listdir('../public') if os.path.exists('../public') else [],
         'files_in_parent': os.listdir('..') if os.path.exists('..') else [],
-        'python_path': sys.path[:5],
     }
     
     return jsonify(debug_info)
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# SERVE HTML PAGES — FIXED WITH MULTIPLE PATH ATTEMPTS
+# SERVE HTML PAGES
 # ═══════════════════════════════════════════════════════════════════════════
 
 @app.route('/')
 def serve_index():
     """Serve the main index.html page."""
-    # Try multiple possible paths
-    possible_paths = [
-        ('public', 'index.html'),
-        ('.', 'public/index.html'),
-        ('../public', 'index.html'),
-        ('.', 'index.html'),
-        ('..', 'public/index.html'),
-    ]
-    
-    for directory, filename in possible_paths:
-        try:
-            return send_from_directory(directory, filename)
-        except:
-            continue
-    
-    return "index.html not found in any location", 404
+    try:
+        return send_from_directory(PUBLIC_DIR, 'index.html')
+    except Exception as e:
+        return f"index.html not found in {PUBLIC_DIR}: {str(e)}", 404
 
 @app.route('/stats')
 def serve_stats():
     """Serve the stats.html page."""
-    possible_paths = [
-        ('public', 'stats.html'),
-        ('.', 'public/stats.html'),
-        ('../public', 'stats.html'),
-        ('.', 'stats.html'),
-    ]
-    
-    for directory, filename in possible_paths:
-        try:
-            return send_from_directory(directory, filename)
-        except:
-            continue
-    
-    return "stats.html not found", 404
+    try:
+        return send_from_directory(PUBLIC_DIR, 'stats.html')
+    except Exception as e:
+        return f"stats.html not found in {PUBLIC_DIR}: {str(e)}", 404
 
 @app.route('/upload')
 def serve_upload():
     """Serve the upload.html page."""
-    possible_paths = [
-        ('public', 'upload.html'),
-        ('.', 'public/upload.html'),
-        ('../public', 'upload.html'),
-        ('.', 'upload.html'),
-    ]
-    
-    for directory, filename in possible_paths:
-        try:
-            return send_from_directory(directory, filename)
-        except:
-            continue
-    
-    return "upload.html not found", 404
+    try:
+        return send_from_directory(PUBLIC_DIR, 'upload.html')
+    except Exception as e:
+        return f"upload.html not found in {PUBLIC_DIR}: {str(e)}", 404
 
 @app.route('/<path:path>')
 def serve_static(path):
     """Serve static files from public folder."""
-    # Skip API routes (handled by other routes)
     if path.startswith('api/'):
         return jsonify({"error": "Not found"}), 404
     
-    # Try multiple paths
-    possible_paths = [
-        ('public', path),
-        ('.', 'public/' + path),
-        ('../public', path),
-    ]
-    
-    for directory, filename in possible_paths:
-        try:
-            return send_from_directory(directory, filename)
-        except:
-            continue
-    
-    return "File not found", 404
+    try:
+        return send_from_directory(PUBLIC_DIR, path)
+    except Exception:
+        return "File not found", 404
 
 
 # ─── Vercel Handler ──────────────────────────────────────────────────────
-# This is what Vercel looks for
 app = app
 
 
 # ─── Local Development ────────────────────────────────────────────────────
 if __name__ == '__main__':
-    # Run locally for testing
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
