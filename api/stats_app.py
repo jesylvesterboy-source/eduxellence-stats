@@ -21,18 +21,24 @@ from datetime import datetime
 import time
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
 
-# ── Version Metadata ──────────────────────────────────────────────────────
+# ===== IMPORTANT: Flask must be imported and app created at the top =====
+from flask import Flask, request, jsonify, send_file, send_from_directory
+
+# ===== Create Flask app IMMEDIATELY for Vercel's static scanner =====
+app = Flask(__name__)
+
+# ===== Version Metadata =====
 ENGINE_VERSION = "2.3.0"
 ENGINE_BUILD = datetime.now().strftime("%Y%m%d")
 
-# ── Configure Logging ──────────────────────────────────────────────────────
+# ===== Configure Logging =====
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
-# ── Constants ──────────────────────────────────────────────────────────────
+# ===== Constants =====
 MAX_RUNTIME_SECONDS = 25
 MAX_MEMORY_MB = 500
 MAX_CHARTS = 10
@@ -45,7 +51,7 @@ MAX_PREDICTORS = 10
 RANDOM_SEED = 42
 API_RATE_LIMIT = 10
 
-# ── Error Codes ────────────────────────────────────────────────────────────
+# ===== Error Codes =====
 ERROR_CODES = {
     "VAL_001": "Column not found in dataset",
     "VAL_002": "Column contains no valid numeric data",
@@ -69,12 +75,12 @@ ERROR_CODES = {
     "ERR_005": "Logistic regression failed to converge",
 }
 
-# ── Targeted Warnings Filtering ──────────────────────────────────────────
+# ===== Targeted Warnings Filtering =====
 warnings.filterwarnings("ignore", category=UserWarning, module="matplotlib")
 warnings.filterwarnings("ignore", category=FutureWarning, module="pandas")
 warnings.filterwarnings("ignore", category=UserWarning, module="seaborn")
 
-# ── Supabase Storage Integration ──────────────────────────────────────────
+# ===== Supabase Storage Integration =====
 try:
     from supabase import create_client, Client
     SUPABASE_URL = os.environ.get("SUPABASE_URL")
@@ -91,7 +97,7 @@ except ImportError:
     supabase = None
     logger.warning("Supabase package not installed. Charts will use base64 encoding.")
 
-# ── Custom Exceptions ──────────────────────────────────────────────────────
+# ===== Custom Exceptions =====
 class AnalysisTooLargeError(Exception):
     pass
 
@@ -113,7 +119,7 @@ class SingularMatrixError(Exception):
 class PerfectSeparationError(Exception):
     pass
 
-# ── API Rate Limiting ────────────────────────────────────────────────────
+# ===== API Rate Limiting =====
 _rate_limit_store = {}
 
 def check_rate_limit(ip_address, limit=API_RATE_LIMIT, window_seconds=60):
@@ -136,7 +142,7 @@ def check_rate_limit(ip_address, limit=API_RATE_LIMIT, window_seconds=60):
     _rate_limit_store[ip_address].append(current_time)
     return True
 
-# ── Memory Check ──────────────────────────────────────────────────────────
+# ===== Memory Check =====
 def check_memory_usage(df, max_memory_mb=MAX_MEMORY_MB):
     memory_mb = df.memory_usage(deep=True).sum() / (1024 * 1024)
     if memory_mb > max_memory_mb:
@@ -146,7 +152,7 @@ def check_memory_usage(df, max_memory_mb=MAX_MEMORY_MB):
         )
     return memory_mb
 
-# ── Timeout Protection ────────────────────────────────────────────────────
+# ===== Timeout Protection =====
 def with_timeout(timeout_seconds=MAX_RUNTIME_SECONDS):
     def decorator(func):
         def wrapper(*args, **kwargs):
@@ -162,7 +168,7 @@ def with_timeout(timeout_seconds=MAX_RUNTIME_SECONDS):
         return wrapper
     return decorator
 
-# ── System Metadata ──────────────────────────────────────────────────────
+# ===== System Metadata =====
 def get_system_metadata():
     import sys, platform
     import statsmodels, scipy, pandas, matplotlib, seaborn
@@ -181,7 +187,7 @@ def get_system_metadata():
         "random_seed": RANDOM_SEED
     }
 
-# ── Brand palette ──────────────────────────────────────────────────────────
+# ===== Brand palette =====
 P = {
     "navy":"#0B1829","navy2":"#112240","blue":"#1E6BFF","blue2":"#4B8AFF",
     "teal":"#0FC9A0","teal2":"#09A882","white":"#FFFFFF","off":"#F7F9FC",
@@ -190,7 +196,7 @@ P = {
 }
 PAL = ["#1E6BFF","#0FC9A0","#F59E0B","#8B5CF6","#EC4899","#EF4444","#10B981","#F97316","#06B6D4","#84CC16"]
 
-# ── Chart Storage Handler ──────────────────────────────────────────────────
+# ===== Chart Storage Handler =====
 def _store_chart(fig, chart_name, dpi=110, use_storage=True):
     """Store chart either as base64 (small) or Supabase Storage (large)."""
     buf = io.BytesIO()
@@ -251,7 +257,7 @@ def get_effect_size_label(r):
     direction = "positive" if r > 0 else "negative"
     return f"{direction} {strength}"
 
-# ── Validation Functions ──────────────────────────────────────────────────
+# ===== Validation Functions =====
 def validate_numeric_column(df, column, context=""):
     if column not in df.columns:
         raise ValidationError(f"{ERROR_CODES['VAL_001']}: {column}{': ' + context if context else ''}")
@@ -293,7 +299,7 @@ def validate_no_duplicate_columns(df):
         df.columns = pd.io.parsers.ParserBase({'names': df.columns})._maybe_dedup_names(df.columns)
     return df
 
-# ── Data Cleaning ──────────────────────────────────────────────────────────
+# ===== Data Cleaning =====
 def prepare_dataframe(df):
     logger.info(f"Preparing dataframe with {len(df)} rows and {len(df.columns)} columns")
     df = df.replace([np.inf, -np.inf], np.nan)
@@ -361,7 +367,7 @@ def get_missing_summary(df):
             }
     return missing_summary
 
-# ── Assumption Checker ──────────────────────────────────────────────────────
+# ===== Assumption Checker =====
 def check_assumptions(df, test_type, params):
     checks = []
     def chk(name, passed, note, suggestion="", fix=None):
@@ -412,10 +418,7 @@ def check_assumptions(df, test_type, params):
 
     return checks
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# SMART TEST RECOMMENDER
-# ══════════════════════════════════════════════════════════════════════════════
+# ===== SMART TEST RECOMMENDER =====
 def recommend_tests(df, columns):
     cols = {c["name"]: c for c in columns}
     num = [c["name"] for c in columns if c["dtype"].startswith("num") and c["n_unique"]>5]
@@ -441,10 +444,7 @@ def recommend_tests(df, columns):
         suggestions.append({"test":"mann_whitney","reason":"Non-parametric alternative.","priority":4})
     return sorted(suggestions, key=lambda x: x["priority"])
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# DESCRIPTIVE STATISTICS
-# ══════════════════════════════════════════════════════════════════════════════
+# ===== DESCRIPTIVE STATISTICS =====
 @with_timeout(MAX_RUNTIME_SECONDS)
 def descriptive_statistics(df, columns):
     check_analysis_limits(df, "descriptive", {"columns": columns})
@@ -574,10 +574,7 @@ def descriptive_statistics(df, columns):
         "reproducibility": get_system_metadata()
     }
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# CHI-SQUARE
-# ══════════════════════════════════════════════════════════════════════════════
+# ===== CHI-SQUARE =====
 @with_timeout(MAX_RUNTIME_SECONDS)
 def chi_square_test(df, var1, var2):
     validate_categorical_column(df, var1, "for chi-square test")
@@ -655,10 +652,7 @@ def _chi_square_result(ct, chi2, p, dof, test_name, extra, original_rows, cleane
             "interpretation":f"A {test_name} examined the relationship between {ct.index.name} and {ct.columns.name}. "
                 f"The association was {vrd}, {fp(p)}. We therefore {h0} the null hypothesis."}
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# T-TEST
-# ══════════════════════════════════════════════════════════════════════════════
+# ===== T-TEST =====
 @with_timeout(MAX_RUNTIME_SECONDS)
 def independent_ttest(df, numeric_var, group_var, alpha=.05):
     validate_numeric_column(df, numeric_var, "for t-test")
@@ -732,10 +726,7 @@ def independent_ttest(df, numeric_var, group_var, alpha=.05):
         "reproducibility": get_system_metadata()
     }
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# ANOVA
-# ══════════════════════════════════════════════════════════════════════════════
+# ===== ANOVA =====
 @with_timeout(MAX_RUNTIME_SECONDS)
 def one_way_anova(df, numeric_var, group_var):
     validate_numeric_column(df, numeric_var, "for ANOVA")
@@ -770,7 +761,7 @@ def one_way_anova(df, numeric_var, group_var):
     _style([a1,a2]); fig.suptitle(f"ANOVA: {numeric_var} by {group_var} | F({k-1},{n_t-k})={F:.3f}, {fp(p)}, η²={eta:.3f}",fontsize=11,fontweight="bold",color=P["navy"],y=1.02)
     plt.tight_layout(); charts.append({"title":"ANOVA Group Plots","img":_store_chart(fig, "anova_plots", 110)})
     
-    # ── FIXED ISSUE 5: Tukey HSD Post-Hoc Tests ──────────────────────────
+    # Tukey HSD Post-Hoc Tests
     posthoc = []
     if p < 0.05 and k > 2:
         try:
@@ -816,10 +807,7 @@ def one_way_anova(df, numeric_var, group_var):
         "reproducibility": get_system_metadata()
     }
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# CORRELATION
-# ══════════════════════════════════════════════════════════════════════════════
+# ===== CORRELATION =====
 @with_timeout(MAX_RUNTIME_SECONDS)
 def correlation_analysis(df, columns, method="pearson"):
     num = [c for c in columns if pd.to_numeric(df[c],errors="coerce").notna().sum()>len(df)*.4]
@@ -857,7 +845,7 @@ def correlation_analysis(df, columns, method="pearson"):
             p_matrix.loc[c2, c1] = p
             n_matrix.loc[c1, c2] = len(pair_data)
             n_matrix.loc[c2, c1] = len(pair_data)
-            # ── FIXED ISSUE 4: Direction + Strength ──────────────────────
+            # Direction + Strength
             strength_label = get_effect_size_label(r)
             pairs.append({"Variable 1":c1,"Variable 2":c2,"r":round(float(r),4),"p-value":round(float(p),4),"p_display":fp(p),"Significance":sp(p),"Strength":strength_label})
     
@@ -927,10 +915,7 @@ def correlation_analysis(df, columns, method="pearson"):
         "reproducibility": get_system_metadata()
     }
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# LINEAR REGRESSION
-# ══════════════════════════════════════════════════════════════════════════════
+# ===== LINEAR REGRESSION =====
 @with_timeout(MAX_RUNTIME_SECONDS)
 def linear_regression(df, dependent, predictors, robust=True, n_bootstrap=1000):
     check_analysis_limits(df, "regression", {"predictors": predictors})
@@ -977,7 +962,7 @@ def linear_regression(df, dependent, predictors, robust=True, n_bootstrap=1000):
     F_stat = model.fvalue
     p_f = model.f_pvalue
     
-    # ── FIXED ISSUE 7: Get confidence intervals ──────────────────────────
+    # Get confidence intervals
     conf_int = model.conf_int()
     
     coef = []
@@ -1041,11 +1026,11 @@ def linear_regression(df, dependent, predictors, robust=True, n_bootstrap=1000):
     influence = model.get_influence()
     cooks_d = influence.cooks_distance[0]
     
-    # ── FIXED ISSUE 3: Cook's Distance threshold ──────────────────────────
+    # Cook's Distance threshold: 4/n
     cooks_threshold = 4 / n_obs
     cooks_passed = float(cooks_d.max()) < cooks_threshold
     
-    # ── FIXED ISSUE 2: Safe VIF calculation ──────────────────────────────
+    # Safe VIF calculation
     from statsmodels.stats.outliers_influence import variance_inflation_factor
     vif_data = []
     for i in range(X.shape[1]):
@@ -1062,7 +1047,7 @@ def linear_regression(df, dependent, predictors, robust=True, n_bootstrap=1000):
             "Interpretation": get_vif_label(vif) if vif != np.inf else "severe"
         })
     
-    # ── FIXED ISSUE 6: Add numerical assumption tests ──────────────────────
+    # Numerical assumption tests
     from statsmodels.stats.stattools import durbin_watson
     dw_stat = durbin_watson(model.resid)
     
@@ -1090,11 +1075,11 @@ def linear_regression(df, dependent, predictors, robust=True, n_bootstrap=1000):
     bp_test = het_breuschpagan(model.resid, model.model.exog)
     homoscedasticity_passed = bp_test[1] > 0.05
     
-    # ── FIXED ISSUE 1: Fixed Actual vs Predicted plot ─────────────────────
+    # Fixed Actual vs Predicted plot
     fig, axes = plt.subplots(2, 2, figsize=(12, 10))
     fig.patch.set_facecolor(P["white"])
     
-    # Fixed: Use min/max of both actual and predicted for the reference line
+    # Use min/max of both actual and predicted for the reference line
     mn = min(model.fittedvalues.min(), y.min())
     mx = max(model.fittedvalues.max(), y.max())
     
@@ -1150,7 +1135,7 @@ def linear_regression(df, dependent, predictors, robust=True, n_bootstrap=1000):
     
     rows_removed = original_rows - len(sub)
     
-    # ── FIXED ISSUE 6: Updated assumptions with numerical tests ──────────
+    # Updated assumptions with numerical tests
     assumptions = [
         {"name":"Normality of Residuals","test":normality_test,"statistic":normality_stat,"passed":normality_passed},
         {"name":"Homoscedasticity","test":"Breusch-Pagan","p_value":round(float(bp_test[1]),4),"passed":homoscedasticity_passed},
@@ -1198,10 +1183,7 @@ def linear_regression(df, dependent, predictors, robust=True, n_bootstrap=1000):
         "reproducibility": get_system_metadata()
     }
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# LOGISTIC REGRESSION
-# ══════════════════════════════════════════════════════════════════════════════
+# ===== LOGISTIC REGRESSION =====
 @with_timeout(MAX_RUNTIME_SECONDS)
 def logistic_regression(df, dependent, predictors):
     check_analysis_limits(df, "logistic_regression", {"predictors": predictors})
@@ -1368,10 +1350,7 @@ def logistic_regression(df, dependent, predictors):
         "reproducibility": get_system_metadata()
     }
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# MANN-WHITNEY U
-# ══════════════════════════════════════════════════════════════════════════════
+# ===== MANN-WHITNEY U =====
 @with_timeout(MAX_RUNTIME_SECONDS)
 def mann_whitney(df, numeric_var, group_var):
     validate_numeric_column(df, numeric_var, "for Mann-Whitney U test")
@@ -1430,10 +1409,7 @@ def mann_whitney(df, numeric_var, group_var):
         "reproducibility": get_system_metadata()
     }
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# KRUSKAL-WALLIS
-# ══════════════════════════════════════════════════════════════════════════════
+# ===== KRUSKAL-WALLIS =====
 @with_timeout(MAX_RUNTIME_SECONDS)
 def kruskal_wallis(df, numeric_var, group_var):
     validate_numeric_column(df, numeric_var, "for Kruskal-Wallis test")
@@ -1465,7 +1441,7 @@ def kruskal_wallis(df, numeric_var, group_var):
     _style(ax); plt.tight_layout()
     charts.append({"title":"Kruskal-Wallis Box Plot","img":_store_chart(fig, "kruskal_boxplot", 110)})
     
-    # ── FIXED ISSUE 5: Dunn's Post-Hoc Test ──────────────────────────────
+    # Dunn's Post-Hoc Test
     posthoc = []
     if p < 0.05 and len(gs) > 2:
         try:
@@ -1518,10 +1494,7 @@ def kruskal_wallis(df, numeric_var, group_var):
         "reproducibility": get_system_metadata()
     }
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# DISPATCHER
-# ══════════════════════════════════════════════════════════════════════════════
+# ===== DISPATCHER =====
 ANALYSIS_MAP = {
     "descriptive": descriptive_statistics,
     "chi_square": chi_square_test,
@@ -1643,19 +1616,12 @@ def run_analysis(df, analysis_type, params, client_ip=None):
             "cta_url": "https://www.eduxellence.org/#contact"
         }
 
-
-# ═══════════════════════════════════════════════════════════════════════════
-# FLASK WEB APPLICATION
-# ═══════════════════════════════════════════════════════════════════════════
-
-from flask import Flask, request, jsonify, send_file, send_from_directory
+# ===== FLASK WEB APPLICATION =====
 import io
 import tempfile
 import os
 
-app = Flask(__name__)
-
-# ─── Determine the correct public directory path ────────────────────────
+# ===== Determine the correct public directory path =====
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PUBLIC_DIR = None
 
@@ -1686,8 +1652,7 @@ try:
 except Exception as e:
     logger.error(f"Error listing public dir: {e}")
 
-
-# ─── File Upload Endpoint ────────────────────────────────────────────────
+# ===== File Upload Endpoint =====
 @app.route('/api/upload', methods=['POST'])
 def api_upload():
     """Handle file upload, parse data, return column metadata."""
@@ -1753,8 +1718,7 @@ def api_upload():
         logger.error(f"Upload error: {str(e)}\n{traceback.format_exc()}")
         return jsonify({"error": str(e)}), 500
 
-
-# ─── Assumptions Check Endpoint ──────────────────────────────────────────
+# ===== Assumptions Check Endpoint =====
 @app.route('/api/assumptions', methods=['POST'])
 def api_assumptions():
     """Check assumptions for a given test."""
@@ -1785,8 +1749,7 @@ def api_assumptions():
         logger.error(f"Assumptions error: {str(e)}\n{traceback.format_exc()}")
         return jsonify({"error": str(e)}), 500
 
-
-# ─── Analysis Endpoint ────────────────────────────────────────────────────
+# ===== Analysis Endpoint =====
 @app.route('/api/analyze', methods=['POST'])
 def api_analyze():
     """Run statistical analysis."""
@@ -1843,8 +1806,7 @@ def api_analyze():
             "message": str(e)
         }), 500
 
-
-# ─── Export Endpoint ──────────────────────────────────────────────────────
+# ===== Export Endpoint =====
 @app.route('/api/export', methods=['POST'])
 def api_export():
     """Export results as Excel, Word, or PDF."""
@@ -1975,8 +1937,7 @@ def api_export():
         logger.error(f"Export error: {str(e)}\n{traceback.format_exc()}")
         return jsonify({"error": str(e)}), 500
 
-
-# ─── AI Interpretation Endpoint ──────────────────────────────────────────
+# ===== AI Interpretation Endpoint =====
 @app.route('/api/ai-interpret', methods=['POST'])
 def api_ai_interpret():
     """Switch AI interpretation mode."""
@@ -2018,8 +1979,7 @@ def api_ai_interpret():
         logger.error(f"AI interpret error: {str(e)}\n{traceback.format_exc()}")
         return jsonify({"error": str(e)}), 500
 
-
-# ─── Health Check ─────────────────────────────────────────────────────────
+# ===== Health Check =====
 @app.route('/api/health', methods=['GET'])
 def api_health():
     """Health check endpoint for Vercel."""
@@ -2029,8 +1989,7 @@ def api_health():
         "timestamp": datetime.now().isoformat()
     })
 
-
-# ─── Root Endpoint ────────────────────────────────────────────────────────
+# ===== Root Endpoint =====
 @app.route('/api', methods=['GET'])
 def api_root():
     """API root endpoint."""
@@ -2047,11 +2006,7 @@ def api_root():
         ]
     })
 
-
-# ═══════════════════════════════════════════════════════════════════════════
-# DEBUG ENDPOINT
-# ═══════════════════════════════════════════════════════════════════════════
-
+# ===== DEBUG ENDPOINT =====
 @app.route('/debug')
 def debug():
     """Debug endpoint to check file locations."""
@@ -2070,11 +2025,7 @@ def debug():
     
     return jsonify(debug_info)
 
-
-# ═══════════════════════════════════════════════════════════════════════════
-# SERVE HTML PAGES
-# ═══════════════════════════════════════════════════════════════════════════
-
+# ===== SERVE HTML PAGES =====
 @app.route('/')
 def serve_index():
     """Serve the main index.html page."""
@@ -2110,12 +2061,11 @@ def serve_static(path):
     except Exception:
         return "File not found", 404
 
+# ===== Vercel Handler =====
+# Vercel checks for app, application, or handler
+handler = app
 
-# ─── Vercel Handler ──────────────────────────────────────────────────────
-app = app
-
-
-# ─── Local Development ────────────────────────────────────────────────────
+# ===== Local Development =====
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
