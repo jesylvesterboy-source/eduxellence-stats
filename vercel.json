@@ -4,32 +4,19 @@
     {
       "src": "api/stats_app.py",
       "use": "@vercel/python",
-      "config": { "maxLambdaSize": "50mb" }
-    },
-    {
-      "src": "public/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "data/**",
-      "use": "@vercel/static"
+      "config": { "maxLambdaSize": "50mb", "includeFiles": ["public/**", "data/**"] }
     }
   ],
   "routes": [
-    { "src": "/api/(.*)",   "dest": "api/stats_app.py" },
-    { "src": "/data/(.*)",  "dest": "/data/$1" },
-    { "src": "/",           "dest": "public/index.html" },
-    { "src": "/stats",      "dest": "public/stats.html" },
-    { "src": "/upload",     "dest": "public/upload.html" },
-    { "src": "/(.*)",       "dest": "public/$1" }
+    { "src": "/(.*)", "dest": "api/stats_app.py" }
   ],
   "headers": [
     {
       "source": "/api/(.*)",
       "headers": [
-        { "key": "Access-Control-Allow-Origin",   "value": "*" },
-        { "key": "Access-Control-Allow-Methods",  "value": "GET, POST, OPTIONS" },
-        { "key": "Access-Control-Allow-Headers",  "value": "Content-Type" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" },
         { "key": "Access-Control-Expose-Headers", "value": "Content-Disposition" }
       ]
     }
