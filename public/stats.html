@@ -392,8 +392,6 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
 const S={metaPath:null,filename:null,cols:[],test:null,params:null,results:null,assumptions:[],aiMode:'simple',fileData:null};
 
 // ===== API BASE URL - UPDATED TO HUGGING FACE =====
-// Old: const API_BASE = '';
-// New: Hugging Face Space URL
 const API_BASE = 'https://Eduxellence-eduxellence-api.hf.space';
 
 // ===== Helper: Convert file to base64 =====
@@ -468,7 +466,6 @@ async function handleFile(file){
   
   const fd=new FormData(); fd.append("file",file);
   try{
-    // Updated to use Hugging Face API
     const r=await fetch(`${API_BASE}/api/upload`,{method:"POST",body:fd}); const d=await r.json();
     hideP("upw");
     if(d.error==="large_file"){document.getElementById("large-modal").classList.add("show");return;}
@@ -560,7 +557,6 @@ async function checkAssumptions(){
   hideA("ve"); S.params=vp.p;
   showP("apw"); animP("ap-fill","ap-pct",2000);
   try{
-    // Updated to use Hugging Face API
     const r=await fetch(`${API_BASE}/api/assumptions`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({meta_path:S.metaPath,analysis_type:S.test,params:S.params})});
     const d=await r.json(); hideP("apw");
     if(d.checks?.length) renderAssumptions(d.checks,d.all_passed);
@@ -582,7 +578,6 @@ async function runAnalysis(){
   showP("anpw"); const stages=["Loading data…","Parsing columns…","Running test…","Computing effect sizes…","Generating charts…","Building interpretation…","Finalising…"];
   let t=0; const tm=setInterval(()=>{t+=100;const pct=Math.min(92,Math.round(92*(1-Math.pow(1-t/9000,2))));document.getElementById("an-fill").style.width=pct+"%";document.getElementById("an-pct").textContent=pct+"%";document.getElementById("an-sub").textContent=stages[Math.min(Math.floor(pct/(92/stages.length)),stages.length-1)];if(t>=9000)clearInterval(tm);},100);
   try{
-    // Updated to use Hugging Face API - NOW INCLUDING file_data
     const r=await fetch(`${API_BASE}/api/analyze`,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
@@ -591,7 +586,7 @@ async function runAnalysis(){
         analysis_type:S.test,
         params:S.params,
         ai_mode:S.aiMode,
-        file_data:S.fileData  // Add file data for the analysis
+        file_data:S.fileData
       })
     });
     const d=await r.json(); clearInterval(tm); hideP("anpw"); document.getElementById("btn-run").disabled=false;
@@ -666,7 +661,7 @@ function renderResults(d){
   if(d.interpretation) h+=`<div class="rs"><div class="rs-title">💬 Plain-English Interpretation</div><div class="itb"><p>${bold(d.interpretation)}</p></div></div>`;
 
   // Charts
-  if(d.charts?.length) h+=`<div class="rs"><div class="rs-title">📊 Charts & Visualisations</div><div class="cg">${d.charts.map((c,i)=>`<div class="cc-card"><div class="cc-title"><span>${c.title}</span><span class="dl-img" onclick="dlImg(${i},'${c.title}')">⬇ PNG</span></div><img class="cc-img" id="chart-${i}" src="data:image/png;base64,${c.img}" alt="${c.title}" loading="lazy"></div>`).join("")}</div></div>`;
+  if(d.charts?.length) h+=`<div class="rs"><div class="rs-title">📊 Charts & Visualisations</div><div class="cg">${d.charts.map((c,i)=>`<div class="cc-card"><div class="cc-title"><span>${c.title}</span><span class="dl-img" onclick="dlImg(${i},'${c.title}')">⬇ PNG</span></div><img class="cc-img" id="chart-${i}" src="${c.img}" alt="${c.title}" loading="lazy"></div>`).join("")}</div></div>`;
 
   // Tables
   for(const[k,lbl] of[["numeric_summary","Descriptive Statistics"],["summary_table","Group Summary"],["coef_table","Regression Coefficients"],["pairs_table","Correlation Pairs"],["posthoc_table","Post-Hoc (Bonferroni)"]]) if(d[k]?.length) h+=`<div class="rs"><div class="rs-title">📋 ${lbl}</div><div class="rt-w">${mkTable(d[k])}</div></div>`;
@@ -710,7 +705,60 @@ function mkCT(ct){
 
 function bold(t){return t.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\n/g,"<br>");}
 function copyAPA(){const t=document.getElementById("apa-txt")?.textContent;if(t){navigator.clipboard?.writeText(t).then(()=>{const b=event.target;b.textContent="Copied!";setTimeout(()=>b.textContent="Copy",2000);});}}
-function dlImg(i,title){const img=document.getElementById(`chart-${i}`);if(!img)return;const a=document.createElement("a");a.href=img.src;a.download=`eduxellence_${title.replace(/\s+/g,"_")}.png`;a.click();}
+
+// ===== FIXED: PNG DOWNLOAD FUNCTION =====
+function dlImg(i, title){
+    const img = document.getElementById(`chart-${i}`);
+    if(!img) {
+        alert('Image not found.');
+        return;
+    }
+    
+    const imageUrl = img.src;
+    const filename = `eduxellence_${title.replace(/\s+/g,"_")}.png`;
+    
+    // If the image is a data URL (base64), download it directly
+    if (imageUrl.startsWith('data:image')) {
+        const a = document.createElement('a');
+        a.href = imageUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        return;
+    }
+    
+    // For external URLs (Supabase, Cloudinary, etc.), fetch as blob
+    fetch(imageUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            // Check if the response is actually an image
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.startsWith('image/')) {
+                throw new Error('Response is not an image.');
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 5000);
+        })
+        .catch(err => {
+            console.error('Download failed:', err);
+            // Fallback: Open image in new tab so user can save manually
+            if (confirm(`Download failed: ${err.message}. Open image in new tab to save?`)) {
+                window.open(imageUrl, '_blank');
+            }
+        });
+}
 
 /* ═══════════ EXPORT (xlsx / docx / pdf) ═══════════ */
 const FMT_LABELS = {xlsx:"⬇ Excel", docx:"⬇ Word", pdf:"⬇ PDF"};
@@ -724,7 +772,6 @@ async function exportFmt(fmt){
   const orig = btn.textContent;
   btn.disabled = true; btn.textContent = "Generating…";
   try{
-    // Updated to use Hugging Face API
     const r = await fetch(`${API_BASE}/api/export`,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
@@ -771,7 +818,6 @@ async function switchAIMode(mode){
   const el = document.getElementById('ai-text-main');
   if(el) el.textContent = 'Generating…';
   try{
-    // Updated to use Hugging Face API
     const r = await fetch(`${API_BASE}/api/ai-interpret`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
