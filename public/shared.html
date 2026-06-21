@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shared Analysis Results — Eduxellence Analytics</title>
+<meta name="description" content="A statistical analysis shared via Eduxellence Analytics.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--ny:#0B1829;--ny2:#112240;--bl:#1E6BFF;--tl:#0FC9A0;--wh:#fff;--of:#F7F9FC;
+  --sl:#64748B;--bd:#E2E8F0;--ok:#16A34A;--er:#DC2626;--tx:#0F172A;--txM:#475569;
+  --r8:8px;--r12:12px;--r16:16px;--r24:24px;--shS:0 1px 3px rgba(0,0,0,.08);--shL:0 12px 40px rgba(0,0,0,.14);}
+body{font-family:'DM Sans',sans-serif;background:var(--of);color:var(--tx);line-height:1.6;min-height:100vh}
+a{color:var(--bl);text-decoration:none}
+.nav{background:var(--ny);height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;position:sticky;top:0;z-index:100}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;color:#fff;text-decoration:none}
+.nav-logo span{color:var(--tl)}
+.nav-cta{background:var(--tl);color:var(--ny);padding:6px 16px;border-radius:20px;font-weight:700;font-family:'Syne',sans-serif;font-size:.82rem}
+
+.watermark-bar{background:linear-gradient(135deg,var(--ny),var(--ny2));color:rgba(255,255,255,.85);text-align:center;padding:.6rem 1rem;font-size:.82rem}
+.watermark-bar a{color:var(--tl);font-weight:600}
+
+.main{max-width:900px;margin:0 auto;padding:2rem 1.25rem 4rem}
+.card{background:var(--wh);border-radius:var(--r24);box-shadow:var(--shL);padding:2rem;margin-bottom:1.5rem}
+
+.meta-row{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;padding-bottom:1.25rem;border-bottom:1px solid var(--bd)}
+.res-title{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:var(--tx)}
+.res-meta{font-size:.8rem;color:var(--sl);margin-top:4px}
+.view-pill{background:rgba(30,107,255,.08);color:var(--bl);font-size:.78rem;font-weight:600;padding:5px 12px;border-radius:20px;display:inline-flex;align-items:center;gap:5px}
+
+.chips{display:flex;gap:.65rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.chip{background:var(--of);border:1px solid var(--bd);border-radius:var(--r12);padding:.8rem 1rem;text-align:center;min-width:100px}
+.cv{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--tx)}
+.cv.sig{color:var(--ok)}
+.cl{font-size:.68rem;color:var(--sl);margin-top:2px;text-transform:uppercase;letter-spacing:.04em}
+
+.rs{margin-bottom:1.75rem}
+.rs-title{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:var(--tx);margin-bottom:.7rem;padding-bottom:.45rem;border-bottom:2px solid var(--bd)}
+.apa{background:#F8F7FF;border:1.5px solid #C4B5FD;border-radius:var(--r8);padding:.9rem 1.1rem}
+.apa-t{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:#1E1B4B;line-height:1.6}
+.ai-box{background:linear-gradient(135deg,rgba(15,201,160,.06),rgba(30,107,255,.04));border:1.5px solid rgba(15,201,160,.3);border-radius:var(--r12);padding:1.1rem 1.4rem}
+.ai-text{font-size:.92rem;color:var(--tx);line-height:1.75}
+.itb{background:rgba(15,201,160,.06);border:1.5px solid rgba(15,201,160,.25);border-radius:var(--r8);padding:1rem 1.25rem}
+
+.cg{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:1.1rem}
+.cc-card{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r12);overflow:hidden}
+.cc-title{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;padding:.65rem .9rem;background:var(--of);border-bottom:1px solid var(--bd)}
+.cc-img{width:100%;display:block;background:#f1f5f9;min-height:160px}
+
+.rtbl{width:100%;border-collapse:collapse;font-size:.82rem}
+.rtbl th{background:var(--ny);color:rgba(255,255,255,.9);padding:.6rem .85rem;text-align:left;font-size:.74rem}
+.rtbl td{padding:.55rem .85rem;border-top:1px solid var(--bd)}
+.rtbl tr:nth-child(even) td{background:var(--of)}
+.rt-w{overflow-x:auto;border-radius:var(--r8);border:1px solid var(--bd)}
+
+.expired-card{text-align:center;padding:3rem 2rem}
+.expired-icon{font-size:3.5rem;margin-bottom:1rem}
+.expired-title{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--tx);margin-bottom:.5rem}
+.expired-sub{color:var(--sl);margin-bottom:1.5rem}
+
+.loading{text-align:center;padding:4rem 2rem;color:var(--sl)}
+.spinner{width:40px;height:40px;border:3px solid var(--bd);border-top-color:var(--bl);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.cta-box{text-align:center;margin-top:2rem;padding:1.5rem;background:rgba(15,201,160,.06);border:1.5px solid rgba(15,201,160,.2);border-radius:var(--r12)}
+.btn-tl{display:inline-flex;align-items:center;gap:8px;background:var(--tl);color:var(--ny);font-family:'Syne',sans-serif;font-weight:700;font-size:.875rem;padding:.7rem 1.5rem;border-radius:10px;text-decoration:none;margin-top:.75rem}
+
+footer{background:var(--ny);color:rgba(255,255,255,.5);text-align:center;padding:1.75rem;font-size:.8rem}
+footer a{color:var(--tl)}
+</style>
+</head>
+<body>
+
+<div class="watermark-bar">
+  ✦ Generated by <a href="https://eduxellence.org" target="_blank">Eduxellence Analytics</a> — Free Statistical Analysis Platform
+</div>
+
+<nav class="nav">
+  <a class="nav-logo" href="https://eduxellence.org">Eduxellence<span>.</span></a>
+  <a href="/stats" class="nav-cta">Run Your Own Analysis</a>
+</nav>
+
+<div class="main" id="main-content">
+  <div class="card loading" id="loading-state">
+    <div class="spinner"></div>
+    <p>Loading shared results…</p>
+  </div>
+</div>
+
+<footer>
+  <p><strong style="color:rgba(255,255,255,.75)">Eduxellence Analytics</strong> — Free Statistical Analysis Platform</p>
+  <p style="margin-top:.4rem"><a href="https://eduxellence.org">Home</a> · <a href="/stats">Run Analysis</a> · <a href="https://eduxellence.org/#contact">Contact</a></p>
+</footer>
+
+<script>
+function getToken() {
+  const parts = window.location.pathname.split('/');
+  return parts[parts.length - 1];
+}
+
+function bold(t){ return (t||"").replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\n/g,"<br>"); }
+
+function mkTable(rows){
+  if(!rows||!rows.length) return "<p style='color:var(--sl);font-size:.85rem'>No data.</p>";
+  const cols = Object.keys(rows[0]);
+  const th = cols.map(c=>`<th>${c}</th>`).join("");
+  const tr = rows.map(r=>`<tr>${cols.map(c=>`<td>${String(r[c]??"")}</td>`).join("")}</tr>`).join("");
+  return `<div class="rt-w"><table class="rtbl"><thead><tr>${th}</tr></thead><tbody>${tr}</tbody></table></div>`;
+}
+
+function buildChips(d){
+  const chips=[];
+  const isSig = d.p_value!=null && d.p_value<.05;
+  if(d.p_display) chips.push({val:d.p_display, lbl:"p-value", cls:isSig?"sig":""});
+  if(d.significance) chips.push({val:d.significance, lbl:"Significance", cls:isSig?"sig":""});
+  if(d.r_squared!=null) chips.push({val:d.r_squared, lbl:"R²", cls:""});
+  if(d.cohens_d!=null) chips.push({val:d.cohens_d, lbl:"Cohen's d", cls:""});
+  if(d.cramers_v!=null) chips.push({val:d.cramers_v, lbl:"Cramér's V", cls:""});
+  if(d.eta_squared!=null) chips.push({val:d.eta_squared, lbl:"η²", cls:""});
+  if(d.n!=null) chips.push({val:d.n, lbl:"Sample (N)", cls:""});
+  return chips.slice(0,6);
+}
+
+async function loadShared(){
+  const token = getToken();
+  try{
+    const r = await fetch(`/api/share/${token}`);
+    const d = await r.json();
+
+    if(!r.ok || !d.ok){
+      renderError(d.error || "This shared result could not be found.", r.status);
+      return;
+    }
+    renderResults(d);
+  }catch(e){
+    renderError("Network error loading shared results: " + e.message, 500);
+  }
+}
+
+function renderError(msg, code){
+  const icon = code===410 ? "⏰" : "🔍";
+  const title = code===410 ? "This Link Has Expired" : "Result Not Found";
+  document.getElementById('main-content').innerHTML = `
+    <div class="card expired-card">
+      <div class="expired-icon">${icon}</div>
+      <div class="expired-title">${title}</div>
+      <div class="expired-sub">${msg}</div>
+      <a href="/stats" class="btn-tl">Run Your Own Free Analysis →</a>
+    </div>`;
+}
+
+function renderResults(d){
+  const a = d.analysis;
+  const results = a.results || {};
+  const chartUrls = a.chart_urls || [];
+
+  let html = `<div class="card">
+    <div class="meta-row">
+      <div>
+        <div class="res-title">${results.analysis_label || results.test || a.analysis_type}</div>
+        <div class="res-meta">Dataset: ${a.dataset_name || "Untitled"} · Shared ${new Date(d.created_at).toLocaleDateString()} · Expires ${new Date(d.expires_at).toLocaleDateString()}</div>
+      </div>
+      <div class="view-pill">👁 ${d.view_count} view${d.view_count===1?'':'s'}</div>
+    </div>`;
+
+  const chips = buildChips(results);
+  if(chips.length) html += `<div class="chips">${chips.map(c=>`<div class="chip"><div class="cv ${c.cls}">${c.val}</div><div class="cl">${c.lbl}</div></div>`).join("")}</div>`;
+
+  if(results.apa_citation) html += `<div class="rs"><div class="rs-title">📌 APA Citation</div><div class="apa"><div class="apa-t">${results.apa_citation}</div></div></div>`;
+
+  if(a.interpretation || results.ai_interpretation){
+    html += `<div class="rs"><div class="rs-title">✦ Interpretation</div><div class="ai-box"><div class="ai-text">${bold(results.ai_interpretation || a.interpretation)}</div></div></div>`;
+  }
+
+  if(chartUrls.length){
+    html += `<div class="rs"><div class="rs-title">📊 Charts</div><div class="cg">${chartUrls.map((url,i)=>`<div class="cc-card"><div class="cc-title">Chart ${i+1}</div><img class="cc-img" src="${url}" loading="lazy" onerror="this.style.display='none'"></div>`).join("")}</div></div>`;
+  }
+
+  for(const [key,label] of [["numeric_summary","Descriptive Statistics"],["summary_table","Group Summary"],["coef_table","Regression Coefficients"],["pairs_table","Correlation Pairs"]]){
+    if(results[key] && results[key].length) html += `<div class="rs"><div class="rs-title">📋 ${label}</div>${mkTable(results[key])}</div>`;
+  }
+
+  html += `</div>
+  <div class="cta-box">
+    <p style="font-size:.9rem;color:var(--txM)">Want to run your own statistical analysis — free?</p>
+    <a href="/stats" class="btn-tl">📊 Try Eduxellence Analytics →</a>
+  </div>`;
+
+  document.getElementById('main-content').innerHTML = html;
+}
+
+loadShared();
+</script>
+</body>
+</html>
