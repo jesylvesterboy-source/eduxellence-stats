@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -150,6 +151,9 @@ footer a{color:var(--tl)}
 </footer>
 
 <script>
+// ===== API BASE URL - FIXED =====
+const API_BASE = 'https://Eduxellence-eduxellence-api.hf.space';
+
 const S = { metaPath:null, filename:null, suggestions:null, config:{}, columns:[] };
 function getAuthToken(){ return localStorage.getItem('edux_auth_token') || null; }
 
@@ -175,7 +179,7 @@ async function handleFile(file){
   document.getElementById('upw').classList.add('show');
   const fd = new FormData(); fd.append('file', file);
   try{
-    const r = await fetch('/api/upload', {method:'POST', body:fd});
+    const r = await fetch(`${API_BASE}/api/upload`, {method:'POST', body:fd});
     const d = await r.json();
     document.getElementById('upw').classList.remove('show');
     if(!r.ok || d.error){
@@ -202,7 +206,7 @@ const TEST_LABELS = {
 async function loadSuggestions(){
   document.getElementById('test-cards').innerHTML = '<p style="color:var(--sl);font-size:.85rem">Analysing your dataset…</p>';
   try{
-    const r = await fetch('/api/package/suggest', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({meta_path:S.metaPath})});
+    const r = await fetch(`${API_BASE}/api/package/suggest`, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({meta_path:S.metaPath})});
     const d = await r.json();
     if(!r.ok || d.error){ document.getElementById('test-cards').innerHTML = '<p style="color:var(--er)">'+(d.error||'Could not load suggestions.')+'</p>'; return; }
     S.suggestions = d.suggestions;
@@ -308,7 +312,7 @@ async function generatePackage(){
   const tm = setInterval(()=>{ pct = Math.min(92, pct+3); document.getElementById('gen-fill').style.width = pct+'%'; }, 300);
 
   try{
-    const r = await fetch('/api/package/generate', {
+    const r = await fetch(`${API_BASE}/api/package/generate`, {
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
       body: JSON.stringify({meta_path:S.metaPath, config:S.config, dataset_name:S.filename})
@@ -359,8 +363,9 @@ function renderResult(d){
 
 function downloadPackage(fmt){
   if(!window._packageId) return;
-  window.location.href = `/api/package/export/${window._packageId}?format=${fmt}`;
+  window.location.href = `${API_BASE}/api/package/export/${window._packageId}?format=${fmt}`;
 }
 </script>
 </body>
 </html>
+```
