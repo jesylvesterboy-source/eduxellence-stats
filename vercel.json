@@ -7,9 +7,11 @@
     }
   ],
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "public/$1"
-    }
+    { "src": "/api/(.*)", "dest": "https://Eduxellence-eduxellence-api.hf.space/api/$1" },
+    { "src": "/", "dest": "public/index.html" },
+    { "src": "/stats", "dest": "public/stats.html" },
+    { "src": "/upload", "dest": "public/upload.html" },
+    { "src": "/pricing", "dest": "public/pricing.html" },
+    { "src": "/(.*)", "dest": "public/$1" }
   ]
 }
