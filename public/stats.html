@@ -75,6 +75,8 @@ code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:#f1f5f9;p
 .btn-sm{padding:.5rem 1rem!important;font-size:.8rem!important}
 .btn-tl{background:var(--tl);color:var(--ny);padding:.7rem 1.5rem;font-size:.875rem}
 .btn-row{display:flex;gap:.75rem;margin-top:1.25rem;flex-wrap:wrap}
+.btn-share{background:linear-gradient(135deg,var(--tl),var(--tl2));color:var(--ny);padding:.5rem 1rem;font-size:.8rem;font-family:'Syne',sans-serif;font-weight:700;border:none;border-radius:var(--r8);cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-share:hover{transform:translateY(-1px);opacity:.9}
 /* ALERTS */
 .alert{border-radius:var(--r8);padding:.9rem 1.1rem;display:none;align-items:flex-start;gap:.75rem;margin-top:.75rem}
 .alert.show{display:flex}
@@ -178,7 +180,7 @@ code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:#f1f5f9;p
 .cc-img{width:100%;display:block}
 .dl-img{font-size:.72rem;color:var(--bl);cursor:pointer;padding:2px 8px;border:1px solid var(--bl);border-radius:6px}
 .dl-img:hover{background:rgba(30,107,255,.08)}
-/* AI STYLES (from stats.html2) */
+/* AI STYLES */
 .ai-mode-btn{padding:6px 14px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:500;color:var(--sl);cursor:pointer;transition:all .15s}
 .ai-mode-btn:hover{border-color:var(--tl);color:var(--tl)}
 .ai-mode-btn.active{border-color:var(--tl);background:rgba(15,201,160,.1);color:var(--tl2);font-weight:600}
@@ -193,7 +195,6 @@ code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:#f1f5f9;p
 .ai-switch-btn{font-size:.72rem;padding:3px 10px;border-radius:20px;border:1px solid var(--bd);background:#fff;color:var(--sl);cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif}
 .ai-switch-btn:hover{border-color:var(--bl);color:var(--bl)}
 .ai-switch-btn.active{border-color:var(--tl);color:var(--tl2);font-weight:600}
-/* END AI STYLES */
 /* LARGE FILE MODAL */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(11,24,41,.7);z-index:500;align-items:center;justify-content:center;padding:1rem}
 .modal-bg.show{display:flex}
@@ -201,6 +202,18 @@ code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:#f1f5f9;p
 .modal h2{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--tx);margin-bottom:.75rem}
 .modal p{color:var(--sl);font-size:.95rem;line-height:1.65;margin-bottom:1.5rem}
 .modal-icon{font-size:3rem;margin-bottom:1rem}
+/* SHARE MODAL */
+#share-modal{display:none;position:fixed;inset:0;background:rgba(11,24,41,.7);z-index:600;align-items:center;justify-content:center;padding:1rem}
+#share-modal.show{display:flex}
+.share-modal-box{background:var(--wh);border-radius:var(--r24);padding:2rem;max-width:480px;width:100%;text-align:center;box-shadow:var(--shL);position:relative}
+.share-modal-box .close-btn{position:absolute;top:1rem;right:1.25rem;background:none;border:none;font-size:1.25rem;color:var(--sl);cursor:pointer;font-family:'DM Sans',sans-serif}
+.share-modal-box .close-btn:hover{color:var(--tx)}
+.share-url-box{display:flex;gap:.5rem;align-items:center;background:var(--of);border:1px solid var(--bd);border-radius:10px;padding:.6rem .8rem;margin:1rem 0}
+.share-url-box input{flex:1;border:none;background:none;font-size:.82rem;color:var(--tx);font-family:'JetBrains Mono',monospace;outline:none}
+.share-url-box .copy-btn{background:var(--bl);color:#fff;border:none;padding:.4rem .9rem;border-radius:6px;font-size:.78rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s}
+.share-url-box .copy-btn:hover{background:#1452CC}
+.spinner{width:32px;height:32px;border:3px solid var(--bd);border-top-color:var(--bl);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
 /* CTA SECTION */
 .cta-s{background:linear-gradient(135deg,var(--ny) 0%,var(--ny2) 100%);padding:3.5rem 2rem;text-align:center}
 .cta-s h2{font-family:'Syne',sans-serif;font-size:clamp(1.4rem,3vw,2rem);font-weight:800;color:#fff;margin-bottom:.75rem}
@@ -313,14 +326,14 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
   <div class="btn-row"><button class="btn btn-s" onclick="gs(1)">← Back</button><button class="btn btn-p" id="btn3" onclick="gs(3)" disabled style="flex:1">Continue → Select Variables</button></div>
 </div>
 
-<!-- S3: VARIABLES (with AI Mode from stats.html2) -->
+<!-- S3: VARIABLES -->
 <div id="p3" class="panel">
   <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.35rem;margin-bottom:.35rem">Select Variables</h2>
   <p style="color:var(--sl);font-size:.9rem;margin-bottom:1.5rem" id="ctx-hint"></p>
   <div id="vb"></div>
   <div class="alert alert-e" id="ve"><span class="alert-ico">⚠</span><div class="al-body"><p id="ve-t"></p></div></div>
 
-  <!-- AI INTERPRETATION MODE (from stats.html2) -->
+  <!-- AI INTERPRETATION MODE -->
   <div style="margin-top:1.25rem;padding:1rem 1.25rem;background:linear-gradient(135deg,rgba(15,201,160,.07),rgba(30,107,255,.05));border:1.5px solid rgba(15,201,160,.25);border-radius:var(--r12)">
     <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;color:var(--ny);margin-bottom:.5rem">✦ AI Interpretation Mode</div>
     <div style="font-size:.78rem;color:var(--sl);margin-bottom:.75rem">Choose how results are explained after the analysis runs.</div>
@@ -359,6 +372,7 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
         <button class="btn btn-ok btn-sm" id="btn-xl"   onclick="exportFmt('xlsx')" title="Download Excel (.xlsx)">⬇ Excel</button>
         <button class="btn btn-ok btn-sm" id="btn-docx" onclick="exportFmt('docx')" title="Download APA Word (.docx)" style="background:linear-gradient(135deg,#1E6BFF,#1452CC)">⬇ Word</button>
         <button class="btn btn-ok btn-sm" id="btn-pdf"  onclick="exportFmt('pdf')"  title="Download PDF" style="background:linear-gradient(135deg,#DC2626,#991B1B)">⬇ PDF</button>
+        <button class="btn btn-share btn-sm" id="btn-share" onclick="openShareModal()" title="Create a shareable link">🔗 Share</button>
       </div>
     </div>
   </div>
@@ -386,6 +400,16 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
   <p style="margin-top:.35rem"><a href="https://eduxellence.org">Home</a> · <a href="https://clean.eduxellence.org">Data Cleaner</a> · <a href="https://eduxellence.org/services">Services</a> · <a href="https://github.com/eduxellence">GitHub</a></p>
   <p style="margin-top:.35rem;font-size:.75rem">🔒 Files are processed privately and deleted immediately · No data stored · No login required</p>
 </footer>
+
+<!-- SHARE MODAL -->
+<div id="share-modal">
+  <div class="share-modal-box">
+    <button class="close-btn" onclick="closeShareModal()">✕</button>
+    <div id="share-modal-body">
+      <!-- injected -->
+    </div>
+  </div>
+</div>
 
 <script>
 /* ═══════════ STATE ═══════════ */
@@ -853,6 +877,187 @@ function guide(){
     "PARAMETRIC vs NON-PARAMETRIC:\n" +
     "Use parametric tests when data is normally distributed.\n" +
     "Use non-parametric when skewed, ordinal, or small sample.");
+}
+
+/* ═══════════ SHARE FUNCTIONALITY ═══════════ */
+function openShareModal(){
+  document.getElementById('share-modal').classList.add('show');
+  renderShareModal();
+}
+
+function closeShareModal(){
+  document.getElementById('share-modal').classList.remove('show');
+}
+
+// ===== GET AUTH TOKEN FROM LOCALSTORAGE =====
+function getAuthToken(){
+  // Check localStorage for the token
+  const token = localStorage.getItem('edux_auth_token');
+  return token || null;
+}
+
+// ===== LOGIN FUNCTION =====
+async function handleLogin(){
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value.trim();
+  const errorEl = document.getElementById('login-error');
+  
+  // Hide any previous error
+  errorEl.style.display = 'none';
+  
+  // Validate inputs
+  if(!email || !password){
+    errorEl.textContent = 'Please enter both email and password.';
+    errorEl.style.display = 'block';
+    return;
+  }
+  
+  // Show loading state on button
+  const loginBtn = document.querySelector('#share-modal-body .btn-p');
+  if(loginBtn) {
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Signing in…';
+  }
+  
+  try {
+    // Call Supabase auth via your backend
+    const response = await fetch(`${API_BASE}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    
+    const data = await response.json();
+    
+    if(!response.ok || !data.token){
+      errorEl.textContent = data.error || 'Login failed. Please check your credentials.';
+      errorEl.style.display = 'block';
+      if(loginBtn) {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Sign In / Create Account';
+      }
+      return;
+    }
+    
+    // Save the token to localStorage
+    localStorage.setItem('edux_auth_token', data.token);
+    
+    // Also save user info if needed
+    if(data.user){
+      localStorage.setItem('edux_user', JSON.stringify(data.user));
+    }
+    
+    // Re-render the share modal (now showing the share link creation)
+    renderShareModal();
+    
+  } catch(e) {
+    errorEl.textContent = 'Network error: ' + e.message;
+    errorEl.style.display = 'block';
+    if(loginBtn) {
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Sign In / Create Account';
+    }
+  }
+}
+
+// ===== LOGOUT FUNCTION =====
+function logoutUser(){
+  localStorage.removeItem('edux_auth_token');
+  localStorage.removeItem('edux_user');
+  closeShareModal();
+  // Optionally refresh the page or update UI
+  alert('You have been signed out.');
+}
+
+async function renderShareModal(){
+  const token = getAuthToken();
+  const body = document.getElementById('share-modal-body');
+
+  if(!token){
+    body.innerHTML = `
+      <div style="text-align:center;padding:.5rem 0;">
+        <div style="font-size:2.5rem;margin-bottom:.75rem;">🔑</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--tx);margin-bottom:.5rem;">Sign In to Share Results</div>
+        <p style="color:var(--sl);font-size:.88rem;line-height:1.6;margin-bottom:1rem;">Enter your email to sign in or create a free account.</p>
+        
+        <!-- LOGIN FORM -->
+        <div style="text-align:left;margin-bottom:1rem;">
+          <label style="font-size:.8rem;font-weight:600;color:var(--tx);display:block;margin-bottom:.25rem;">Email</label>
+          <input id="login-email" type="email" placeholder="you@example.com" style="width:100%;padding:.6rem .8rem;border:1.5px solid var(--bd);border-radius:8px;font-size:.9rem;font-family:'DM Sans',sans-serif;margin-bottom:.75rem;">
+          
+          <label style="font-size:.8rem;font-weight:600;color:var(--tx);display:block;margin-bottom:.25rem;">Password</label>
+          <input id="login-password" type="password" placeholder="Your password" style="width:100%;padding:.6rem .8rem;border:1.5px solid var(--bd);border-radius:8px;font-size:.9rem;font-family:'DM Sans',sans-serif;margin-bottom:.5rem;">
+        </div>
+        
+        <div id="login-error" style="color:var(--er);font-size:.8rem;margin-bottom:.5rem;display:none;"></div>
+        
+        <button class="btn btn-p" style="width:100%;" onclick="handleLogin()">Sign In / Create Account</button>
+        <button class="btn btn-s" style="width:100%;margin-top:.6rem;" onclick="closeShareModal()">Cancel</button>
+      </div>`;
+    return;
+  }
+
+  body.innerHTML = `<div style="text-align:center;padding:1rem 0;">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:.5rem;">
+      <button onclick="logoutUser()" style="background:none;border:none;color:var(--sl);font-size:.75rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;">Sign Out</button>
+    </div>
+    <div class="spinner"></div>
+    <p style="color:var(--sl);font-size:.85rem;margin-top:.75rem;">Creating your shareable link…</p>
+  </div>`;
+
+  try{
+    // Step 1: save the analysis
+    const saveR = await fetch(`${API_BASE}/api/save-analysis`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({meta_path:S.metaPath, analysis_type:S.test, params:S.params, dataset_name:S.filename||'Untitled'})
+    });
+    const saveD = await saveR.json();
+    if(!saveR.ok || !saveD.ok){ throw new Error(saveD.error || 'Could not save analysis.'); }
+
+    // Step 2: create the share link
+    const shareR = await fetch(`${API_BASE}/api/share/create`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({analysis_id: saveD.analysis_id})
+    });
+    const shareD = await shareR.json();
+    if(!shareR.ok || !shareD.ok){ throw new Error(shareD.error || 'Could not create share link.'); }
+
+    body.innerHTML = `
+      <div style="text-align:center;padding:.5rem 0;">
+        <div style="font-size:2.5rem;margin-bottom:.75rem;">🔗</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--tx);margin-bottom:.5rem;">Your Link Is Ready</div>
+        <p style="color:var(--sl);font-size:.85rem;margin-bottom:1rem;">Anyone with this link can view your results. It expires ${new Date(shareD.expires_at).toLocaleDateString()}.</p>
+        <div class="share-url-box">
+          <input id="share-url-input" type="text" readonly value="${shareD.share_url}">
+          <button class="copy-btn" onclick="copyShareUrl()">Copy</button>
+        </div>
+        <button class="btn btn-s" style="width:100%;" onclick="closeShareModal()">Done</button>
+      </div>`;
+  }catch(e){
+    body.innerHTML = `
+      <div style="text-align:center;padding:.5rem 0;">
+        <div style="font-size:2.5rem;margin-bottom:.75rem;">⚠</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--er);margin-bottom:.5rem;">Could Not Create Link</div>
+        <p style="color:var(--sl);font-size:.85rem;margin-bottom:1.25rem;">${e.message}</p>
+        <button class="btn btn-s" style="width:100%;" onclick="closeShareModal()">Close</button>
+      </div>`;
+  }
+}
+
+function copyShareUrl(){
+  const input = document.getElementById('share-url-input');
+  if(!input) return;
+  input.select();
+  navigator.clipboard?.writeText(input.value).then(()=>{
+    const btn = document.querySelector('.copy-btn');
+    if(btn){
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(()=>btn.textContent=orig, 2000);
+    }
+  });
 }
 </script>
 </body>
