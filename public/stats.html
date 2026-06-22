@@ -426,7 +426,7 @@ const SUPABASE_URL = 'https://uvmmottlccuxvfmwckuf.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2bW1vdHRsY2N1eHZmbXdja3VmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3ODQxMzIsImV4cCI6MjA5NzM2MDEzMn0.e4789311KYwC-YXOuPheW9AXIIYRzT-te6YfNnnNdnk';
 
 // Initialize Supabase client
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ===== Helper: Convert file to base64 =====
 function fileToBase64(file) {
@@ -902,7 +902,7 @@ function closeShareModal(){
 // ===== GET AUTH TOKEN FROM SUPABASE SESSION =====
 async function getAuthToken(){
   try {
-    const { data: { session }, error } = await supabase.auth.getSession();
+    const { data: { session }, error } = await supabaseClient.auth.getSession();
     if (error) {
       console.error('Supabase session error:', error);
       return null;
@@ -936,7 +936,7 @@ async function handleLogin(){
   
   try {
     // Step 1: Try to sign in with Supabase
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
       email: email,
       password: password
     });
@@ -945,7 +945,7 @@ async function handleLogin(){
       // If user doesn't exist, try signup
       if (error.message.includes('Invalid login credentials')) {
         // Try signup instead
-        const { data: signupData, error: signupError } = await supabase.auth.signUp({
+        const { data: signupData, error: signupError } = await supabaseClient.auth.signUp({
           email: email,
           password: password
         });
