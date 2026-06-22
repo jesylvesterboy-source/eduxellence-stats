@@ -26,6 +26,9 @@ code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:#f1f5f9;p
 .nav-links{display:flex;gap:1.25rem;align-items:center}
 .nav-links a{color:rgba(255,255,255,.65);font-size:.85rem;font-weight:500;transition:color .15s}
 .nav-links a:hover{color:#fff;text-decoration:none}
+/* NEW: Referral link in nav */
+.nav-links .nav-refer{color:rgba(255,255,255,.65);font-size:.85rem;font-weight:500;cursor:pointer;transition:color .15s;background:none;border:none;font-family:'DM Sans',sans-serif}
+.nav-links .nav-refer:hover{color:#0FC9A0;text-decoration:none}
 .nav-cta{background:var(--tl)!important;color:var(--ny)!important;padding:5px 14px;border-radius:20px;font-weight:600!important}
 .nav-user{display:flex;align-items:center;gap:.5rem}
 .nav-user-email{color:rgba(255,255,255,.7);font-size:.78rem;font-weight:400}
@@ -220,6 +223,12 @@ code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:#f1f5f9;p
 .share-url-box .copy-btn:hover{background:#1452CC}
 .spinner{width:32px;height:32px;border:3px solid var(--bd);border-top-color:var(--bl);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
+/* REFERRAL MODAL STYLES */
+#referral-modal{display:none;position:fixed;inset:0;background:rgba(11,24,41,.8);z-index:800;align-items:center;justify-content:center;padding:1rem}
+#referral-modal.show{display:flex}
+.referral-modal-box{background:var(--wh);border-radius:var(--r24);padding:2.5rem;max-width:520px;width:100%;box-shadow:var(--shL);position:relative;max-height:90vh;overflow-y:auto}
+.referral-modal-box .close-btn{position:absolute;top:1rem;right:1.25rem;background:none;border:none;font-size:1.25rem;color:var(--sl);cursor:pointer;font-family:'DM Sans',sans-serif}
+.referral-modal-box .close-btn:hover{color:var(--tx)}
 /* CTA SECTION */
 .cta-s{background:linear-gradient(135deg,var(--ny) 0%,var(--ny2) 100%);padding:3.5rem 2rem;text-align:center}
 .cta-s h2{font-family:'Syne',sans-serif;font-size:clamp(1.4rem,3vw,2rem);font-weight:800;color:#fff;margin-bottom:.75rem}
@@ -256,6 +265,8 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
     <a href="https://eduxellence.org">Home</a>
     <a href="https://clean.eduxellence.org">Data Cleaner</a>
     <a href="https://eduxellence.org/services">Services</a>
+    <!-- NEW: Referral link in nav -->
+    <button class="nav-refer" onclick="openReferralModal()">🎁 Refer</button>
     <a href="https://eduxellence.org/#contact" class="nav-cta">Book Audit</a>
   </div>
   <div class="nav-user" id="navUser">
@@ -417,6 +428,16 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
   <div class="share-modal-box">
     <button class="close-btn" onclick="closeShareModal()">✕</button>
     <div id="share-modal-body">
+      <!-- injected -->
+    </div>
+  </div>
+</div>
+
+<!-- NEW: REFERRAL MODAL -->
+<div id="referral-modal">
+  <div class="referral-modal-box">
+    <button class="close-btn" onclick="closeReferralModal()">✕</button>
+    <div id="referral-modal-body">
       <!-- injected -->
     </div>
   </div>
@@ -1231,10 +1252,198 @@ function copyShareUrl(){
   });
 }
 
+/* ═══════════ REFERRAL FUNCTIONS (NEW) ═══════════ */
+
+function openReferralModal() {
+  const token = getAuthToken();
+  if (!token) {
+    alert('Please sign in to access referrals.');
+    openLoginModal();
+    return;
+  }
+  document.getElementById('referral-modal').classList.add('show');
+  renderReferralModal();
+}
+
+function closeReferralModal() {
+  document.getElementById('referral-modal').classList.remove('show');
+}
+
+async function renderReferralModal() {
+  const token = getAuthToken();
+  const body = document.getElementById('referral-modal-body');
+  
+  if (!token) {
+    body.innerHTML = `
+      <div style="text-align:center;padding:1rem 0;">
+        <div style="font-size:3rem;margin-bottom:1rem;">🔑</div>
+        <h3 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--tx);margin-bottom:.5rem;">Sign In to Access Referrals</h3>
+        <p style="color:var(--sl);font-size:.9rem;margin-bottom:1.5rem;">Earn free credits by referring friends!</p>
+        <button class="btn btn-p" style="width:100%;" onclick="closeReferralModal();openLoginModal();">Sign In</button>
+        <button class="btn btn-s" style="width:100%;margin-top:.5rem;" onclick="closeReferralModal()">Cancel</button>
+      </div>
+    `;
+    return;
+  }
+  
+  // Show loading
+  body.innerHTML = `
+    <div style="text-align:center;padding:1rem 0;">
+      <div class="spinner"></div>
+      <p style="color:var(--sl);font-size:.85rem;margin-top:.75rem;">Loading referral info…</p>
+    </div>
+  `;
+  
+  try {
+    // Fetch referral code and stats
+    const [codeRes, statsRes] = await Promise.all([
+      fetch(`${API_BASE}/api/referrals/code`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      }),
+      fetch(`${API_BASE}/api/referrals/stats`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+    ]);
+    
+    const codeData = await codeRes.json();
+    const statsData = await statsRes.json();
+    
+    if (!codeRes.ok || !statsRes.ok) {
+      throw new Error(codeData.error || statsData.error || 'Failed to load referral data');
+    }
+    
+    const referralLink = codeData.referral_link || `${window.location.origin}/signup?ref=${codeData.code}`;
+    const totalReferred = statsData.total_referred || 0;
+    const qualifiedCount = statsData.qualified_count || 0;
+    const milestones = statsData.milestones || [];
+    const nextMilestone = statsData.next_milestone || null;
+    
+    let milestonesHtml = '';
+    if (milestones.length > 0) {
+      milestonesHtml = `
+        <div style="margin-top:1rem;text-align:left;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;color:var(--tx);margin-bottom:.5rem;">🏆 Milestones Reached</div>
+          ${milestones.map(m => `
+            <div style="display:flex;align-items:center;gap:.5rem;padding:.4rem .6rem;background:rgba(22,163,74,.06);border-radius:6px;margin-bottom:.3rem;">
+              <span style="font-size:1.1rem;">✅</span>
+              <span style="font-size:.82rem;color:var(--txM);">${m.credits} credits — ${m.description || 'Referral milestone'}</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+    
+    let nextMilestoneHtml = '';
+    if (nextMilestone) {
+      const progress = Math.min(100, (totalReferred / nextMilestone.threshold) * 100);
+      nextMilestoneHtml = `
+        <div style="margin-top:1rem;text-align:left;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;color:var(--tx);margin-bottom:.3rem;">🎯 Next Milestone</div>
+          <div style="font-size:.8rem;color:var(--sl);margin-bottom:.4rem;">${nextMilestone.credits} credits when you reach ${nextMilestone.threshold} referrals (${totalReferred}/${nextMilestone.threshold})</div>
+          <div style="height:6px;background:var(--bd);border-radius:3px;overflow:hidden;">
+            <div style="height:100%;background:linear-gradient(90deg,var(--bl),var(--tl));border-radius:3px;width:${progress}%;transition:width .3s;"></div>
+          </div>
+        </div>
+      `;
+    }
+    
+    body.innerHTML = `
+      <div style="text-align:center;padding:.5rem 0;">
+        <div style="font-size:2.5rem;margin-bottom:.5rem;">🎁</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--tx);margin-bottom:.25rem;">Refer & Earn Credits</div>
+        <p style="color:var(--sl);font-size:.85rem;line-height:1.6;margin-bottom:1rem;">Share your referral link. When your friends sign up and run their first analysis, you both earn free credits!</p>
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-bottom:1rem;">
+          <div style="background:var(--of);border-radius:8px;padding:.6rem;">
+            <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--tx);">${totalReferred}</div>
+            <div style="font-size:.65rem;color:var(--sl);text-transform:uppercase;letter-spacing:.04em;">Referred</div>
+          </div>
+          <div style="background:var(--of);border-radius:8px;padding:.6rem;">
+            <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--ok);">${qualifiedCount}</div>
+            <div style="font-size:.65rem;color:var(--sl);text-transform:uppercase;letter-spacing:.04em;">Qualified</div>
+          </div>
+          <div style="background:var(--of);border-radius:8px;padding:.6rem;">
+            <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--bl);">${codeData.code || '—'}</div>
+            <div style="font-size:.65rem;color:var(--sl);text-transform:uppercase;letter-spacing:.04em;">Your Code</div>
+          </div>
+        </div>
+        
+        ${milestonesHtml}
+        ${nextMilestoneHtml}
+        
+        <div style="display:flex;gap:.5rem;align-items:center;background:var(--of);border:1px solid var(--bd);border-radius:10px;padding:.6rem .8rem;margin:1rem 0;">
+          <input id="referral-url-input" type="text" readonly value="${referralLink}" style="flex:1;border:none;background:none;font-size:.82rem;color:var(--tx);font-family:'JetBrains Mono',monospace;outline:none;">
+          <button onclick="copyReferralUrl()" style="background:var(--bl);color:#fff;border:none;padding:.4rem .9rem;border-radius:6px;font-size:.78rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">Copy</button>
+        </div>
+        
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;margin-top:.5rem;">
+          <button onclick="shareReferral('twitter')" style="background:#000;color:#fff;border:none;padding:.4rem .9rem;border-radius:20px;font-size:.75rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">🐦 Twitter</button>
+          <button onclick="shareReferral('linkedin')" style="background:#0A66C2;color:#fff;border:none;padding:.4rem .9rem;border-radius:20px;font-size:.75rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">💼 LinkedIn</button>
+          <button onclick="shareReferral('whatsapp')" style="background:#25D366;color:#fff;border:none;padding:.4rem .9rem;border-radius:20px;font-size:.75rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">📱 WhatsApp</button>
+          <button onclick="shareReferral('email')" style="background:var(--sl);color:#fff;border:none;padding:.4rem .9rem;border-radius:20px;font-size:.75rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">✉️ Email</button>
+        </div>
+        
+        <button class="btn btn-s" style="width:100%;margin-top:1rem;" onclick="closeReferralModal()">Close</button>
+      </div>
+    `;
+  } catch(e) {
+    body.innerHTML = `
+      <div style="text-align:center;padding:1rem 0;">
+        <div style="font-size:2.5rem;margin-bottom:.75rem;">⚠️</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--er);margin-bottom:.5rem;">Could Not Load Referral Data</div>
+        <p style="color:var(--sl);font-size:.85rem;margin-bottom:1.25rem;">${e.message}</p>
+        <button class="btn btn-s" style="width:100%;" onclick="closeReferralModal()">Close</button>
+      </div>
+    `;
+  }
+}
+
+function copyReferralUrl() {
+  const input = document.getElementById('referral-url-input');
+  if(!input) return;
+  input.select();
+  navigator.clipboard?.writeText(input.value).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    if(btn) {
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = orig, 2000);
+    }
+  });
+}
+
+function shareReferral(platform) {
+  const input = document.getElementById('referral-url-input');
+  if(!input) return;
+  const url = encodeURIComponent(input.value);
+  const text = encodeURIComponent('🎓 Get free statistical analysis at Eduxellence! Use my referral link to earn free credits:');
+  
+  let shareUrl = '';
+  switch(platform) {
+    case 'twitter':
+      shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+      break;
+    case 'linkedin':
+      shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+      break;
+    case 'whatsapp':
+      shareUrl = `https://api.whatsapp.com/send?text=${text}%20${url}`;
+      break;
+    case 'email':
+      shareUrl = `mailto:?subject=Free Statistical Analysis Tool&body=${text}%0A%0A${url}`;
+      break;
+  }
+  
+  if(shareUrl) {
+    window.open(shareUrl, '_blank', 'width=600,height=500');
+  }
+}
+
 // Close login modal on Esc key
 document.addEventListener('keydown', function(e) {
   if(e.key === 'Escape') {
     closeLoginModal();
+    closeReferralModal();
   }
 });
 
@@ -1242,6 +1451,13 @@ document.addEventListener('keydown', function(e) {
 document.getElementById('login-modal').addEventListener('click', function(e) {
   if(e.target === this) {
     closeLoginModal();
+  }
+});
+
+// Close referral modal on background click
+document.getElementById('referral-modal').addEventListener('click', function(e) {
+  if(e.target === this) {
+    closeReferralModal();
   }
 });
 </script>
