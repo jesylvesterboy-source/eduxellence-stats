@@ -479,6 +479,27 @@ function fileToBase64(file) {
   });
 }
 
+// ===== Helper: Get auth token =====
+function getAuthToken() {
+  return localStorage.getItem('edux_auth_token') || 
+         document.cookie.split('; ').find(row => row.startsWith('supabase_token='))?.split('=')[1] ||
+         null;
+}
+
+// ===== Helper: Get user email =====
+function getUserEmail() {
+  try {
+    const userStr = localStorage.getItem('edux_user');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      return user.email || null;
+    }
+  } catch(e) {
+    console.error('Error parsing user data:', e);
+  }
+  return null;
+}
+
 /* ═══════════ TEST DEFS ═══════════ */
 const TESTS=[
   {id:"descriptive",ico:"📊",name:"Descriptive Statistics",bdg:"dsc",bl:"Descriptive",
@@ -653,9 +674,23 @@ async function runAnalysis(){
   showP("anpw"); const stages=["Loading data…","Parsing columns…","Running test…","Computing effect sizes…","Generating charts…","Building interpretation…","Finalising…"];
   let t=0; const tm=setInterval(()=>{t+=100;const pct=Math.min(92,Math.round(92*(1-Math.pow(1-t/9000,2))));document.getElementById("an-fill").style.width=pct+"%";document.getElementById("an-pct").textContent=pct+"%";document.getElementById("an-sub").textContent=stages[Math.min(Math.floor(pct/(92/stages.length)),stages.length-1)];if(t>=9000)clearInterval(tm);},100);
   try{
-    const r=await fetch(`${API_BASE}/api/analyze`,{
+    // Get auth token for the request
+    const token = getAuthToken();
+    const headers = {
+      "Content-Type": "application/json"
+    };
+    
+    // Add Authorization header if token exists
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+      console.log("🔑 Auth token included in request");
+    } else {
+      console.log("ℹ️ No auth token found - request will be anonymous");
+    }
+    
+    const r = await fetch(`${API_BASE}/api/analyze`,{
       method:"POST",
-      headers:{"Content-Type":"application/json"},
+      headers: headers,
       body:JSON.stringify({
         meta_path:S.metaPath,
         analysis_type:S.test,
@@ -665,6 +700,21 @@ async function runAnalysis(){
       })
     });
     const d=await r.json(); clearInterval(tm); hideP("anpw"); document.getElementById("btn-run").disabled=false;
+    
+    // Handle credit/authentication errors
+    if (r.status === 401) {
+      showA("aw","aw-t","Please sign in to run this analysis. 🔑");
+      // Show login modal automatically
+      openLoginModal();
+      return;
+    }
+    
+    if (r.status === 402) {
+      showA("aw","aw-t", d.error || "Insufficient credits. Please top up to continue.");
+      // Show pricing info
+      return;
+    }
+    
     if(!r.ok||d.error){
       if(d.error === "analysis_too_large"){
         showConsultationPrompt(d.message, d.cta_text, d.cta_url);
@@ -1101,10 +1151,6 @@ function openShareModal(){
 
 function closeShareModal(){
   document.getElementById('share-modal').classList.remove('show');
-}
-
-async function getAuthToken(){
-  return localStorage.getItem('edux_auth_token') || null;
 }
 
 async function renderShareModal(){
