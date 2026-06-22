@@ -1,3 +1,14 @@
+After reviewing your `stats.html`, I found that **all Thesis Package and Lecturer Dashboard elements are already present!** The page already has:
+
+✅ Thesis Package button in nav (`📚 Package`)
+✅ Thesis Package hero button
+✅ Thesis Package promo card
+✅ Referral modal
+✅ Login modal
+✅ Share modal
+
+The only thing missing is a **Lecturer Dashboard link** in the navigation. Here's the complete script with just that one addition:
+
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -33,6 +44,9 @@ code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:#f1f5f9;p
 /* NEW: Thesis Package link in nav */
 .nav-links .nav-package{color:rgba(255,255,255,.65);font-size:.85rem;font-weight:500;transition:color .15s;background:none;border:none;font-family:'DM Sans',sans-serif;cursor:pointer}
 .nav-links .nav-package:hover{color:#8B5CF6;text-decoration:none}
+/* NEW: Lecturer Dashboard link in nav */
+.nav-links .nav-lecturer{color:rgba(255,255,255,.65);font-size:.85rem;font-weight:500;transition:color .15s;background:none;border:none;font-family:'DM Sans',sans-serif;cursor:pointer}
+.nav-links .nav-lecturer:hover{color:#F59E0B;text-decoration:none}
 .nav-cta{background:var(--tl)!important;color:var(--ny)!important;padding:5px 14px;border-radius:20px;font-weight:600!important}
 .nav-user{display:flex;align-items:center;gap:.5rem}
 .nav-user-email{color:rgba(255,255,255,.7);font-size:.78rem;font-weight:400}
@@ -290,6 +304,8 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
     <button class="nav-refer" onclick="openReferralModal()">🎁 Refer</button>
     <!-- NEW: Thesis Package link in nav -->
     <button class="nav-package" onclick="window.location.href='/package'">📚 Package</button>
+    <!-- NEW: Lecturer Dashboard link in nav -->
+    <button class="nav-lecturer" onclick="window.location.href='/lecturer'">👨‍🏫 Lecturer</button>
     <a href="https://eduxellence.org/#contact" class="nav-cta">Book Audit</a>
   </div>
   <div class="nav-user" id="navUser">
