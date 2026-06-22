@@ -27,6 +27,12 @@ code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:#f1f5f9;p
 .nav-links a{color:rgba(255,255,255,.65);font-size:.85rem;font-weight:500;transition:color .15s}
 .nav-links a:hover{color:#fff;text-decoration:none}
 .nav-cta{background:var(--tl)!important;color:var(--ny)!important;padding:5px 14px;border-radius:20px;font-weight:600!important}
+.nav-user{display:flex;align-items:center;gap:.5rem}
+.nav-user-email{color:rgba(255,255,255,.7);font-size:.78rem;font-weight:400}
+.nav-login-btn{background:rgba(255,255,255,.1);color:#fff;padding:5px 14px;border-radius:20px;font-size:.78rem;font-weight:500;border:1px solid rgba(255,255,255,.15);cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif}
+.nav-login-btn:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.3)}
+.nav-logout-btn{background:rgba(220,38,38,.15);color:#ef4444;padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:500;border:1px solid rgba(220,38,38,.2);cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif}
+.nav-logout-btn:hover{background:rgba(220,38,38,.25)}
 /* HERO */
 .hero{background:linear-gradient(135deg,var(--ny) 0%,var(--ny2) 100%);padding:4rem 1.5rem 5rem;text-align:center;position:relative;overflow:hidden}
 .hero::before{content:'';position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(30,107,255,.18) 0%,transparent 70%);top:-200px;left:50%;transform:translateX(-50%);pointer-events:none}
@@ -252,6 +258,11 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
     <a href="https://eduxellence.org/services">Services</a>
     <a href="https://eduxellence.org/#contact" class="nav-cta">Book Audit</a>
   </div>
+  <div class="nav-user" id="navUser">
+    <span class="nav-user-email" id="navUserEmail"></span>
+    <button class="nav-login-btn" id="navLoginBtn" onclick="openLoginModal()">🔑 Sign In</button>
+    <button class="nav-logout-btn" id="navLogoutBtn" onclick="logoutUser()" style="display:none;">Sign Out</button>
+  </div>
 </nav>
 
 <section class="hero">
@@ -407,6 +418,36 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
     <button class="close-btn" onclick="closeShareModal()">✕</button>
     <div id="share-modal-body">
       <!-- injected -->
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN MODAL -->
+<div id="login-modal" style="display:none;position:fixed;inset:0;background:rgba(11,24,41,.8);z-index:700;align-items:center;justify-content:center;padding:1rem">
+  <div style="background:var(--wh);border-radius:var(--r24);padding:2.5rem;max-width:420px;width:100%;box-shadow:var(--shL);position:relative">
+    <button onclick="closeLoginModal()" style="position:absolute;top:1rem;right:1.25rem;background:none;border:none;font-size:1.25rem;color:var(--sl);cursor:pointer;font-family:'DM Sans',sans-serif">✕</button>
+    <div style="text-align:center;margin-bottom:1.5rem">
+      <div style="font-size:2.5rem;margin-bottom:.5rem">🔑</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--tx)">Sign In</div>
+      <p style="color:var(--sl);font-size:.88rem;margin-top:.25rem">Enter your credentials to access all features</p>
+    </div>
+    
+    <div id="login-error" style="color:var(--er);font-size:.82rem;padding:.6rem;background:rgba(220,38,38,.06);border-radius:8px;display:none;margin-bottom:.75rem"></div>
+    <div id="login-success" style="color:var(--ok);font-size:.82rem;padding:.6rem;background:rgba(22,163,74,.06);border-radius:8px;display:none;margin-bottom:.75rem"></div>
+    
+    <div style="text-align:left;margin-bottom:.5rem">
+      <label style="font-size:.8rem;font-weight:600;color:var(--tx);display:block;margin-bottom:.25rem">Email</label>
+      <input id="login-email" type="email" placeholder="you@example.com" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--bd);border-radius:8px;font-size:.9rem;font-family:'DM Sans',sans-serif;margin-bottom:.75rem;">
+      
+      <label style="font-size:.8rem;font-weight:600;color:var(--tx);display:block;margin-bottom:.25rem">Password</label>
+      <input id="login-password" type="password" placeholder="Your password (min 6 characters)" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--bd);border-radius:8px;font-size:.9rem;font-family:'DM Sans',sans-serif;margin-bottom:.5rem;">
+    </div>
+    
+    <button class="btn btn-p" id="loginSubmitBtn" onclick="handleLoginSubmit()" style="width:100%;margin-bottom:.5rem">Sign In / Create Account</button>
+    
+    <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--sl)">
+      <span>No account? Will be created automatically.</span>
+      <span style="color:var(--bl);cursor:pointer" onclick="showDevMode()">Dev Mode</span>
     </div>
   </div>
 </div>
@@ -889,38 +930,25 @@ function guide(){
     "Use non-parametric when skewed, ordinal, or small sample.");
 }
 
-/* ═══════════ SHARE FUNCTIONALITY ═══════════ */
-function openShareModal(){
-  document.getElementById('share-modal').classList.add('show');
-  renderShareModal();
+/* ═══════════ LOGIN FUNCTIONS ═══════════ */
+function openLoginModal(){
+  document.getElementById('login-modal').style.display = 'flex';
+  document.getElementById('login-error').style.display = 'none';
+  document.getElementById('login-success').style.display = 'none';
 }
 
-function closeShareModal(){
-  document.getElementById('share-modal').classList.remove('show');
+function closeLoginModal(){
+  document.getElementById('login-modal').style.display = 'none';
 }
 
-// ===== GET AUTH TOKEN FROM SUPABASE SESSION =====
-async function getAuthToken(){
-  try {
-    const { data: { session }, error } = await supabaseClient.auth.getSession();
-    if (error) {
-      console.error('Supabase session error:', error);
-      return null;
-    }
-    return session?.access_token || null;
-  } catch(e) {
-    console.error('Auth error:', e);
-    return null;
-  }
-}
-
-// ===== LOGIN FUNCTION - USES SUPABASE AUTH DIRECTLY =====
-async function handleLogin(){
+async function handleLoginSubmit(){
   const email = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value.trim();
   const errorEl = document.getElementById('login-error');
+  const successEl = document.getElementById('login-success');
   
   errorEl.style.display = 'none';
+  successEl.style.display = 'none';
   
   if(!email || !password){
     errorEl.textContent = 'Please enter both email and password.';
@@ -928,14 +956,18 @@ async function handleLogin(){
     return;
   }
   
-  const loginBtn = document.querySelector('#share-modal-body .btn-p');
-  if(loginBtn) {
-    loginBtn.disabled = true;
-    loginBtn.textContent = 'Signing in…';
+  if(password.length < 6){
+    errorEl.textContent = 'Password must be at least 6 characters.';
+    errorEl.style.display = 'block';
+    return;
   }
   
+  const btn = document.getElementById('loginSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Processing…';
+  
   try {
-    // Step 1: Try to sign in with Supabase
+    // Try to sign in with Supabase
     const { data, error } = await supabaseClient.auth.signInWithPassword({
       email: email,
       password: password
@@ -953,22 +985,17 @@ async function handleLogin(){
         if (signupError) {
           errorEl.textContent = signupError.message || 'Could not create account.';
           errorEl.style.display = 'block';
-          if(loginBtn) {
-            loginBtn.disabled = false;
-            loginBtn.textContent = 'Sign In / Create Account';
-          }
+          btn.disabled = false;
+          btn.textContent = 'Sign In / Create Account';
           return;
         }
         
         // Check if user needs email confirmation
         if (signupData.user && !signupData.session) {
-          errorEl.textContent = '✅ Account created! Please check your email to confirm.';
-          errorEl.style.color = 'var(--ok)';
-          errorEl.style.display = 'block';
-          if(loginBtn) {
-            loginBtn.disabled = false;
-            loginBtn.textContent = 'Sign In / Create Account';
-          }
+          successEl.textContent = '✅ Account created! Please check your email to confirm.';
+          successEl.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = 'Sign In / Create Account';
           return;
         }
         
@@ -978,17 +1005,20 @@ async function handleLogin(){
           if(signupData.user){
             localStorage.setItem('edux_user', JSON.stringify(signupData.user));
           }
-          renderShareModal();
+          updateNavUI(signupData.user);
+          successEl.textContent = '✅ Account created and signed in!';
+          successEl.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = 'Sign In / Create Account';
+          setTimeout(closeLoginModal, 1500);
           return;
         }
       }
       
       errorEl.textContent = error.message || 'Login failed. Please try again.';
       errorEl.style.display = 'block';
-      if(loginBtn) {
-        loginBtn.disabled = false;
-        loginBtn.textContent = 'Sign In / Create Account';
-      }
+      btn.disabled = false;
+      btn.textContent = 'Sign In / Create Account';
       return;
     }
     
@@ -998,32 +1028,83 @@ async function handleLogin(){
       if(data.user){
         localStorage.setItem('edux_user', JSON.stringify(data.user));
       }
-      renderShareModal();
+      updateNavUI(data.user);
+      successEl.textContent = '✅ Signed in successfully!';
+      successEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Sign In / Create Account';
+      setTimeout(closeLoginModal, 1500);
     } else {
       errorEl.textContent = 'Login failed. No session returned.';
       errorEl.style.display = 'block';
-      if(loginBtn) {
-        loginBtn.disabled = false;
-        loginBtn.textContent = 'Sign In / Create Account';
-      }
+      btn.disabled = false;
+      btn.textContent = 'Sign In / Create Account';
     }
     
   } catch(e) {
     errorEl.textContent = 'Network error: ' + e.message;
     errorEl.style.display = 'block';
-    if(loginBtn) {
-      loginBtn.disabled = false;
-      loginBtn.textContent = 'Sign In / Create Account';
-    }
+    btn.disabled = false;
+    btn.textContent = 'Sign In / Create Account';
   }
 }
 
-// ===== LOGOUT FUNCTION =====
+function updateNavUI(user){
+  const emailEl = document.getElementById('navUserEmail');
+  const loginBtn = document.getElementById('navLoginBtn');
+  const logoutBtn = document.getElementById('navLogoutBtn');
+  
+  if(user){
+    emailEl.textContent = user.email || 'User';
+    loginBtn.style.display = 'none';
+    logoutBtn.style.display = 'inline-block';
+  } else {
+    emailEl.textContent = '';
+    loginBtn.style.display = 'inline-block';
+    logoutBtn.style.display = 'none';
+  }
+}
+
 function logoutUser(){
   localStorage.removeItem('edux_auth_token');
   localStorage.removeItem('edux_user');
-  closeShareModal();
+  updateNavUI(null);
   alert('You have been signed out.');
+}
+
+function showDevMode(){
+  const errorEl = document.getElementById('login-error');
+  errorEl.textContent = '🔧 DEV MODE: Use any email and password (min 6 chars). Sign up will work automatically.';
+  errorEl.style.color = 'var(--wn)';
+  errorEl.style.display = 'block';
+}
+
+// Check for existing session on load
+document.addEventListener('DOMContentLoaded', function(){
+  const token = localStorage.getItem('edux_auth_token');
+  const userStr = localStorage.getItem('edux_user');
+  if(token && userStr){
+    try {
+      const user = JSON.parse(userStr);
+      updateNavUI(user);
+    } catch(e) {
+      console.error('Error parsing user data:', e);
+    }
+  }
+});
+
+/* ═══════════ SHARE FUNCTIONS ═══════════ */
+function openShareModal(){
+  document.getElementById('share-modal').classList.add('show');
+  renderShareModal();
+}
+
+function closeShareModal(){
+  document.getElementById('share-modal').classList.remove('show');
+}
+
+async function getAuthToken(){
+  return localStorage.getItem('edux_auth_token') || null;
 }
 
 async function renderShareModal(){
@@ -1035,21 +1116,8 @@ async function renderShareModal(){
       <div style="text-align:center;padding:.5rem 0;">
         <div style="font-size:2.5rem;margin-bottom:.75rem;">🔑</div>
         <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--tx);margin-bottom:.5rem;">Sign In to Share Results</div>
-        <p style="color:var(--sl);font-size:.88rem;line-height:1.6;margin-bottom:1rem;">Enter your email to sign in or create a free account.</p>
-        
-        <!-- LOGIN FORM -->
-        <div style="text-align:left;margin-bottom:1rem;">
-          <label style="font-size:.8rem;font-weight:600;color:var(--tx);display:block;margin-bottom:.25rem;">Email</label>
-          <input id="login-email" type="email" placeholder="you@example.com" style="width:100%;padding:.6rem .8rem;border:1.5px solid var(--bd);border-radius:8px;font-size:.9rem;font-family:'DM Sans',sans-serif;margin-bottom:.75rem;">
-          
-          <label style="font-size:.8rem;font-weight:600;color:var(--tx);display:block;margin-bottom:.25rem;">Password</label>
-          <input id="login-password" type="password" placeholder="Your password" style="width:100%;padding:.6rem .8rem;border:1.5px solid var(--bd);border-radius:8px;font-size:.9rem;font-family:'DM Sans',sans-serif;margin-bottom:.5rem;">
-        </div>
-        
-        <div id="login-error" style="color:var(--er);font-size:.8rem;margin-bottom:.5rem;display:none;"></div>
-        
-        <button class="btn btn-p" style="width:100%;" onclick="handleLogin()">Sign In / Create Account</button>
-        <button class="btn btn-s" style="width:100%;margin-top:.6rem;" onclick="closeShareModal()">Cancel</button>
+        <p style="color:var(--sl);font-size:.88rem;line-height:1.6;margin-bottom:1rem;">Please <a href="#" onclick="closeShareModal();openLoginModal();return false;" style="color:var(--bl);font-weight:600;">sign in</a> to create shareable links.</p>
+        <button class="btn btn-s" style="width:100%;" onclick="closeShareModal()">Cancel</button>
       </div>`;
     return;
   }
@@ -1116,6 +1184,20 @@ function copyShareUrl(){
     }
   });
 }
+
+// Close login modal on Esc key
+document.addEventListener('keydown', function(e) {
+  if(e.key === 'Escape') {
+    closeLoginModal();
+  }
+});
+
+// Close login modal on background click
+document.getElementById('login-modal').addEventListener('click', function(e) {
+  if(e.target === this) {
+    closeLoginModal();
+  }
+});
 </script>
 </body>
 </html>
