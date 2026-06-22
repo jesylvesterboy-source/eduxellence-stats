@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,6 +30,9 @@ code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:#f1f5f9;p
 /* NEW: Referral link in nav */
 .nav-links .nav-refer{color:rgba(255,255,255,.65);font-size:.85rem;font-weight:500;cursor:pointer;transition:color .15s;background:none;border:none;font-family:'DM Sans',sans-serif}
 .nav-links .nav-refer:hover{color:#0FC9A0;text-decoration:none}
+/* NEW: Thesis Package link in nav */
+.nav-links .nav-package{color:rgba(255,255,255,.65);font-size:.85rem;font-weight:500;transition:color .15s;background:none;border:none;font-family:'DM Sans',sans-serif;cursor:pointer}
+.nav-links .nav-package:hover{color:#8B5CF6;text-decoration:none}
 .nav-cta{background:var(--tl)!important;color:var(--ny)!important;padding:5px 14px;border-radius:20px;font-weight:600!important}
 .nav-user{display:flex;align-items:center;gap:.5rem}
 .nav-user-email{color:rgba(255,255,255,.7);font-size:.78rem;font-weight:400}
@@ -45,6 +49,10 @@ code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:#f1f5f9;p
 .hero-sub{color:rgba(255,255,255,.6);max-width:520px;margin:0 auto 2rem;font-size:1rem}
 .tp{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-top:1rem}
 .tp span{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.75);font-size:.78rem;padding:4px 12px;border-radius:20px}
+/* NEW: Thesis Package Hero Button */
+.hero-package-btn{margin-top:1.5rem;display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#8B5CF6,#6D28D9);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;padding:.7rem 1.8rem;border-radius:30px;border:none;cursor:pointer;transition:all .2s;text-decoration:none;box-shadow:0 4px 20px rgba(139,92,246,.35)}
+.hero-package-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(139,92,246,.45);text-decoration:none;color:#fff}
+.hero-package-badge{font-size:.55rem;background:rgba(255,255,255,.2);padding:2px 10px;border-radius:10px;text-transform:uppercase;letter-spacing:.04em}
 /* MAIN */
 .main{max-width:1100px;margin:-2.5rem auto 4rem;padding:0 1rem;position:relative;z-index:2}
 /* WIZARD */
@@ -86,6 +94,9 @@ code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:#f1f5f9;p
 .btn-row{display:flex;gap:.75rem;margin-top:1.25rem;flex-wrap:wrap}
 .btn-share{background:linear-gradient(135deg,var(--tl),var(--tl2));color:var(--ny);padding:.5rem 1rem;font-size:.8rem;font-family:'Syne',sans-serif;font-weight:700;border:none;border-radius:var(--r8);cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
 .btn-share:hover{transform:translateY(-1px);opacity:.9}
+/* NEW: Package Button Style */
+.btn-package{background:linear-gradient(135deg,#8B5CF6,#6D28D9);color:#fff;padding:.7rem 1.5rem;font-size:.875rem;border:none;border-radius:var(--r8);cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;transition:all .2s;display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.btn-package:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(139,92,246,.4);color:#fff;text-decoration:none}
 /* ALERTS */
 .alert{border-radius:var(--r8);padding:.9rem 1.1rem;display:none;align-items:flex-start;gap:.75rem;margin-top:.75rem}
 .alert.show{display:flex}
@@ -123,6 +134,16 @@ code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:#f1f5f9;p
 .t-desc{font-size:.78rem;color:var(--sl);line-height:1.5}
 .t-bdg{display:inline-block;font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:10px;margin-top:.5rem}
 .b-par{background:#DBEAFE;color:#1E40AF}.b-np{background:#FEF3C7;color:#92400E}.b-dsc{background:#F3E8FF;color:#6B21A8}
+/* NEW: Thesis Package Promo Card */
+.package-promo{background:linear-gradient(135deg,rgba(139,92,246,.1),rgba(109,40,217,.06));border:2px solid #8B5CF6;border-radius:var(--r16);padding:1.25rem 1.5rem;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.package-promo:hover{border-color:#7C3AED;background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(109,40,217,.1))}
+.package-promo-left{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+.package-promo-icon{font-size:2rem}
+.package-promo-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;color:var(--tx);display:flex;align-items:center;gap:.5rem}
+.package-promo-badge{font-size:.6rem;background:linear-gradient(135deg,#8B5CF6,#6D28D9);color:#fff;padding:2px 10px;border-radius:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.package-promo-desc{font-size:.82rem;color:var(--sl);margin-top:.2rem}
+.package-promo-tags{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.3rem}
+.package-promo-tags span{font-size:.6rem;background:rgba(139,92,246,.1);color:#6D28D9;padding:2px 8px;border-radius:10px}
 /* RECOMMENDATIONS */
 .recs{background:rgba(15,201,160,.06);border:1.5px solid rgba(15,201,160,.2);border-radius:var(--r12);padding:1rem 1.25rem;margin-bottom:1.25rem}
 .rec-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--ny);margin-bottom:.6rem}
@@ -267,6 +288,8 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
     <a href="https://eduxellence.org/services">Services</a>
     <!-- NEW: Referral link in nav -->
     <button class="nav-refer" onclick="openReferralModal()">🎁 Refer</button>
+    <!-- NEW: Thesis Package link in nav -->
+    <button class="nav-package" onclick="window.location.href='/package'">📚 Package</button>
     <a href="https://eduxellence.org/#contact" class="nav-cta">Book Audit</a>
   </div>
   <div class="nav-user" id="navUser">
@@ -284,6 +307,14 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
     <span>📊 Descriptive</span><span>🔲 Chi-Square</span><span>⚖️ T-Test</span>
     <span>📈 ANOVA</span><span>🔗 Correlation</span><span>📉 Regression</span>
     <span>🥊 Mann-Whitney</span><span>🏆 Kruskal-Wallis</span>
+  </div>
+  <!-- NEW: Thesis Package Hero Button -->
+  <div style="margin-top:1.5rem;">
+    <a href="/package" class="hero-package-btn">
+      📚 Launch Thesis Package
+      <span class="hero-package-badge">NEW</span>
+    </a>
+    <div style="font-size:.7rem;color:rgba(255,255,255,.4);margin-top:.5rem;">Run all 7 tests at once — perfect for research</div>
   </div>
 </section>
 
@@ -340,6 +371,33 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
 <div id="p2" class="panel">
   <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.35rem;margin-bottom:.35rem">Choose Your Statistical Test</h2>
   <p style="color:var(--sl);font-size:.9rem;margin-bottom:1.25rem">Not sure? <a href="#" onclick="guide();return false">See the decision guide →</a></p>
+  
+  <!-- NEW: Thesis Package Promo Card -->
+  <div class="package-promo">
+    <div class="package-promo-left">
+      <div class="package-promo-icon">📚</div>
+      <div>
+        <div class="package-promo-title">
+          Thesis / Research Package
+          <span class="package-promo-badge">NEW</span>
+        </div>
+        <div class="package-promo-desc">Run all 7 statistical tests at once — perfect for thesis, dissertation, and research papers.</div>
+        <div class="package-promo-tags">
+          <span>📊 Descriptive</span>
+          <span>🔲 Chi-Square</span>
+          <span>⚖️ T-Test</span>
+          <span>📈 ANOVA</span>
+          <span>🔗 Correlation</span>
+          <span>📉 Regression</span>
+          <span>🏆 Kruskal-Wallis</span>
+        </div>
+      </div>
+    </div>
+    <a href="/package" class="btn-package">
+      Launch Package →
+    </a>
+  </div>
+
   <div class="recs" id="recs-box" style="display:none">
     <div class="rec-title">✦ Recommended for your data:</div>
     <div class="rec-list" id="rec-list"></div>
@@ -1463,3 +1521,4 @@ document.getElementById('referral-modal').addEventListener('click', function(e) 
 </script>
 </body>
 </html>
+```
