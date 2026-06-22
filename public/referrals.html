@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Refer Friends — Eduxellence Analytics</title>
+<meta name="description" content="Invite friends to Eduxellence Analytics and earn free credits.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--ny:#0B1829;--ny2:#112240;--bl:#1E6BFF;--tl:#0FC9A0;--wh:#fff;--of:#F7F9FC;
+  --sl:#64748B;--bd:#E2E8F0;--ok:#16A34A;--tx:#0F172A;--txM:#475569;
+  --r8:8px;--r12:12px;--r16:16px;--r24:24px;--shS:0 1px 3px rgba(0,0,0,.08);--shM:0 4px 16px rgba(0,0,0,.1);--shL:0 12px 40px rgba(0,0,0,.14);}
+body{font-family:'DM Sans',sans-serif;background:var(--of);color:var(--tx);line-height:1.6}
+a{color:var(--bl);text-decoration:none}
+.nav{background:var(--ny);height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;position:sticky;top:0;z-index:100}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;color:#fff;text-decoration:none}
+.nav-logo span{color:var(--tl)}
+.nav-links{display:flex;gap:1.25rem;align-items:center}
+.nav-links a{color:rgba(255,255,255,.65);font-size:.85rem;font-weight:500}
+.nav-cta{background:var(--tl)!important;color:var(--ny)!important;padding:6px 16px;border-radius:20px;font-weight:700!important;font-family:'Syne',sans-serif}
+.hero{background:linear-gradient(135deg,var(--ny),var(--ny2));padding:3.5rem 1.5rem 5rem;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(15,201,160,.18) 0%,transparent 70%);top:-180px;left:50%;transform:translateX(-50%);pointer-events:none}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,4vw,2.75rem);font-weight:800;color:#fff;margin-bottom:.75rem;letter-spacing:-1px}
+.hero p{color:rgba(255,255,255,.6);max-width:520px;margin:0 auto}
+.main{max-width:900px;margin:-3rem auto 4rem;padding:0 1.25rem}
+.signin-card{background:var(--wh);border-radius:var(--r24);box-shadow:var(--shL);padding:3rem 2rem;text-align:center}
+.signin-icon{font-size:3rem;margin-bottom:1rem}
+.code-card{background:var(--wh);border-radius:var(--r24);box-shadow:var(--shL);padding:2rem;margin-bottom:1.5rem;text-align:center}
+.code-label{font-size:.8rem;color:var(--sl);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.code-display{font-family:'JetBrains Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--ny);background:var(--of);border:2px dashed var(--bd);border-radius:var(--r12);padding:1rem 1.5rem;display:inline-block;margin-bottom:1rem;letter-spacing:.1em}
+.link-row{display:flex;gap:.5rem;align-items:center;background:var(--of);border:1px solid var(--bd);border-radius:10px;padding:.7rem 1rem;max-width:500px;margin:0 auto}
+.link-input{flex:1;border:none;background:none;font-size:.85rem;color:var(--tx);font-family:'JetBrains Mono',monospace;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.copy-btn{background:var(--bl);color:#fff;border:none;padding:.5rem 1.2rem;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;white-space:nowrap}
+.copy-btn:hover{background:#1452CC}
+.share-row{display:flex;gap:.6rem;justify-content:center;margin-top:1.25rem;flex-wrap:wrap}
+.share-btn{display:inline-flex;align-items:center;gap:6px;padding:.55rem 1.1rem;border-radius:20px;border:1.5px solid var(--bd);background:#fff;color:var(--txM);font-size:.82rem;font-weight:600;cursor:pointer;text-decoration:none;transition:all .15s}
+.share-btn:hover{border-color:var(--bl);color:var(--bl);text-decoration:none}
+.progress-section{background:var(--wh);border-radius:var(--r24);box-shadow:var(--shL);padding:2rem;margin-bottom:1.5rem}
+.progress-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--tx);margin-bottom:1.25rem}
+.milestone-track{position:relative;margin:2.5rem 0 1.5rem}
+.milestone-bar{height:8px;background:var(--bd);border-radius:4px;position:relative;overflow:visible}
+.milestone-fill{height:100%;background:linear-gradient(90deg,var(--tl),var(--bl));border-radius:4px;transition:width .5s ease}
+.milestone-marker{position:absolute;top:50%;transform:translate(-50%,-50%);width:32px;height:32px;border-radius:50%;background:var(--wh);border:3px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;font-family:'Syne',sans-serif;color:var(--sl)}
+.milestone-marker.reached{border-color:var(--ok);background:var(--ok);color:#fff}
+.milestone-marker.current{border-color:var(--bl);background:var(--bl);color:#fff;box-shadow:0 0 0 4px rgba(30,107,255,.2)}
+.milestone-label{position:absolute;top:42px;transform:translateX(-50%);font-size:.72rem;color:var(--sl);text-align:center;white-space:nowrap;font-weight:600}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:2.5rem}
+.stat-box{background:var(--of);border-radius:var(--r12);padding:1.2rem;text-align:center}
+.stat-num{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--tx)}
+.stat-lbl{font-size:.75rem;color:var(--sl);margin-top:2px;text-transform:uppercase;letter-spacing:.04em}
+.next-reward-box{background:linear-gradient(135deg,rgba(30,107,255,.06),rgba(15,201,160,.06));border:1.5px solid rgba(30,107,255,.2);border-radius:var(--r12);padding:1.25rem 1.5rem;margin-top:1.5rem;text-align:center}
+.next-reward-box.complete{background:linear-gradient(135deg,rgba(22,163,74,.08),rgba(15,201,160,.08));border-color:rgba(22,163,74,.3)}
+.how-it-works{background:var(--wh);border-radius:var(--r24);box-shadow:var(--shL);padding:2rem;margin-bottom:1.5rem}
+.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:1.25rem}
+.step-card{text-align:center}
+.step-num-circle{width:40px;height:40px;border-radius:50%;background:var(--ny);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;margin:0 auto .75rem}
+.step-title{font-weight:700;font-size:.9rem;margin-bottom:.4rem}
+.step-desc{font-size:.8rem;color:var(--sl);line-height:1.5}
+.referrals-list{background:var(--wh);border-radius:var(--r24);box-shadow:var(--shL);padding:2rem}
+.ref-row{display:flex;justify-content:space-between;align-items:center;padding:.85rem 0;border-bottom:1px solid var(--bd);font-size:.85rem}
+.ref-row:last-child{border-bottom:none}
+.ref-status{font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px}
+.status-pending{background:#FEF3C7;color:#92400E}
+.status-qualified{background:rgba(22,163,74,.1);color:var(--ok)}
+.empty-state{text-align:center;padding:2rem;color:var(--sl);font-size:.88rem}
+footer{background:var(--ny);color:rgba(255,255,255,.5);text-align:center;padding:2rem;font-size:.83rem;margin-top:2rem}
+footer a{color:var(--tl)}
+@media(max-width:640px){.stats-grid{grid-template-columns:1fr}.steps-grid{grid-template-columns:1fr}.nav-links{display:none}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="/">Eduxellence<span>.</span></a>
+  <div class="nav-links">
+    <a href="/stats">Statistical Analysis</a>
+    <a href="/pricing">Pricing</a>
+    <a href="https://eduxellence.org/#contact" class="nav-cta">Book Audit</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <h1>Invite Friends, Earn Free Credits</h1>
+  <p>Share your link. When a friend joins and runs their first analysis, you both win.</p>
+</section>
+
+<div class="main" id="main-content">
+  <div class="signin-card">
+    <div class="signin-icon">🔒</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:.5rem">Sign In to See Your Referral Link</div>
+    <p style="color:var(--sl);font-size:.9rem;margin-bottom:1.25rem">Create a free account to get your personal referral link and start earning credits.</p>
+    <a href="/login" style="display:inline-block;background:var(--bl);color:#fff;font-family:'Syne',sans-serif;font-weight:700;padding:.8rem 2rem;border-radius:10px">Sign In / Create Free Account</a>
+  </div>
+</div>
+
+<footer>
+  <p><strong style="color:rgba(255,255,255,.75)">Eduxellence Analytics</strong> — Free Statistical Analysis Platform</p>
+  <p style="margin-top:.4rem"><a href="/">Home</a> · <a href="/stats">Run Analysis</a> · <a href="https://eduxellence.org/#contact">Contact</a></p>
+</footer>
+
+<script>
+function getAuthToken(){ return localStorage.getItem('edux_auth_token') || null; }
+
+const MILESTONES = [
+  {threshold: 3,  label: '5 free credits',       pos: 30},
+  {threshold: 10, label: '1 free Thesis Package', pos: 100},
+];
+
+async function init(){
+  const token = getAuthToken();
+  if(!token) return;
+
+  try{
+    const [codeR, statsR] = await Promise.all([
+      fetch('/api/referrals/code', {headers:{'Authorization':'Bearer '+token}}),
+      fetch('/api/referrals/stats', {headers:{'Authorization':'Bearer '+token}}),
+    ]);
+    const codeD = await codeR.json();
+    const statsD = await statsR.json();
+    if(!codeR.ok || !statsR.ok){
+      document.getElementById('main-content').innerHTML = '<div class="signin-card"><p style="color:var(--sl)">Could not load referral data. Please try signing in again.</p></div>';
+      return;
+    }
+    render(codeD, statsD);
+  }catch(e){
+    document.getElementById('main-content').innerHTML = '<div class="signin-card"><p style="color:var(--sl)">Network error: ' + e.message + '</p></div>';
+  }
+}
+
+function render(codeD, statsD){
+  const qualified = statsD.qualified_count || 0;
+  const fillPct = Math.min(100, (qualified / 10) * 100);
+
+  const milestoneMarkers = MILESTONES.map(m=>{
+    const reached = qualified >= m.threshold;
+    const isCurrent = !reached && statsD.next_milestone && statsD.next_milestone.threshold === m.threshold;
+    return '<div class="milestone-marker ' + (reached?'reached':isCurrent?'current':'') + '" style="left:' + m.pos + '%">' + (reached?'✓':m.threshold) + '</div>' +
+      '<div class="milestone-label" style="left:' + m.pos + '%">' + m.label + '</div>';
+  }).join('');
+
+  const nextRewardHtml = statsD.next_milestone
+    ? '<div class="next-reward-box"><div style="font-weight:700;font-size:.95rem;margin-bottom:.25rem">🎯 ' + statsD.next_milestone.remaining + ' more referral' + (statsD.next_milestone.remaining===1?'':'s') + ' to unlock</div><div style="font-size:.85rem;color:var(--txM)">' + statsD.next_milestone.reward + '</div></div>'
+    : '<div class="next-reward-box complete"><div style="font-weight:700;font-size:.95rem">🎉 You have unlocked every referral milestone!</div><div style="font-size:.85rem;color:var(--txM);margin-top:.25rem">Keep referring — every qualified friend still helps grow the community.</div></div>';
+
+  const referralsListHtml = statsD.referrals && statsD.referrals.length
+    ? statsD.referrals.map(r=>'<div class="ref-row"><span>Referred ' + new Date(r.created_at).toLocaleDateString() + '</span><span class="ref-status ' + (r.status==='pending'?'status-pending':'status-qualified') + '">' + (r.status==='pending'?'⏳ Pending first analysis':'✓ Qualified') + '</span></div>').join('')
+    : '<div class="empty-state">No referrals yet — share your link to get started!</div>';
+
+  document.getElementById('main-content').innerHTML =
+    '<div class="code-card">' +
+      '<div class="code-label">Your Referral Code</div>' +
+      '<div class="code-display">' + codeD.code + '</div>' +
+      '<div class="link-row">' +
+        '<input class="link-input" id="ref-link-input" readonly value="' + codeD.referral_link + '">' +
+        '<button class="copy-btn" onclick="copyLink()">Copy Link</button>' +
+      '</div>' +
+      '<div class="share-row">' +
+        '<a class="share-btn" target="_blank" href="https://wa.me/?text=' + encodeURIComponent('Clean your data and run statistical analysis free — I use Eduxellence Analytics. Join with my link: ' + codeD.referral_link) + '">💬 WhatsApp</a>' +
+        '<a class="share-btn" target="_blank" href="https://twitter.com/intent/tweet?text=' + encodeURIComponent('Free statistical analysis tool for researchers and students:') + '&url=' + encodeURIComponent(codeD.referral_link) + '">🐦 X / Twitter</a>' +
+        '<a class="share-btn" target="_blank" href="mailto:?subject=' + encodeURIComponent('Free statistical analysis tool') + '&body=' + encodeURIComponent('I think you would find this useful: ' + codeD.referral_link) + '">✉️ Email</a>' +
+      '</div>' +
+    '</div>' +
+    '<div class="progress-section">' +
+      '<div class="progress-title">Your Referral Progress</div>' +
+      '<div class="milestone-track">' +
+        '<div class="milestone-bar"><div class="milestone-fill" style="width:' + fillPct + '%"></div></div>' +
+        milestoneMarkers +
+      '</div>' +
+      nextRewardHtml +
+      '<div class="stats-grid">' +
+        '<div class="stat-box"><div class="stat-num">' + statsD.total_referred + '</div><div class="stat-lbl">Total Invited</div></div>' +
+        '<div class="stat-box"><div class="stat-num">' + statsD.qualified_count + '</div><div class="stat-lbl">Qualified</div></div>' +
+        '<div class="stat-box"><div class="stat-num">' + statsD.milestones_reached.length + '</div><div class="stat-lbl">Rewards Earned</div></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="how-it-works">' +
+      '<div class="progress-title">How It Works</div>' +
+      '<div class="steps-grid">' +
+        '<div class="step-card"><div class="step-num-circle">1</div><div class="step-title">Share your link</div><div class="step-desc">Send your unique code to classmates, colleagues, or your research WhatsApp group.</div></div>' +
+        '<div class="step-card"><div class="step-num-circle">2</div><div class="step-title">They run an analysis</div><div class="step-desc">Once your friend signs up and completes any analysis — even a free one — they qualify.</div></div>' +
+        '<div class="step-card"><div class="step-num-circle">3</div><div class="step-title">You get rewarded</div><div class="step-desc">3 qualified friends = 5 free credits. 10 qualified friends = a free Thesis Package.</div></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="referrals-list">' +
+      '<div class="progress-title">Your Referrals</div>' +
+      referralsListHtml +
+    '</div>';
+}
+
+function copyLink(){
+  const input = document.getElementById('ref-link-input');
+  input.select();
+  navigator.clipboard?.writeText(input.value).then(()=>{
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(()=>btn.textContent = orig, 2000);
+  });
+}
+
+init();
+</script>
+</body>
+</html>
