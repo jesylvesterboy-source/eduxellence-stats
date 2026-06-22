@@ -411,12 +411,22 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
   </div>
 </div>
 
+<!-- ===== SUPABASE JS SDK ===== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
 /* ═══════════ STATE ═══════════ */
 const S={metaPath:null,filename:null,cols:[],test:null,params:null,results:null,assumptions:[],aiMode:'simple',fileData:null};
 
 // ===== API BASE URL - UPDATED TO HUGGING FACE =====
 const API_BASE = 'https://Eduxellence-eduxellence-api.hf.space';
+
+// ===== SUPABASE CONFIGURATION (ANON KEY - SAFE FOR FRONTEND) =====
+const SUPABASE_URL = 'https://uvmmottlccuxvfmwckuf.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2bW1vdHRsY2N1eHZmbXdja3VmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3ODQxMzIsImV4cCI6MjA5NzM2MDEzMn0.e4789311KYwC-YXOuPheW9AXIIYRzT-te6YfNnnNdnk';
+
+// Initialize Supabase client
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ===== Helper: Convert file to base64 =====
 function fileToBase64(file) {
@@ -889,30 +899,35 @@ function closeShareModal(){
   document.getElementById('share-modal').classList.remove('show');
 }
 
-// ===== GET AUTH TOKEN FROM LOCALSTORAGE =====
-function getAuthToken(){
-  // Check localStorage for the token
-  const token = localStorage.getItem('edux_auth_token');
-  return token || null;
+// ===== GET AUTH TOKEN FROM SUPABASE SESSION =====
+async function getAuthToken(){
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error) {
+      console.error('Supabase session error:', error);
+      return null;
+    }
+    return session?.access_token || null;
+  } catch(e) {
+    console.error('Auth error:', e);
+    return null;
+  }
 }
 
-// ===== LOGIN FUNCTION =====
+// ===== LOGIN FUNCTION - USES SUPABASE AUTH DIRECTLY =====
 async function handleLogin(){
   const email = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value.trim();
   const errorEl = document.getElementById('login-error');
   
-  // Hide any previous error
   errorEl.style.display = 'none';
   
-  // Validate inputs
   if(!email || !password){
     errorEl.textContent = 'Please enter both email and password.';
     errorEl.style.display = 'block';
     return;
   }
   
-  // Show loading state on button
   const loginBtn = document.querySelector('#share-modal-body .btn-p');
   if(loginBtn) {
     loginBtn.disabled = true;
@@ -920,17 +935,55 @@ async function handleLogin(){
   }
   
   try {
-    // Call Supabase auth via your backend
-    const response = await fetch(`${API_BASE}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+    // Step 1: Try to sign in with Supabase
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password
     });
     
-    const data = await response.json();
-    
-    if(!response.ok || !data.token){
-      errorEl.textContent = data.error || 'Login failed. Please check your credentials.';
+    if (error) {
+      // If user doesn't exist, try signup
+      if (error.message.includes('Invalid login credentials')) {
+        // Try signup instead
+        const { data: signupData, error: signupError } = await supabase.auth.signUp({
+          email: email,
+          password: password
+        });
+        
+        if (signupError) {
+          errorEl.textContent = signupError.message || 'Could not create account.';
+          errorEl.style.display = 'block';
+          if(loginBtn) {
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Sign In / Create Account';
+          }
+          return;
+        }
+        
+        // Check if user needs email confirmation
+        if (signupData.user && !signupData.session) {
+          errorEl.textContent = '✅ Account created! Please check your email to confirm.';
+          errorEl.style.color = 'var(--ok)';
+          errorEl.style.display = 'block';
+          if(loginBtn) {
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Sign In / Create Account';
+          }
+          return;
+        }
+        
+        // Signup successful with session
+        if (signupData.session) {
+          localStorage.setItem('edux_auth_token', signupData.session.access_token);
+          if(signupData.user){
+            localStorage.setItem('edux_user', JSON.stringify(signupData.user));
+          }
+          renderShareModal();
+          return;
+        }
+      }
+      
+      errorEl.textContent = error.message || 'Login failed. Please try again.';
       errorEl.style.display = 'block';
       if(loginBtn) {
         loginBtn.disabled = false;
@@ -939,16 +992,21 @@ async function handleLogin(){
       return;
     }
     
-    // Save the token to localStorage
-    localStorage.setItem('edux_auth_token', data.token);
-    
-    // Also save user info if needed
-    if(data.user){
-      localStorage.setItem('edux_user', JSON.stringify(data.user));
+    // Login successful
+    if (data.session) {
+      localStorage.setItem('edux_auth_token', data.session.access_token);
+      if(data.user){
+        localStorage.setItem('edux_user', JSON.stringify(data.user));
+      }
+      renderShareModal();
+    } else {
+      errorEl.textContent = 'Login failed. No session returned.';
+      errorEl.style.display = 'block';
+      if(loginBtn) {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Sign In / Create Account';
+      }
     }
-    
-    // Re-render the share modal (now showing the share link creation)
-    renderShareModal();
     
   } catch(e) {
     errorEl.textContent = 'Network error: ' + e.message;
@@ -965,12 +1023,11 @@ function logoutUser(){
   localStorage.removeItem('edux_auth_token');
   localStorage.removeItem('edux_user');
   closeShareModal();
-  // Optionally refresh the page or update UI
   alert('You have been signed out.');
 }
 
 async function renderShareModal(){
-  const token = getAuthToken();
+  const token = await getAuthToken();
   const body = document.getElementById('share-modal-body');
 
   if(!token){
