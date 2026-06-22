@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Thesis / Research Package — Eduxellence Analytics</title>
+<meta name="description" content="One package, 7 statistical tests, one APA-formatted report. Built for thesis and research projects.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--ny:#0B1829;--ny2:#112240;--bl:#1E6BFF;--tl:#0FC9A0;--wh:#fff;--of:#F7F9FC;
+  --sl:#64748B;--slL:#CBD5E1;--bd:#E2E8F0;--ok:#16A34A;--er:#DC2626;--wn:#D97706;--tx:#0F172A;--txM:#475569;
+  --r8:8px;--r12:12px;--r16:16px;--r24:24px;--shS:0 1px 3px rgba(0,0,0,.08);--shM:0 4px 16px rgba(0,0,0,.1);--shL:0 12px 40px rgba(0,0,0,.14);}
+body{font-family:'DM Sans',sans-serif;background:var(--of);color:var(--tx);line-height:1.6}
+a{color:var(--bl);text-decoration:none}
+.nav{background:var(--ny);height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;position:sticky;top:0;z-index:100}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;color:#fff;text-decoration:none}
+.nav-logo span{color:var(--tl)}
+.nav-links{display:flex;gap:1.25rem;align-items:center}
+.nav-links a{color:rgba(255,255,255,.65);font-size:.85rem;font-weight:500}
+.nav-cta{background:var(--tl)!important;color:var(--ny)!important;padding:6px 16px;border-radius:20px;font-weight:700!important;font-family:'Syne',sans-serif}
+.hero{background:linear-gradient(135deg,var(--ny),var(--ny2));padding:3.5rem 1.5rem 5rem;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(15,201,160,.18) 0%,transparent 70%);top:-180px;left:50%;transform:translateX(-50%);pointer-events:none}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(1.7rem,4vw,2.5rem);font-weight:800;color:#fff;margin-bottom:.6rem;letter-spacing:-1px}
+.hero p{color:rgba(255,255,255,.6);max-width:540px;margin:0 auto}
+.price-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(15,201,160,.15);border:1px solid rgba(15,201,160,.35);color:var(--tl);font-family:'Syne',sans-serif;font-weight:700;padding:8px 20px;border-radius:30px;margin-top:1.25rem;font-size:.95rem}
+.main{max-width:920px;margin:-3rem auto 4rem;padding:0 1.25rem}
+.wizard{background:var(--wh);border-radius:var(--r24);box-shadow:var(--shL);overflow:hidden}
+.sb{display:flex;border-bottom:1px solid var(--bd);background:var(--of);padding:.75rem 1.5rem;gap:0;overflow-x:auto}
+.si{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+.sc{width:28px;height:28px;border-radius:50%;border:2px solid var(--slL);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:var(--sl)}
+.sc.active{border-color:var(--bl);background:var(--bl);color:#fff}
+.sc.done{border-color:var(--ok);background:var(--ok);color:#fff}
+.sl-label{font-size:.8rem;font-weight:500;color:var(--sl);white-space:nowrap}
+.sl-label.active{color:var(--bl);font-weight:600}
+.ss{width:24px;height:2px;background:var(--bd);margin:0 .5rem}
+.panel{display:none;padding:2rem}
+.panel.active{display:block}
+.dz{border:2px dashed var(--slL);border-radius:var(--r16);padding:2.5rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--of)}
+.dz:hover,.dz.drag{border-color:var(--bl);background:rgba(30,107,255,.04)}
+.dz-ico{font-size:1.75rem;margin-bottom:.75rem}
+.dz-t{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:.3rem}
+.dz-s{font-size:.85rem;color:var(--sl)}
+#fi{display:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:'Syne',sans-serif;font-weight:700;border:none;border-radius:var(--r8);cursor:pointer;transition:all .2s}
+.btn-p{background:linear-gradient(135deg,var(--bl),#1452CC);color:#fff;padding:.85rem 2rem;font-size:.95rem;width:100%}
+.btn-p:disabled{background:var(--slL);cursor:not-allowed}
+.btn-s{background:transparent;border:1.5px solid var(--bd);color:var(--sl);padding:.7rem 1.5rem;font-size:.875rem;font-family:'DM Sans',sans-serif;font-weight:500}
+.btn-row{display:flex;gap:.75rem;margin-top:1.5rem}
+.test-card{border:1.5px solid var(--bd);border-radius:var(--r12);padding:1.1rem 1.25rem;margin-bottom:.75rem}
+.test-card.ready{border-color:rgba(22,163,74,.4);background:rgba(22,163,74,.03)}
+.test-card.broken{border-color:rgba(220,38,38,.4);background:rgba(220,38,38,.04)}
+.tc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+.tc-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.92rem;color:var(--tx)}
+.tc-status{font-size:.7rem;font-weight:700;padding:2px 10px;border-radius:20px}
+.tc-status.ready{background:rgba(22,163,74,.12);color:var(--ok)}
+.tc-status.broken{background:rgba(220,38,38,.12);color:var(--er)}
+.tc-reason{font-size:.82rem;color:var(--txM);margin-bottom:.6rem}
+.tc-fix{display:none;gap:.5rem;flex-wrap:wrap;margin-top:.5rem}
+.tc-fix.show{display:flex}
+.tc-fix select{padding:.4rem .7rem;border:1px solid var(--bd);border-radius:6px;font-size:.82rem;font-family:'DM Sans',sans-serif}
+.tc-fix-btn{font-size:.78rem;color:var(--bl);background:none;border:none;cursor:pointer;font-weight:600;text-decoration:underline}
+.alert{border-radius:var(--r8);padding:.9rem 1.1rem;display:none;gap:.75rem;margin-top:1rem}
+.alert.show{display:flex}
+.alert-e{background:rgba(220,38,38,.06);border:1.5px solid rgba(220,38,38,.25);color:var(--er)}
+.alert-w{background:rgba(217,119,6,.07);border:1.5px solid rgba(217,119,6,.25);color:var(--wn)}
+.alert p{font-size:.875rem}
+.pw{display:none;margin-top:1.25rem}
+.pw.show{display:block}
+.pt{height:6px;background:var(--bd);border-radius:3px;overflow:hidden}
+.pf{height:100%;background:linear-gradient(90deg,var(--bl),var(--tl));border-radius:3px;width:0;transition:width .3s}
+.result-card{text-align:center;padding:2rem}
+.result-icon{font-size:3rem;margin-bottom:1rem}
+.result-summary{text-align:left;margin:1.5rem 0;display:flex;flex-direction:column;gap:.5rem}
+.rs-row{display:flex;justify-content:space-between;padding:.6rem .9rem;background:var(--of);border-radius:8px;font-size:.85rem}
+footer{background:var(--ny);color:rgba(255,255,255,.5);text-align:center;padding:2rem;font-size:.83rem;margin-top:2rem}
+footer a{color:var(--tl)}
+@media(max-width:640px){.panel{padding:1.25rem}.nav-links{display:none}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="/">Eduxellence<span>.</span></a>
+  <div class="nav-links">
+    <a href="/stats">Statistical Analysis</a>
+    <a href="/pricing">Pricing</a>
+    <a href="https://eduxellence.org/#contact" class="nav-cta">Book Audit</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <h1>The Complete Thesis Package</h1>
+  <p>7 statistical tests. One dataset. One APA-formatted report — Word and PDF, ready to submit.</p>
+  <div class="price-tag">💎 12 credits — one-time, all 7 tests included</div>
+</section>
+
+<div class="main">
+<div class="wizard">
+  <div class="sb">
+    <div class="si"><div class="sc active" id="sc1">1</div><span class="sl-label active" id="sl1">Upload</span></div>
+    <div class="ss"></div>
+    <div class="si"><div class="sc" id="sc2">2</div><span class="sl-label" id="sl2">Review Variables</span></div>
+    <div class="ss"></div>
+    <div class="si"><div class="sc" id="sc3">3</div><span class="sl-label" id="sl3">Generate</span></div>
+  </div>
+
+  <!-- STEP 1: UPLOAD -->
+  <div id="p1" class="panel active">
+    <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:.4rem">Upload Your Dataset</h2>
+    <p style="color:var(--sl);font-size:.9rem;margin-bottom:1.5rem">We'll auto-detect which of the 7 tests fit your data.</p>
+    <div class="dz" id="dz" onclick="document.getElementById('fi').click()">
+      <div class="dz-ico">📊</div>
+      <div class="dz-t">Drop your file here</div>
+      <div class="dz-s">or click to browse — CSV, XLSX, XLS</div>
+    </div>
+    <input type="file" id="fi" accept=".csv,.xlsx,.xls">
+    <div class="alert alert-e" id="ue"><p id="ue-t"></p></div>
+    <div class="pw" id="upw"><div class="pt"><div class="pf" id="up-fill"></div></div></div>
+    <div class="btn-row"><button class="btn btn-p" id="btn2" onclick="goStep(2)" disabled>Continue → Review Variables</button></div>
+  </div>
+
+  <!-- STEP 2: REVIEW -->
+  <div id="p2" class="panel">
+    <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:.4rem">Review Suggested Variables</h2>
+    <p style="color:var(--sl);font-size:.9rem;margin-bottom:1.5rem">We auto-suggest variables for each test. Fix any marked ✗ before continuing — <strong>all 7 must be ready</strong>.</p>
+    <div id="test-cards"></div>
+    <div class="alert alert-w" id="we"><p id="we-t"></p></div>
+    <div class="btn-row"><button class="btn btn-s" onclick="goStep(1)">← Back</button><button class="btn btn-p" id="btn3" onclick="goStep(3)" disabled style="flex:1">Continue → Generate Package</button></div>
+  </div>
+
+  <!-- STEP 3: GENERATE -->
+  <div id="p3" class="panel">
+    <div id="gen-precheck">
+      <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:.4rem">Generate Your Package</h2>
+      <p style="color:var(--sl);font-size:.9rem;margin-bottom:1.5rem">This costs <strong>12 credits</strong>, charged only after all 7 tests complete successfully.</p>
+      <div class="alert alert-e" id="ge"><p id="ge-t"></p></div>
+      <div class="pw" id="genpw"><div class="pt"><div class="pf" id="gen-fill"></div></div><p style="font-size:.8rem;color:var(--sl);margin-top:.5rem" id="gen-sub">Running 7 statistical tests…</p></div>
+      <div class="btn-row"><button class="btn btn-s" onclick="goStep(2)">← Back</button><button class="btn btn-p" id="btn-gen" onclick="generatePackage()" style="flex:1">⚡ Generate Package (12 credits)</button></div>
+    </div>
+    <div id="gen-result" style="display:none"></div>
+  </div>
+
+</div>
+</div>
+
+<footer>
+  <p><strong style="color:rgba(255,255,255,.75)">Eduxellence Analytics</strong> — Free Statistical Analysis Platform</p>
+  <p style="margin-top:.4rem"><a href="/">Home</a> · <a href="/stats">Run Single Analysis</a> · <a href="https://eduxellence.org/#contact">Contact</a></p>
+</footer>
+
+<script>
+const S = { metaPath:null, filename:null, suggestions:null, config:{}, columns:[] };
+function getAuthToken(){ return localStorage.getItem('edux_auth_token') || null; }
+
+function goStep(n){
+  [1,2,3].forEach(i=>{
+    document.getElementById('p'+i).classList.toggle('active', i===n);
+    const c = document.getElementById('sc'+i), l = document.getElementById('sl'+i);
+    c.classList.remove('active','done'); l.classList.remove('active');
+    if(i<n){ c.classList.add('done'); }
+    if(i===n){ c.classList.add('active'); l.classList.add('active'); }
+  });
+  if(n===2) loadSuggestions();
+}
+
+const dz = document.getElementById('dz'), fi = document.getElementById('fi');
+dz.addEventListener('dragover', e=>{e.preventDefault(); dz.classList.add('drag');});
+dz.addEventListener('dragleave', ()=>dz.classList.remove('drag'));
+dz.addEventListener('drop', e=>{e.preventDefault(); dz.classList.remove('drag'); if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);});
+fi.addEventListener('change', e=>{ if(e.target.files[0]) handleFile(e.target.files[0]); });
+
+async function handleFile(file){
+  document.getElementById('ue').classList.remove('show');
+  document.getElementById('upw').classList.add('show');
+  const fd = new FormData(); fd.append('file', file);
+  try{
+    const r = await fetch('/api/upload', {method:'POST', body:fd});
+    const d = await r.json();
+    document.getElementById('upw').classList.remove('show');
+    if(!r.ok || d.error){
+      document.getElementById('ue-t').textContent = d.error || 'Upload failed.';
+      document.getElementById('ue').classList.add('show');
+      return;
+    }
+    S.metaPath = d.meta_path; S.filename = file.name; S.columns = d.columns;
+    document.getElementById('btn2').disabled = false;
+  }catch(e){
+    document.getElementById('upw').classList.remove('show');
+    document.getElementById('ue-t').textContent = 'Network error: ' + e.message;
+    document.getElementById('ue').classList.add('show');
+  }
+}
+
+const TEST_ORDER = ['descriptive','chi_square','t_test','anova','correlation','regression','reliability'];
+const TEST_LABELS = {
+  descriptive:"Descriptive Statistics", chi_square:"Chi-Square Test", t_test:"Independent T-Test",
+  anova:"One-Way ANOVA", correlation:"Correlation Analysis", regression:"Linear Regression",
+  reliability:"Reliability (Cronbach's Alpha)"
+};
+
+async function loadSuggestions(){
+  document.getElementById('test-cards').innerHTML = '<p style="color:var(--sl);font-size:.85rem">Analysing your dataset…</p>';
+  try{
+    const r = await fetch('/api/package/suggest', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({meta_path:S.metaPath})});
+    const d = await r.json();
+    if(!r.ok || d.error){ document.getElementById('test-cards').innerHTML = '<p style="color:var(--er)">'+(d.error||'Could not load suggestions.')+'</p>'; return; }
+    S.suggestions = d.suggestions;
+    S.config = {};
+    TEST_ORDER.forEach(k => S.config[k] = d.suggestions[k].params);
+    renderTestCards();
+    updateContinueButton();
+  }catch(e){
+    document.getElementById('test-cards').innerHTML = '<p style="color:var(--er)">Network error: '+e.message+'</p>';
+  }
+}
+
+function renderTestCards(){
+  const numCols = S.columns.filter(c=>c.dtype==='numeric').map(c=>c.name);
+  const catCols = S.columns.filter(c=>c.dtype==='categorical').map(c=>c.name);
+  const allCols = S.columns.map(c=>c.name);
+
+  document.getElementById('test-cards').innerHTML = TEST_ORDER.map(key=>{
+    const s = S.suggestions[key];
+    const ready = !!S.config[key];
+    const opts = c => c.map(n=>`<option value="${n}">${n}</option>`).join('');
+    let fixHtml = '';
+    if(key==='descriptive' || key==='correlation' || key==='reliability'){
+      fixHtml = `<select id="fix-${key}-cols" multiple size="4" style="min-width:200px">${opts(numCols.concat(catCols))}</select>
+        <button class="tc-fix-btn" onclick="applyFix('${key}')">Apply</button>`;
+    } else if(key==='chi_square'){
+      fixHtml = `<select id="fix-${key}-v1">${opts(catCols)}</select> × <select id="fix-${key}-v2">${opts(catCols)}</select>
+        <button class="tc-fix-btn" onclick="applyFix('${key}')">Apply</button>`;
+    } else if(key==='t_test' || key==='anova'){
+      fixHtml = `<select id="fix-${key}-nv">${opts(numCols)}</select> by <select id="fix-${key}-gv">${opts(catCols)}</select>
+        <button class="tc-fix-btn" onclick="applyFix('${key}')">Apply</button>`;
+    } else if(key==='regression'){
+      fixHtml = `<select id="fix-${key}-dep">${opts(numCols)}</select> ~ <select id="fix-${key}-preds" multiple size="3">${opts(numCols)}</select>
+        <button class="tc-fix-btn" onclick="applyFix('${key}')">Apply</button>`;
+    }
+
+    return `<div class="test-card ${ready?'ready':'broken'}" id="tc-${key}">
+      <div class="tc-header">
+        <span class="tc-title">${TEST_LABELS[key]}</span>
+        <span class="tc-status ${ready?'ready':'broken'}">${ready?'✓ Ready':'✗ Needs Fix'}</span>
+      </div>
+      <div class="tc-reason">${s.reason}</div>
+      ${!ready ? `<button class="tc-fix-btn" onclick="toggleFix('${key}')">Fix manually →</button><div class="tc-fix" id="fixbox-${key}">${fixHtml}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function toggleFix(key){
+  document.getElementById('fixbox-'+key).classList.toggle('show');
+}
+
+function applyFix(key){
+  let params = null;
+  if(key==='descriptive' || key==='correlation' || key==='reliability'){
+    const sel = document.getElementById(`fix-${key}-cols`);
+    const cols = [...sel.selectedOptions].map(o=>o.value);
+    if(key==='correlation' && cols.length>=2) params = {columns:cols, method:'pearson'};
+    else if(key==='reliability' && cols.length>=2) params = {columns:cols};
+    else if(key==='descriptive' && cols.length>=1) params = {columns:cols};
+  } else if(key==='chi_square'){
+    const v1 = document.getElementById(`fix-${key}-v1`).value;
+    const v2 = document.getElementById(`fix-${key}-v2`).value;
+    if(v1 && v2 && v1!==v2) params = {var1:v1, var2:v2};
+  } else if(key==='t_test' || key==='anova'){
+    const nv = document.getElementById(`fix-${key}-nv`).value;
+    const gv = document.getElementById(`fix-${key}-gv`).value;
+    if(nv && gv) params = {numeric_var:nv, group_var:gv};
+  } else if(key==='regression'){
+    const dep = document.getElementById(`fix-${key}-dep`).value;
+    const preds = [...document.getElementById(`fix-${key}-preds`).selectedOptions].map(o=>o.value).filter(p=>p!==dep);
+    if(dep && preds.length) params = {dependent:dep, predictors:preds};
+  }
+
+  if(!params){ alert('Please complete the selection before applying.'); return; }
+  S.config[key] = params;
+  S.suggestions[key] = {params, reason: 'Manually configured.'};
+  renderTestCards();
+  updateContinueButton();
+}
+
+function updateContinueButton(){
+  const allReady = TEST_ORDER.every(k => !!S.config[k]);
+  document.getElementById('btn3').disabled = !allReady;
+  const we = document.getElementById('we'), wet = document.getElementById('we-t');
+  if(!allReady){
+    const missing = TEST_ORDER.filter(k=>!S.config[k]).map(k=>TEST_LABELS[k]);
+    wet.textContent = `${missing.length} test(s) still need fixing: ${missing.join(', ')}. All 7 must be ready before you can generate the package.`;
+    we.classList.add('show');
+  } else {
+    we.classList.remove('show');
+  }
+}
+
+async function generatePackage(){
+  const token = getAuthToken();
+  if(!token){ document.getElementById('ge-t').textContent = 'Please sign in to generate your package.'; document.getElementById('ge').classList.add('show'); return; }
+
+  document.getElementById('ge').classList.remove('show');
+  document.getElementById('btn-gen').disabled = true;
+  document.getElementById('genpw').classList.add('show');
+
+  let pct = 0;
+  const tm = setInterval(()=>{ pct = Math.min(92, pct+3); document.getElementById('gen-fill').style.width = pct+'%'; }, 300);
+
+  try{
+    const r = await fetch('/api/package/generate', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({meta_path:S.metaPath, config:S.config, dataset_name:S.filename})
+    });
+    const d = await r.json();
+    clearInterval(tm);
+    document.getElementById('genpw').classList.remove('show');
+    document.getElementById('btn-gen').disabled = false;
+
+    if(!r.ok || !d.ok){
+      document.getElementById('ge-t').textContent = d.error || 'Package generation failed.';
+      document.getElementById('ge').classList.add('show');
+      return;
+    }
+
+    renderResult(d);
+  }catch(e){
+    clearInterval(tm);
+    document.getElementById('genpw').classList.remove('show');
+    document.getElementById('btn-gen').disabled = false;
+    document.getElementById('ge-t').textContent = 'Network error: ' + e.message;
+    document.getElementById('ge').classList.add('show');
+  }
+}
+
+function renderResult(d){
+  document.getElementById('gen-precheck').style.display = 'none';
+  const summaryRows = Object.entries(d.summary).map(([k,s])=>
+    `<div class="rs-row"><span>${s.label}</span><span style="font-family:'JetBrains Mono',monospace">${s.p_display||'—'}</span></div>`).join('');
+
+  document.getElementById('gen-result').style.display = 'block';
+  document.getElementById('gen-result').innerHTML = `
+    <div class="result-card">
+      <div class="result-icon">🎉</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem">Your Package Is Ready!</div>
+      <p style="color:var(--sl);font-size:.88rem;margin-top:.4rem">All ${d.completed_count} of ${d.total_count} tests completed successfully. ${d.credits_charged} credits charged — balance: ${d.credits_balance}.</p>
+      <div class="result-summary">${summaryRows}</div>
+      <div class="btn-row">
+        <button class="btn btn-p" onclick="downloadPackage('docx')" style="background:linear-gradient(135deg,#1E6BFF,#1452CC)">⬇ Download Word Report</button>
+      </div>
+      <div class="btn-row" style="margin-top:.6rem">
+        <button class="btn btn-p" onclick="downloadPackage('pdf')" style="background:linear-gradient(135deg,#DC2626,#991B1B)">⬇ Download PDF Report</button>
+      </div>
+      <div class="btn-row"><button class="btn btn-s" style="width:100%" onclick="location.reload()">Start a New Package</button></div>
+    </div>`;
+  window._packageId = d.package_id;
+}
+
+function downloadPackage(fmt){
+  if(!window._packageId) return;
+  window.location.href = `/api/package/export/${window._packageId}?format=${fmt}`;
+}
+</script>
+</body>
+</html>
