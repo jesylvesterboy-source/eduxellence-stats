@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pricing — Eduxellence Analytics</title>
+<meta name="description" content="Freemium statistical analysis pricing. Free data cleaning and descriptive stats. Pay-as-you-go credits or monthly plans for advanced tests.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--ny:#0B1829;--ny2:#112240;--bl:#1E6BFF;--tl:#0FC9A0;--wh:#fff;--of:#F7F9FC;
+  --sl:#64748B;--bd:#E2E8F0;--ok:#16A34A;--tx:#0F172A;--txM:#475569;
+  --r8:8px;--r12:12px;--r16:16px;--r24:24px;--shS:0 1px 3px rgba(0,0,0,.08);--shM:0 4px 16px rgba(0,0,0,.1);--shL:0 12px 40px rgba(0,0,0,.14);}
+body{font-family:'DM Sans',sans-serif;background:var(--of);color:var(--tx);line-height:1.6}
+a{color:var(--bl);text-decoration:none}
+
+.nav{background:var(--ny);height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;position:sticky;top:0;z-index:100}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;color:#fff;text-decoration:none}
+.nav-logo span{color:var(--tl)}
+.nav-links{display:flex;gap:1.25rem;align-items:center}
+.nav-links a{color:rgba(255,255,255,.65);font-size:.85rem;font-weight:500}
+.nav-cta{background:var(--tl)!important;color:var(--ny)!important;padding:6px 16px;border-radius:20px;font-weight:700!important;font-family:'Syne',sans-serif}
+
+.hero{background:linear-gradient(135deg,var(--ny),var(--ny2));padding:3.5rem 1.5rem 5rem;text-align:center}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,4vw,2.75rem);font-weight:800;color:#fff;margin-bottom:.75rem;letter-spacing:-1px}
+.hero p{color:rgba(255,255,255,.6);max-width:520px;margin:0 auto 1.5rem}
+
+.currency-switch{display:inline-flex;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:30px;padding:4px;gap:2px}
+.cur-btn{padding:7px 18px;border-radius:24px;border:none;background:transparent;color:rgba(255,255,255,.6);font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;transition:all .15s}
+.cur-btn.active{background:var(--tl);color:var(--ny)}
+
+.main{max-width:1100px;margin:-3rem auto 4rem;padding:0 1.25rem}
+
+.section-title{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--tx);text-align:center;margin:3rem 0 .5rem}
+.section-sub{text-align:center;color:var(--sl);max-width:480px;margin:0 auto 2rem;font-size:.9rem}
+
+.tier-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1rem}
+.tier-card{background:var(--wh);border-radius:var(--r24);box-shadow:var(--shL);padding:2rem;position:relative}
+.tier-card.free{border:2px solid var(--ok)}
+.tier-card.paid{border:2px solid var(--bl)}
+.tier-badge{display:inline-block;font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:1rem;text-transform:uppercase;letter-spacing:.04em}
+.tier-badge.free{background:rgba(22,163,74,.1);color:var(--ok)}
+.tier-badge.paid{background:rgba(30,107,255,.1);color:var(--bl)}
+.tier-title{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--tx);margin-bottom:.5rem}
+.tier-desc{color:var(--sl);font-size:.88rem;margin-bottom:1.25rem;line-height:1.6}
+.tier-list{display:flex;flex-direction:column;gap:.5rem}
+.tier-item{display:flex;align-items:center;gap:.6rem;font-size:.85rem;color:var(--tx)}
+.tier-item.x::before{content:'✕';color:#CBD5E1;font-weight:700;width:16px}
+.tier-item.ok::before{content:'✓';color:var(--ok);font-weight:700;width:16px}
+
+.price-table-wrap{background:var(--wh);border-radius:var(--r24);box-shadow:var(--shL);overflow:hidden;margin-bottom:3rem}
+.price-row{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;border-bottom:1px solid var(--bd)}
+.price-row:last-child{border-bottom:none}
+.price-row:nth-child(even){background:var(--of)}
+.pr-label{font-weight:600;font-size:.92rem;color:var(--tx)}
+.pr-price{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--bl)}
+.pr-price.free{color:var(--ok)}
+
+.packs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:3rem}
+.pack-card{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r16);padding:1.5rem;text-align:center;transition:all .15s;position:relative}
+.pack-card:hover{border-color:var(--bl);box-shadow:var(--shM);transform:translateY(-2px)}
+.pack-card.best{border-color:var(--tl)}
+.pack-badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--tl);color:var(--ny);font-size:.68rem;font-weight:700;padding:3px 12px;border-radius:20px;white-space:nowrap}
+.pack-credits{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--tx)}
+.pack-label{font-size:.78rem;color:var(--sl);margin-bottom:.75rem}
+.pack-price{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;color:var(--bl);margin-bottom:1rem}
+.pack-btn{width:100%;padding:.65rem;border-radius:10px;border:none;background:var(--ny);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;transition:all .15s}
+.pack-btn:hover{background:var(--bl)}
+
+.sub-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem;margin-bottom:3rem}
+.sub-card{background:var(--wh);border:1.5px solid var(--bd);border-radius:var(--r16);padding:1.75rem;transition:all .15s}
+.sub-card.popular{border-color:var(--bl);box-shadow:var(--shM)}
+.sub-popular-badge{display:inline-block;background:var(--bl);color:#fff;font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:.75rem}
+.sub-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--tx)}
+.sub-price{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--bl);margin:.5rem 0}
+.sub-price span{font-size:.85rem;color:var(--sl);font-weight:400}
+.sub-features{display:flex;flex-direction:column;gap:.5rem;margin:1rem 0 1.25rem}
+.sub-feat{font-size:.82rem;color:var(--txM);display:flex;gap:.5rem;align-items:flex-start}
+.sub-feat::before{content:'✓';color:var(--ok);font-weight:700;flex-shrink:0}
+.sub-btn{width:100%;padding:.7rem;border-radius:10px;border:1.5px solid var(--bl);background:transparent;color:var(--bl);font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer}
+.sub-card.popular .sub-btn{background:var(--bl);color:#fff}
+
+.loading{text-align:center;padding:3rem;color:var(--sl)}
+
+footer{background:var(--ny);color:rgba(255,255,255,.5);text-align:center;padding:2rem;font-size:.83rem}
+footer a{color:var(--tl)}
+
+@media(max-width:640px){.tier-grid{grid-template-columns:1fr}.nav-links{display:none}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="/">Eduxellence<span>.</span></a>
+  <div class="nav-links">
+    <a href="/stats">Statistical Analysis</a>
+    <a href="/upload">Data Cleaner</a>
+    <a href="https://eduxellence.org/#contact" class="nav-cta">Book Audit</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <h1>Simple, Honest Pricing</h1>
+  <p>Start free. Pay only for the advanced statistics you need — credits or a monthly plan, your choice.</p>
+  <div class="currency-switch" id="currency-switch">
+    <button class="cur-btn" data-cur="NGN" onclick="switchCurrency('NGN')">₦ NGN</button>
+    <button class="cur-btn" data-cur="USD" onclick="switchCurrency('USD')">$ USD</button>
+    <button class="cur-btn" data-cur="GBP" onclick="switchCurrency('GBP')">£ GBP</button>
+  </div>
+</section>
+
+<div class="main">
+
+  <div class="tier-grid">
+    <div class="tier-card free">
+      <span class="tier-badge free">Always Free</span>
+      <div class="tier-title">Free Forever</div>
+      <div class="tier-desc">Get full value before you ever pay a cent.</div>
+      <div class="tier-list">
+        <div class="tier-item ok">Data upload &amp; cleaning</div>
+        <div class="tier-item ok">Descriptive statistics</div>
+        <div class="tier-item ok">Frequency tables &amp; charts</div>
+        <div class="tier-item ok">Basic AI insights</div>
+        <div class="tier-item ok">Datasets up to 500 rows</div>
+        <div class="tier-item x">Inferential tests (Chi-Square, ANOVA…)</div>
+        <div class="tier-item x">APA Word/PDF reports</div>
+      </div>
+    </div>
+    <div class="tier-card paid">
+      <span class="tier-badge paid">Pay As You Go</span>
+      <div class="tier-title">Credits or Subscription</div>
+      <div class="tier-desc">Unlock advanced statistics exactly when you need them.</div>
+      <div class="tier-list">
+        <div class="tier-item ok">Regression &amp; Multiple Regression</div>
+        <div class="tier-item ok">ANOVA, Chi-Square, Correlation</div>
+        <div class="tier-item ok">Reliability &amp; Factor Analysis</div>
+        <div class="tier-item ok">AI research report generator</div>
+        <div class="tier-item ok">Thesis-ready APA interpretation</div>
+        <div class="tier-item ok">Word, PDF &amp; Excel exports</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Pay-Per-Analysis</div>
+  <div class="section-sub">No subscription needed. Buy credits, spend them on exactly the tests you run.</div>
+  <div class="price-table-wrap" id="price-table">
+    <div class="loading">Loading pricing…</div>
+  </div>
+
+  <div class="section-title">Credit Packs</div>
+  <div class="section-sub">Bigger packs save you more. Credits never expire.</div>
+  <div class="packs-grid" id="packs-grid">
+    <div class="loading">Loading credit packs…</div>
+  </div>
+
+  <div class="section-title">Monthly Plans</div>
+  <div class="section-sub">For heavy users — predictable pricing, more analyses included.</div>
+  <div class="sub-grid" id="sub-grid">
+    <div class="loading">Loading plans…</div>
+  </div>
+
+</div>
+
+<footer>
+  <p><strong style="color:rgba(255,255,255,.75)">Eduxellence Analytics</strong> — Free Statistical Analysis Platform</p>
+  <p style="margin-top:.4rem"><a href="/">Home</a> · <a href="/stats">Run Analysis</a> · <a href="https://eduxellence.org/#contact">Contact</a></p>
+</footer>
+
+<script>
+let currentCurrency = 'NGN';
+
+async function detectDefaultCurrency(){
+  // Server-side detection via Vercel's x-vercel-ip-country geo header —
+  // far more reliable than guessing from navigator.language, which only
+  // reflects browser/OS language settings, not actual visitor location.
+  try{
+    const r = await fetch('/api/geo');
+    const d = await r.json();
+    return d.currency || 'USD';
+  }catch(e){
+    // Network failure fallback — still better than nothing
+    const lang = navigator.language || '';
+    if(lang.includes('en-GB')) return 'GBP';
+    return 'USD';
+  }
+}
+
+function switchCurrency(cur){
+  currentCurrency = cur;
+  document.querySelectorAll('.cur-btn').forEach(b=>b.classList.toggle('active', b.dataset.cur===cur));
+  loadPricing();
+}
+
+async function loadPricing(){
+  try{
+    const r = await fetch(`/api/pricing?currency=${currentCurrency}`);
+    const d = await r.json();
+    renderPriceTable(d.tests);
+    renderPacks(d.credit_packs, d.currency);
+    renderSubs(d.subscriptions, d.currency);
+  }catch(e){
+    document.getElementById('price-table').innerHTML = `<div class="loading">Could not load pricing. Please refresh.</div>`;
+  }
+}
+
+function renderPriceTable(tests){
+  const paid = tests.filter(t=>!t.free);
+  const free = tests.filter(t=>t.free);
+  let html = '';
+  [...free, ...paid].forEach(t=>{
+    html += `<div class="price-row">
+      <div class="pr-label">${t.label}</div>
+      <div class="pr-price ${t.free?'free':''}">${t.free?'Free':t.display_price}</div>
+    </div>`;
+  });
+  document.getElementById('price-table').innerHTML = html;
+}
+
+function renderPacks(packs, currency){
+  document.getElementById('packs-grid').innerHTML = packs.map(p=>`
+    <div class="pack-card ${p.badge && p.badge.includes('Best')?'best':''}">
+      ${p.badge?`<div class="pack-badge">${p.badge}</div>`:''}
+      <div class="pack-credits">${p.credits}</div>
+      <div class="pack-label">Credits</div>
+      <div class="pack-price">${p.display_price}</div>
+      <button class="pack-btn" onclick="buyPack('${p.id}')">Buy Now</button>
+    </div>`).join('');
+}
+
+function renderSubs(plans, currency){
+  document.getElementById('sub-grid').innerHTML = plans.map(p=>`
+    <div class="sub-card ${p.key==='researcher'?'popular':''}">
+      ${p.key==='researcher'?'<div class="sub-popular-badge">Most Popular</div>':''}
+      <div class="sub-name">${p.name}</div>
+      <div class="sub-price">${p.display_price}</div>
+      <div class="sub-features">
+        ${p.features.map(f=>`<div class="sub-feat">${f}</div>`).join('')}
+        <div class="sub-feat">${p.analyses_per_month===-1?'Unlimited analyses (fair use)':p.analyses_per_month+' analyses/month'}</div>
+      </div>
+      <button class="sub-btn" onclick="subscribePlan('${p.key}')">Choose ${p.name}</button>
+    </div>`).join('');
+}
+
+function buyPack(packId){
+  const token = localStorage.getItem('edux_auth_token');
+  if(!token){
+    alert('Please sign in to purchase credits.');
+    window.location.href = '/login';
+    return;
+  }
+  fetch('/api/payments/initiate',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+    body: JSON.stringify({pack_id: packId})
+  }).then(r=>r.json()).then(d=>{
+    if(d.checkout_url) window.location.href = d.checkout_url;
+    else alert(d.error || 'Could not start checkout.');
+  }).catch(e=>alert('Error: '+e.message));
+}
+
+function subscribePlan(planKey){
+  alert(`Subscription checkout for "${planKey}" — connect this to your Lemon Squeezy subscription product.`);
+}
+
+(async () => {
+  const detected = await detectDefaultCurrency();
+  switchCurrency(detected);
+  document.querySelector(`.cur-btn[data-cur="${currentCurrency}"]`)?.classList.add('active');
+})();
+</script>
+</body>
+</html>
