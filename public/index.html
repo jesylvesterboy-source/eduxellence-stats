@@ -59,6 +59,7 @@ a{color:var(--bl);text-decoration:none}a:hover{text-decoration:underline}
 .tb-teal:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(15,201,160,.4);text-decoration:none;color:var(--ny)}
 .free-tag{display:inline-block;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.25);color:var(--ok);font-size:.72rem;font-weight:700;padding:2px 10px;border-radius:10px;margin-bottom:.75rem}
 .pay-tag{display:inline-block;background:rgba(30,107,255,.1);border:1px solid rgba(30,107,255,.2);color:var(--bl);font-size:.72rem;font-weight:700;padding:2px 10px;border-radius:10px;margin-bottom:.75rem}
+.premium-tag{display:inline-block;background:linear-gradient(135deg,rgba(217,119,6,.15),rgba(217,119,6,.05));border:1px solid rgba(217,119,6,.3);color:var(--wn);font-size:.72rem;font-weight:700;padding:2px 10px;border-radius:10px;margin-bottom:.75rem}
 
 /* HOW IT WORKS */
 .section{max-width:960px;margin:0 auto 5rem;padding:0 1.5rem}
@@ -80,17 +81,32 @@ a{color:var(--bl);text-decoration:none}a:hover{text-decoration:underline}
 .adv{background:#E0E7FF;color:#3730A3}
 .free{background:rgba(22,163,74,.1);color:var(--ok)}
 .pay{background:rgba(30,107,255,.1);color:var(--bl)}
+.premium{background:linear-gradient(135deg,rgba(217,119,6,.15),rgba(217,119,6,.05));color:var(--wn)}
 
 /* PRICING */
 .pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
 .price-card{background:var(--wh);border:1.5px solid var(--bd);border-radius:16px;padding:1.5rem;text-align:center}
 .price-card.highlight{border-color:var(--bl);box-shadow:0 4px 20px rgba(30,107,255,.15)}
+.price-card.premium{border-color:var(--wn);box-shadow:0 4px 20px rgba(217,119,6,.15)}
 .pc-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--sl);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem}
 .pc-price{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--tx);margin-bottom:.3rem}
 .pc-price span{font-size:.9rem;color:var(--sl);font-weight:400}
 .pc-desc{font-size:.8rem;color:var(--sl);line-height:1.5;margin-top:.5rem}
 .free-forever{color:var(--ok);font-weight:700}
 .pay-per-use{color:var(--bl);font-weight:700}
+.premium-price{color:var(--wn);font-weight:700}
+
+/* THESIS PACKAGE CARD */
+.thesis-card{background:linear-gradient(135deg,var(--ny),var(--ny2));border:2px solid var(--tl);border-radius:24px;padding:2.5rem 3rem;text-align:center;margin:3rem auto;max-width:800px;box-shadow:0 12px 40px rgba(0,0,0,.15)}
+.thesis-card h3{font-family:'Syne',sans-serif;font-size:clamp(1.3rem,2.5vw,1.8rem);font-weight:800;color:#fff;margin-bottom:.75rem}
+.thesis-card p{color:rgba(255,255,255,.7);font-size:.95rem;line-height:1.7;margin-bottom:1.25rem}
+.thesis-card .price-big{font-family:'Syne',sans-serif;font-size:2.5rem;font-weight:800;color:var(--tl);margin-bottom:.5rem}
+.thesis-card .price-big span{font-size:1rem;color:rgba(255,255,255,.5);font-weight:400}
+.thesis-features{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin:1.25rem 0}
+.thesis-feat{display:flex;align-items:center;gap:.5rem;color:rgba(255,255,255,.8);font-size:.85rem}
+.thesis-feat::before{content:'✓';color:var(--tl);font-weight:700}
+.thesis-btn{display:inline-flex;align-items:center;gap:10px;background:var(--tl);color:var(--ny);font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;padding:.9rem 2.5rem;border-radius:12px;border:none;cursor:pointer;transition:all .2s;text-decoration:none}
+.thesis-btn:hover{background:#0DB890;transform:translateY(-2px);box-shadow:0 6px 24px rgba(15,201,160,.35);text-decoration:none;color:var(--ny)}
 
 /* STEPS */
 .steps-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.5rem}
@@ -119,6 +135,8 @@ footer strong{color:rgba(255,255,255,.75)}
   .tools{grid-template-columns:1fr}
   .hero-stats{gap:1.25rem}
   .nav-links{display:none}
+  .thesis-card{padding:1.5rem;margin:2rem 0}
+  .thesis-features{flex-direction:column;align-items:center}
 }
 </style>
 </head>
@@ -215,6 +233,27 @@ footer strong{color:rgba(255,255,255,.75)}
   </div>
 </section>
 
+<!-- THESIS PACKAGE - NEW SECTION -->
+<section class="section">
+  <div class="sec-label">Complete Research Package</div>
+  <div class="thesis-card">
+    <div class="premium-tag" style="margin-bottom:1rem">🎓 Premium Package</div>
+    <h3>Full Research / Thesis Package</h3>
+    <p>Everything you need to complete your thesis, dissertation, or research project — all analyses, reports, and interpretations in one comprehensive package.</p>
+    <div class="price-big">12 Credits <span>($12 USD)</span></div>
+    <div class="thesis-features">
+      <div class="thesis-feat">All 12 Statistical Tests</div>
+      <div class="thesis-feat">APA-Formatted Reports</div>
+      <div class="thesis-feat">AI Interpretation</div>
+      <div class="thesis-feat">Word &amp; PDF Exports</div>
+      <div class="thesis-feat">Assumption Checks</div>
+      <div class="thesis-feat">Publication-Ready Charts</div>
+    </div>
+    <a href="/stats?package=thesis" class="thesis-btn">🚀 Start Thesis Package →</a>
+    <div style="font-size:.75rem;color:rgba(255,255,255,.4);margin-top:1rem">One click. All analyses. Complete report.</div>
+  </div>
+</section>
+
 <!-- HOW IT WORKS -->
 <section class="section">
   <div class="sec-label">How It Works</div>
@@ -249,10 +288,10 @@ footer strong{color:rgba(255,255,255,.75)}
       <div class="pc-price pay-per-use">From 1 Credit</div>
       <div class="pc-desc">T-Test, ANOVA, Regression, Logistic, PCA, Factor Analysis, ARIMA. Pay per test.</div>
     </div>
-    <div class="price-card">
-      <div class="pc-name">Expert Consultation</div>
-      <div class="pc-price">Custom<span> / project</span></div>
-      <div class="pc-desc">Large datasets, full thesis analysis, custom pipelines, R/SPSS/EViews modelling.</div>
+    <div class="price-card premium">
+      <div class="pc-name">Thesis Package</div>
+      <div class="pc-price premium-price">12 Credits</div>
+      <div class="pc-desc">Full research package — all analyses, APA reports, interpretations, and exports.</div>
     </div>
   </div>
 </section>
@@ -261,7 +300,7 @@ footer strong{color:rgba(255,255,255,.75)}
 <section class="section" style="margin-bottom:3rem">
   <div class="sec-label">Credit Packs</div>
   <h2 class="sec-title">Buy credits. Never expire.</h2>
-  <p class="sec-sub">1 credit = $1 USD. Use them on any advanced test.</p>
+  <p class="sec-sub">1 credit = $1 USD. Use them on any advanced test or the thesis package.</p>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem">
     <div style="background:var(--wh);border:1px solid var(--bd);border-radius:16px;padding:1.25rem;text-align:center">
       <div style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--tx)">5</div>
