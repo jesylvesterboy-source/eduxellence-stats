@@ -58,6 +58,7 @@ a{color:var(--bl);text-decoration:none}a:hover{text-decoration:underline}
 .tb-teal{background:linear-gradient(135deg,var(--tl),#09A882);color:var(--ny);box-shadow:0 4px 14px rgba(15,201,160,.3)}
 .tb-teal:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(15,201,160,.4);text-decoration:none;color:var(--ny)}
 .free-tag{display:inline-block;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.25);color:var(--ok);font-size:.72rem;font-weight:700;padding:2px 10px;border-radius:10px;margin-bottom:.75rem}
+.pay-tag{display:inline-block;background:rgba(30,107,255,.1);border:1px solid rgba(30,107,255,.2);color:var(--bl);font-size:.72rem;font-weight:700;padding:2px 10px;border-radius:10px;margin-bottom:.75rem}
 
 /* HOW IT WORKS */
 .section{max-width:960px;margin:0 auto 5rem;padding:0 1.5rem}
@@ -77,14 +78,8 @@ a{color:var(--bl);text-decoration:none}a:hover{text-decoration:underline}
 .np{background:#FEF3C7;color:#92400E}
 .desc{background:#F3E8FF;color:#6B21A8}
 .adv{background:#E0E7FF;color:#3730A3}
-
-/* STEPS */
-.steps-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.5rem}
-.step{background:var(--wh);border:1px solid var(--bd);border-radius:16px;padding:1.75rem 1.5rem;position:relative;overflow:hidden}
-.step-n{font-family:'Syne',sans-serif;font-size:4rem;font-weight:800;color:rgba(30,107,255,.07);position:absolute;top:.25rem;right:1rem;line-height:1}
-.step-icon{font-size:1.75rem;margin-bottom:.75rem}
-.step-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;color:var(--tx);margin-bottom:.35rem}
-.step-desc{font-size:.83rem;color:var(--sl);line-height:1.6}
+.free{background:rgba(22,163,74,.1);color:var(--ok)}
+.pay{background:rgba(30,107,255,.1);color:var(--bl)}
 
 /* PRICING */
 .pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
@@ -95,6 +90,15 @@ a{color:var(--bl);text-decoration:none}a:hover{text-decoration:underline}
 .pc-price span{font-size:.9rem;color:var(--sl);font-weight:400}
 .pc-desc{font-size:.8rem;color:var(--sl);line-height:1.5;margin-top:.5rem}
 .free-forever{color:var(--ok);font-weight:700}
+.pay-per-use{color:var(--bl);font-weight:700}
+
+/* STEPS */
+.steps-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.5rem}
+.step{background:var(--wh);border:1px solid var(--bd);border-radius:16px;padding:1.75rem 1.5rem;position:relative;overflow:hidden}
+.step-n{font-family:'Syne',sans-serif;font-size:4rem;font-weight:800;color:rgba(30,107,255,.07);position:absolute;top:.25rem;right:1rem;line-height:1}
+.step-icon{font-size:1.75rem;margin-bottom:.75rem}
+.step-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;color:var(--tx);margin-bottom:.35rem}
+.step-desc{font-size:.83rem;color:var(--sl);line-height:1.6}
 
 /* CTA */
 .cta{background:linear-gradient(135deg,var(--ny) 0%,var(--ny2) 100%);padding:4rem 2rem;text-align:center}
@@ -197,18 +201,18 @@ footer strong{color:rgba(255,255,255,.75)}
   <h2 class="sec-title">12 Professional Statistical Tests</h2>
   <p class="sec-sub">From simple descriptives to advanced modelling — all with automatic assumption checking and APA formatting.</p>
   <div class="tests-grid">
-    <div class="test-item"><div class="ti-icon">📊</div><div class="ti-name">Descriptive Statistics</div><div class="ti-desc">Mean, SD, skewness, histograms, boxplots, Q-Q plots, pie charts.</div><span class="ti-badge desc">Descriptive</span></div>
-    <div class="test-item"><div class="ti-icon">🔲</div><div class="ti-name">Chi-Square Test</div><div class="ti-desc">Test independence between two categorical variables. Cramér's V effect size.</div><span class="ti-badge par">Parametric</span></div>
-    <div class="test-item"><div class="ti-icon">⚖️</div><div class="ti-name">Independent T-Test</div><div class="ti-desc">Compare means between two groups. Cohen's d, 95% CI, violin plots.</div><span class="ti-badge par">Parametric</span></div>
-    <div class="test-item"><div class="ti-icon">📈</div><div class="ti-name">One-Way ANOVA</div><div class="ti-desc">Compare means across 3+ groups. η², Bonferroni post-hoc tests.</div><span class="ti-badge par">Parametric</span></div>
-    <div class="test-item"><div class="ti-icon">🔗</div><div class="ti-name">Correlation</div><div class="ti-desc">Pearson or Spearman. Heatmap, scatter matrix, bubble chart.</div><span class="ti-badge par">Parametric</span></div>
-    <div class="test-item"><div class="ti-icon">📉</div><div class="ti-name">Linear Regression</div><div class="ti-desc">Simple or multiple. R², coefficients, CI bands, residual plots.</div><span class="ti-badge par">Parametric</span></div>
-    <div class="test-item"><div class="ti-icon">🔄</div><div class="ti-name">Logistic Regression</div><div class="ti-desc">Binary classification. Odds ratios, confusion matrix, AUC-ROC.</div><span class="ti-badge adv">Advanced</span></div>
-    <div class="test-item"><div class="ti-icon">📐</div><div class="ti-name">PCA</div><div class="ti-desc">Principal Component Analysis. Dimensionality reduction, variance explained.</div><span class="ti-badge adv">Advanced</span></div>
-    <div class="test-item"><div class="ti-icon">🧩</div><div class="ti-name">Factor Analysis</div><div class="ti-desc">Uncover latent factors. Factor loadings, eigenvalues, scree plot.</div><span class="ti-badge adv">Advanced</span></div>
-    <div class="test-item"><div class="ti-icon">📈</div><div class="ti-name">ARIMA</div><div class="ti-desc">Time series forecasting. ACF/PACF plots, forecast visualisation.</div><span class="ti-badge adv">Advanced</span></div>
-    <div class="test-item"><div class="ti-icon">🥊</div><div class="ti-name">Mann-Whitney U</div><div class="ti-desc">Non-parametric alternative to T-Test. For non-normal or ordinal data.</div><span class="ti-badge np">Non-Parametric</span></div>
-    <div class="test-item"><div class="ti-icon">🏆</div><div class="ti-name">Kruskal-Wallis</div><div class="ti-desc">Non-parametric ANOVA alternative for skewed distributions.</div><span class="ti-badge np">Non-Parametric</span></div>
+    <div class="test-item"><div class="ti-icon">📊</div><div class="ti-name">Descriptive Statistics</div><div class="ti-desc">Mean, SD, skewness, histograms, boxplots, Q-Q plots, pie charts.</div><span class="ti-badge free">Free</span></div>
+    <div class="test-item"><div class="ti-icon">🔲</div><div class="ti-name">Chi-Square Test</div><div class="ti-desc">Test independence between two categorical variables. Cramér's V effect size.</div><span class="ti-badge pay">1 Credit</span></div>
+    <div class="test-item"><div class="ti-icon">⚖️</div><div class="ti-name">Independent T-Test</div><div class="ti-desc">Compare means between two groups. Cohen's d, 95% CI, violin plots.</div><span class="ti-badge pay">1 Credit</span></div>
+    <div class="test-item"><div class="ti-icon">📈</div><div class="ti-name">One-Way ANOVA</div><div class="ti-desc">Compare means across 3+ groups. η², Bonferroni post-hoc tests.</div><span class="ti-badge pay">2 Credits</span></div>
+    <div class="test-item"><div class="ti-icon">🔗</div><div class="ti-name">Correlation</div><div class="ti-desc">Pearson or Spearman. Heatmap, scatter matrix, bubble chart.</div><span class="ti-badge pay">1 Credit</span></div>
+    <div class="test-item"><div class="ti-icon">📉</div><div class="ti-name">Linear Regression</div><div class="ti-desc">Simple or multiple. R², coefficients, CI bands, residual plots.</div><span class="ti-badge pay">3 Credits</span></div>
+    <div class="test-item"><div class="ti-icon">🔄</div><div class="ti-name">Logistic Regression</div><div class="ti-desc">Binary classification. Odds ratios, confusion matrix, AUC-ROC.</div><span class="ti-badge pay">5 Credits</span></div>
+    <div class="test-item"><div class="ti-icon">📐</div><div class="ti-name">PCA</div><div class="ti-desc">Principal Component Analysis. Dimensionality reduction, variance explained.</div><span class="ti-badge pay">5 Credits</span></div>
+    <div class="test-item"><div class="ti-icon">🧩</div><div class="ti-name">Factor Analysis</div><div class="ti-desc">Uncover latent factors. Factor loadings, eigenvalues, scree plot.</div><span class="ti-badge pay">6 Credits</span></div>
+    <div class="test-item"><div class="ti-icon">📈</div><div class="ti-name">ARIMA</div><div class="ti-desc">Time series forecasting. ACF/PACF plots, forecast visualisation.</div><span class="ti-badge pay">8 Credits</span></div>
+    <div class="test-item"><div class="ti-icon">🥊</div><div class="ti-name">Mann-Whitney U</div><div class="ti-desc">Non-parametric alternative to T-Test. For non-normal or ordinal data.</div><span class="ti-badge pay">1 Credit</span></div>
+    <div class="test-item"><div class="ti-icon">🏆</div><div class="ti-name">Kruskal-Wallis</div><div class="ti-desc">Non-parametric ANOVA alternative for skewed distributions.</div><span class="ti-badge pay">2 Credits</span></div>
   </div>
 </section>
 
@@ -228,8 +232,8 @@ footer strong{color:rgba(255,255,255,.75)}
 <!-- PRICING -->
 <section class="section">
   <div class="sec-label">Pricing</div>
-  <h2 class="sec-title">Start free. Scale when ready.</h2>
-  <p class="sec-sub">The core tools are completely free. For larger projects and expert support, book a consultation.</p>
+  <h2 class="sec-title">Start free. Pay only for what you need.</h2>
+  <p class="sec-sub">Descriptive statistics and data cleaning are always free. Advanced tests cost credits — buy packs or subscribe for unlimited access.</p>
   <div class="pricing-grid">
     <div class="price-card">
       <div class="pc-name">Data Cleaning</div>
@@ -242,9 +246,9 @@ footer strong{color:rgba(255,255,255,.75)}
       <div class="pc-desc">Full descriptive analysis — histograms, boxplots, frequency tables, Q-Q plots.</div>
     </div>
     <div class="price-card highlight">
-      <div class="pc-name">Statistical Tests</div>
-      <div class="pc-price free-forever">Free</div>
-      <div class="pc-desc">All 12 tests, assumption checks, APA output, charts, Excel export. Always free.</div>
+      <div class="pc-name">Advanced Tests</div>
+      <div class="pc-price pay-per-use">From 1 Credit</div>
+      <div class="pc-desc">T-Test, ANOVA, Regression, Logistic, PCA, Factor Analysis, ARIMA. Pay per test.</div>
     </div>
     <div class="price-card">
       <div class="pc-name">Expert Consultation</div>
@@ -252,6 +256,40 @@ footer strong{color:rgba(255,255,255,.75)}
       <div class="pc-desc">Large datasets, full thesis analysis, custom pipelines, R/SPSS/EViews modelling.</div>
     </div>
   </div>
+</section>
+
+<!-- CREDIT PACKS -->
+<section class="section" style="margin-bottom:3rem">
+  <div class="sec-label">Credit Packs</div>
+  <h2 class="sec-title">Buy credits. Never expire.</h2>
+  <p class="sec-sub">1 credit = $1 USD. Use them on any advanced test.</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem">
+    <div style="background:var(--wh);border:1px solid var(--bd);border-radius:16px;padding:1.25rem;text-align:center">
+      <div style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--tx)">5</div>
+      <div style="font-size:.78rem;color:var(--sl);margin-bottom:.5rem">Credits</div>
+      <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--bl)">$5</div>
+    </div>
+    <div style="background:var(--wh);border:1.5px solid var(--tl);border-radius:16px;padding:1.25rem;text-align:center;position:relative">
+      <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--tl);color:var(--ny);font-size:.68rem;font-weight:700;padding:3px 12px;border-radius:20px;white-space:nowrap">Best Value</div>
+      <div style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--tx)">25</div>
+      <div style="font-size:.78rem;color:var(--sl);margin-bottom:.5rem">Credits</div>
+      <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--bl)">$20</div>
+      <div style="font-size:.7rem;color:var(--ok);margin-top:.25rem">Save 20%</div>
+    </div>
+    <div style="background:var(--wh);border:1px solid var(--bd);border-radius:16px;padding:1.25rem;text-align:center">
+      <div style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--tx)">60</div>
+      <div style="font-size:.78rem;color:var(--sl);margin-bottom:.5rem">Credits</div>
+      <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--bl)">$45</div>
+      <div style="font-size:.7rem;color:var(--ok);margin-top:.25rem">Save 25%</div>
+    </div>
+    <div style="background:var(--wh);border:1px solid var(--bd);border-radius:16px;padding:1.25rem;text-align:center">
+      <div style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--tx)">150</div>
+      <div style="font-size:.78rem;color:var(--sl);margin-bottom:.5rem">Credits</div>
+      <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--bl)">$100</div>
+      <div style="font-size:.7rem;color:var(--ok);margin-top:.25rem">Save 33%</div>
+    </div>
+  </div>
+  <p style="text-align:center;color:var(--sl);font-size:.78rem;margin-top:1rem">Credits never expire. Use them on any test, any time.</p>
 </section>
 
 <!-- LARGE FILE NOTICE -->
