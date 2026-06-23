@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Eduxellence Analytics — Free Data Tools</title>
-<meta name="description" content="Free professional data cleaning and statistical analysis tools. Chi-Square, T-Test, ANOVA, Regression, Correlation — with charts, APA tables and plain-English interpretation.">
+<meta name="description" content="Free professional data cleaning and statistical analysis tools. Chi-Square, T-Test, ANOVA, Regression, Correlation, Logistic Regression, PCA, Factor Analysis, ARIMA — with charts, APA tables and plain-English interpretation.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -76,6 +76,7 @@ a{color:var(--bl);text-decoration:none}a:hover{text-decoration:underline}
 .par{background:#DBEAFE;color:#1E40AF}
 .np{background:#FEF3C7;color:#92400E}
 .desc{background:#F3E8FF;color:#6B21A8}
+.adv{background:#E0E7FF;color:#3730A3}
 
 /* STEPS */
 .steps-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.5rem}
@@ -134,7 +135,7 @@ footer strong{color:rgba(255,255,255,.75)}
   <h1>Research-Grade Data Tools<br><span>For Everyone.</span></h1>
   <p class="hero-sub">Clean messy data and run professional statistical analysis — directly in your browser. Built by Eduxellence Analytics for researchers, students, and data teams.</p>
   <div class="hero-stats">
-    <div class="hs"><div class="hs-num">8</div><div class="hs-lbl">Statistical Tests</div></div>
+    <div class="hs"><div class="hs-num">12</div><div class="hs-lbl">Statistical Tests</div></div>
     <div class="hs"><div class="hs-num">$0</div><div class="hs-lbl">Cost to Start</div></div>
     <div class="hs"><div class="hs-num">APA</div><div class="hs-lbl">Formatted Output</div></div>
     <div class="hs"><div class="hs-num">30s</div><div class="hs-lbl">Time to Results</div></div>
@@ -150,11 +151,13 @@ footer strong{color:rgba(255,255,255,.75)}
       <div class="tool-icon icon-blue">📊</div>
       <div class="free-tag">FREE</div>
       <div class="tool-name">Statistical Analysis</div>
-      <div class="tool-desc">Upload your dataset and run any of 8 professional statistical tests. Get publication-ready charts, APA-formatted tables, assumption checks, and plain-English interpretation — instantly.</div>
+      <div class="tool-desc">Upload your dataset and run any of 12 professional statistical tests. Get publication-ready charts, APA-formatted tables, assumption checks, and plain-English interpretation — instantly.</div>
       <div class="tool-features">
         <div class="tf">Chi-Square, T-Test, ANOVA</div>
-        <div class="tf">Correlation & Linear Regression</div>
-        <div class="tf">Mann-Whitney & Kruskal-Wallis</div>
+        <div class="tf">Correlation &amp; Linear Regression</div>
+        <div class="tf">Logistic Regression &amp; PCA</div>
+        <div class="tf">Factor Analysis &amp; ARIMA</div>
+        <div class="tf">Mann-Whitney &amp; Kruskal-Wallis</div>
         <div class="tf">Auto assumption checking</div>
         <div class="tf">APA citation + interpretation</div>
         <div class="tf">Download Excel report</div>
@@ -191,8 +194,8 @@ footer strong{color:rgba(255,255,255,.75)}
 <!-- STATISTICAL TESTS -->
 <section class="section">
   <div class="sec-label">What You Can Run</div>
-  <h2 class="sec-title">8 Professional Statistical Tests</h2>
-  <p class="sec-sub">From simple descriptives to multiple regression — all with automatic assumption checking and APA formatting.</p>
+  <h2 class="sec-title">12 Professional Statistical Tests</h2>
+  <p class="sec-sub">From simple descriptives to advanced modelling — all with automatic assumption checking and APA formatting.</p>
   <div class="tests-grid">
     <div class="test-item"><div class="ti-icon">📊</div><div class="ti-name">Descriptive Statistics</div><div class="ti-desc">Mean, SD, skewness, histograms, boxplots, Q-Q plots, pie charts.</div><span class="ti-badge desc">Descriptive</span></div>
     <div class="test-item"><div class="ti-icon">🔲</div><div class="ti-name">Chi-Square Test</div><div class="ti-desc">Test independence between two categorical variables. Cramér's V effect size.</div><span class="ti-badge par">Parametric</span></div>
@@ -200,6 +203,10 @@ footer strong{color:rgba(255,255,255,.75)}
     <div class="test-item"><div class="ti-icon">📈</div><div class="ti-name">One-Way ANOVA</div><div class="ti-desc">Compare means across 3+ groups. η², Bonferroni post-hoc tests.</div><span class="ti-badge par">Parametric</span></div>
     <div class="test-item"><div class="ti-icon">🔗</div><div class="ti-name">Correlation</div><div class="ti-desc">Pearson or Spearman. Heatmap, scatter matrix, bubble chart.</div><span class="ti-badge par">Parametric</span></div>
     <div class="test-item"><div class="ti-icon">📉</div><div class="ti-name">Linear Regression</div><div class="ti-desc">Simple or multiple. R², coefficients, CI bands, residual plots.</div><span class="ti-badge par">Parametric</span></div>
+    <div class="test-item"><div class="ti-icon">🔄</div><div class="ti-name">Logistic Regression</div><div class="ti-desc">Binary classification. Odds ratios, confusion matrix, AUC-ROC.</div><span class="ti-badge adv">Advanced</span></div>
+    <div class="test-item"><div class="ti-icon">📐</div><div class="ti-name">PCA</div><div class="ti-desc">Principal Component Analysis. Dimensionality reduction, variance explained.</div><span class="ti-badge adv">Advanced</span></div>
+    <div class="test-item"><div class="ti-icon">🧩</div><div class="ti-name">Factor Analysis</div><div class="ti-desc">Uncover latent factors. Factor loadings, eigenvalues, scree plot.</div><span class="ti-badge adv">Advanced</span></div>
+    <div class="test-item"><div class="ti-icon">📈</div><div class="ti-name">ARIMA</div><div class="ti-desc">Time series forecasting. ACF/PACF plots, forecast visualisation.</div><span class="ti-badge adv">Advanced</span></div>
     <div class="test-item"><div class="ti-icon">🥊</div><div class="ti-name">Mann-Whitney U</div><div class="ti-desc">Non-parametric alternative to T-Test. For non-normal or ordinal data.</div><span class="ti-badge np">Non-Parametric</span></div>
     <div class="test-item"><div class="ti-icon">🏆</div><div class="ti-name">Kruskal-Wallis</div><div class="ti-desc">Non-parametric ANOVA alternative for skewed distributions.</div><span class="ti-badge np">Non-Parametric</span></div>
   </div>
@@ -212,7 +219,7 @@ footer strong{color:rgba(255,255,255,.75)}
   <p class="sec-sub">No Python, no SPSS, no spreadsheet formulas. Just upload and run.</p>
   <div class="steps-row">
     <div class="step"><div class="step-n">1</div><div class="step-icon">📂</div><div class="step-title">Upload your file</div><div class="step-desc">CSV or Excel. Column types detected automatically. Up to 10 MB on the free tier.</div></div>
-    <div class="step"><div class="step-n">2</div><div class="step-icon">🎯</div><div class="step-title">Choose your test</div><div class="step-desc">We recommend the right test based on your data. Or pick from all 8 available tests.</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-icon">🎯</div><div class="step-title">Choose your test</div><div class="step-desc">We recommend the right test based on your data. Or pick from all 12 available tests.</div></div>
     <div class="step"><div class="step-n">3</div><div class="step-icon">✅</div><div class="step-title">Check assumptions</div><div class="step-desc">Your data is automatically tested for normality, equal variance, outliers and more.</div></div>
     <div class="step"><div class="step-n">4</div><div class="step-icon">📊</div><div class="step-title">Get your results</div><div class="step-desc">Charts, APA citation, coefficient tables, and a plain-English explanation — ready to copy into your paper.</div></div>
   </div>
@@ -237,7 +244,7 @@ footer strong{color:rgba(255,255,255,.75)}
     <div class="price-card highlight">
       <div class="pc-name">Statistical Tests</div>
       <div class="pc-price free-forever">Free</div>
-      <div class="pc-desc">All 8 tests, assumption checks, APA output, charts, Excel export. Always free.</div>
+      <div class="pc-desc">All 12 tests, assumption checks, APA output, charts, Excel export. Always free.</div>
     </div>
     <div class="price-card">
       <div class="pc-name">Expert Consultation</div>
