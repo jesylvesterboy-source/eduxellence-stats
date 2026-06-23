@@ -401,6 +401,8 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
         <button class="btn btn-ok btn-sm" id="btn-docx" onclick="exportFmt('docx')" title="Download APA Word (.docx)" style="background:linear-gradient(135deg,#1E6BFF,#1452CC)">⬇ Word</button>
         <button class="btn btn-ok btn-sm" id="btn-pdf"  onclick="exportFmt('pdf')"  title="Download PDF" style="background:linear-gradient(135deg,#DC2626,#991B1B)">⬇ PDF</button>
         <button class="btn btn-share btn-sm" id="btn-share" onclick="openShareModal()" title="Create a shareable link">🔗 Share</button>
+        <!-- NEW: Code button -->
+        <button class="btn btn-ok btn-sm" id="btn-code" onclick="downloadCode()" title="Download Python code to reproduce this analysis" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9)">🐍 Code</button>
       </div>
     </div>
   </div>
@@ -1013,6 +1015,35 @@ async function exportFmt(fmt){
   }finally{
     btn.disabled = false;
     btn.textContent = orig;
+  }
+}
+
+// ===== NEW: DOWNLOAD CODE SNIPPET =====
+async function downloadCode(){
+  const btn = document.getElementById('btn-code');
+  const orig = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Generating…';
+  try{
+    const r = await fetch(`${API_BASE}/api/code-snippet`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({analysis_type: S.test, params: S.params})
+    });
+    if(!r.ok){
+      const d = await r.json().catch(()=>({}));
+      alert(d.error || 'Could not generate code for this analysis type yet.');
+      return;
+    }
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `eduxellence_${S.test}_code.py`;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(url), 5000);
+  }catch(e){
+    alert('Error: ' + e.message);
+  }finally{
+    btn.disabled = false; btn.textContent = orig;
   }
 }
 
