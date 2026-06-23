@@ -423,4 +423,99 @@ async function runThesis() {
 function buildParams(testId) {
   // This should be expanded based on the test type
   // For now, return empty params that work for all tests
-  const base = { numeric_var: null, group_var: null, columns:
+  const base = { numeric_var: null, group_var: null, columns: [], var1: null, var2: null, dependent: null, predictors: [] };
+  // In a real implementation, you'd dynamically build params based on column types
+  return base;
+}
+
+// ===== SHOW RESULTS =====
+function showResults() {
+  document.getElementById('step-progress').style.display = 'none';
+  document.getElementById('step-results').style.display = 'block';
+  document.getElementById('btn-run-thesis').disabled = false;
+
+  const results = S.results || {};
+  const keys = Object.keys(results);
+  const total = keys.length;
+
+  // Summary stats
+  document.getElementById('result-summary').innerHTML = `
+    <div class="result-stat"><div class="num">${total}</div><div class="lbl">Tests Run</div></div>
+    <div class="result-stat"><div class="num">${S.filename || 'Unknown'}</div><div class="lbl">Dataset</div></div>
+    <div class="result-stat"><div class="num">${new Date().toLocaleDateString()}</div><div class="lbl">Date</div></div>
+  `;
+
+  // Individual results
+  let html = '';
+  for (const [id, data] of Object.entries(results)) {
+    const test = ALL_TESTS.find(t => t.id === id);
+    const name = test ? test.label : id;
+    const icon = test ? test.icon : '📊';
+    const apa = data.apa_citation || 'No APA citation available.';
+    const interp = data.interpretation || 'No interpretation available.';
+    html += `
+      <div class="result-item">
+        <div class="ri-header">
+          <span class="ri-name">${icon} ${name}</span>
+          <span class="ri-status ok">✅ Complete</span>
+        </div>
+        <div style="background:#F8F7FF;border:1.5px solid #C4B5FD;border-radius:var(--r8);padding:.7rem .9rem;margin:.5rem 0;font-size:.78rem;font-family:'JetBrains Mono',monospace;color:#1E1B4B">${apa}</div>
+        <div class="ri-preview" style="margin-top:.5rem;font-size:.85rem;color:var(--tx)">${interp.slice(0, 200)}${interp.length > 200 ? '…' : ''}</div>
+        <div style="margin-top:.5rem;display:flex;gap:.4rem;flex-wrap:wrap">
+          <span style="font-size:.72rem;color:var(--sl);background:var(--of);padding:2px 10px;border-radius:10px">${test ? test.cost + ' credits' : ''}</span>
+          <button class="btn btn-secondary btn-sm" style="padding:.2rem .7rem;font-size:.7rem" onclick="alert('View full results for ${name}')">View Full</button>
+        </div>
+      </div>
+    `;
+  }
+  document.getElementById('result-items').innerHTML = html;
+  document.getElementById('results-meta').textContent = `Thesis Package · ${total} tests · ${new Date().toLocaleString()}`;
+}
+
+// ===== EXPORT FUNCTIONS =====
+function exportThesis(format) {
+  alert(`Exporting thesis report as ${format.toUpperCase()}...\n\nThis will download a complete research report with all ${Object.keys(S.results || {}).length} analyses.`);
+  // In production, call /api/export with format=docx/pdf/xlsx
+}
+
+// ===== NAVIGATION =====
+function goBack() {
+  document.getElementById('step-tests').style.display = 'none';
+  document.getElementById('step-upload').style.display = 'block';
+}
+
+function resetAll() {
+  S = { metaPath: null, filename: null, selectedTests: [], results: null };
+  document.getElementById('step-results').style.display = 'none';
+  document.getElementById('step-progress').style.display = 'none';
+  document.getElementById('step-tests').style.display = 'none';
+  document.getElementById('step-upload').style.display = 'block';
+  resetUpload();
+}
+
+// ===== UTILITIES =====
+function showError(id, textId, msg) {
+  document.getElementById(textId).textContent = msg;
+  document.getElementById(id).classList.add('show');
+}
+function hideError(id) { document.getElementById(id).classList.remove('show'); }
+
+function animateProgress(barId, pctId, dur) {
+  let t = 0; const interval = 50;
+  const timer = setInterval(() => {
+    t += interval;
+    const p = Math.min(95, Math.round(95 * (1 - Math.pow(1 - t / dur, 2.5))));
+    document.getElementById(barId).style.width = p + '%';
+    document.getElementById(pctId).textContent = p + '%';
+    if (t >= dur) clearInterval(timer);
+  }, interval);
+}
+
+// ===== INIT =====
+// Check if ?package=thesis is in URL
+if (window.location.search.includes('package=thesis')) {
+  document.getElementById('step-upload').style.display = 'block';
+}
+</script>
+</body>
+</html>
