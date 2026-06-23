@@ -122,7 +122,7 @@ footer a{color:var(--tl)}
         <div class="tier-item ok">Frequency tables &amp; charts</div>
         <div class="tier-item ok">Basic AI insights</div>
         <div class="tier-item ok">Datasets up to 500 rows</div>
-        <div class="tier-item x">Inferential tests (Chi-Square, ANOVA…)</div>
+        <div class="tier-item x">Inferential tests (Chi-Square, ANOVA, T-Test…)</div>
         <div class="tier-item x">APA Word/PDF reports</div>
       </div>
     </div>
@@ -132,11 +132,12 @@ footer a{color:var(--tl)}
       <div class="tier-desc">Unlock advanced statistics exactly when you need them.</div>
       <div class="tier-list">
         <div class="tier-item ok">Regression &amp; Multiple Regression</div>
-        <div class="tier-item ok">ANOVA, Chi-Square, Correlation</div>
-        <div class="tier-item ok">Reliability &amp; Factor Analysis</div>
+        <div class="tier-item ok">Logistic Regression &amp; PCA</div>
+        <div class="tier-item ok">ANOVA, Chi-Square, T-Test, Correlation</div>
+        <div class="tier-item ok">Factor Analysis &amp; Reliability</div>
+        <div class="tier-item ok">ARIMA Time Series Forecasting</div>
         <div class="tier-item ok">AI research report generator</div>
-        <div class="tier-item ok">Thesis-ready APA interpretation</div>
-        <div class="tier-item ok">Word, PDF &amp; Excel exports</div>
+        <div class="tier-item ok">APA Word, PDF &amp; Excel exports</div>
       </div>
     </div>
   </div>
@@ -204,15 +205,44 @@ async function loadPricing(){
 }
 
 function renderPriceTable(tests){
-  const paid = tests.filter(t=>!t.free);
-  const free = tests.filter(t=>t.free);
+  // Define the order for the price table
+  const order = [
+    "cleaning", "descriptive",
+    "chi_square", "correlation", "t_test", "mann_whitney",
+    "anova", "kruskal_wallis",
+    "regression", "multiple_regression",
+    "logistic_regression", "pca",
+    "factor_analysis", "arima",
+    "reliability",
+    "thesis_package",
+    "ai_interpretation", "export_docx", "export_pdf", "export_xlsx"
+  ];
+  
+  // Create a map for quick lookup
+  const testMap = {};
+  tests.forEach(t => testMap[t.key] = t);
+  
   let html = '';
-  [...free, ...paid].forEach(t=>{
-    html += `<div class="price-row">
-      <div class="pr-label">${t.label}</div>
-      <div class="pr-price ${t.free?'free':''}">${t.free?'Free':t.display_price}</div>
-    </div>`;
+  order.forEach(key => {
+    const t = testMap[key];
+    if (t) {
+      html += `<div class="price-row">
+        <div class="pr-label">${t.label}</div>
+        <div class="pr-price ${t.free?'free':''}">${t.free?'Free':t.display_price}</div>
+      </div>`;
+    }
   });
+  
+  // Add any tests not in the order list
+  tests.forEach(t => {
+    if (!order.includes(t.key)) {
+      html += `<div class="price-row">
+        <div class="pr-label">${t.label}</div>
+        <div class="pr-price ${t.free?'free':''}">${t.free?'Free':t.display_price}</div>
+      </div>`;
+    }
+  });
+  
   document.getElementById('price-table').innerHTML = html;
 }
 
