@@ -29,7 +29,10 @@ CREDIT_COSTS = {
     "kruskal_wallis":       2,   # non-parametric anova, same tier
     "regression":           3,   # simple regression
     "multiple_regression":  4,   # regression with 2+ predictors (auto-detected)
-    "factor_analysis":      5,   # reserved for future test
+    "logistic_regression":  5,   # logistic regression
+    "pca":                  5,   # principal component analysis
+    "factor_analysis":      6,   # factor analysis
+    "arima":                8,   # time series forecasting
     "reliability":           3,   # Cronbach's alpha — reserved for future test
     # Bundles
     "thesis_package":       12,   # mid-point of $10-15 range
@@ -51,7 +54,10 @@ CREDIT_LABELS = {
     "kruskal_wallis":      "Kruskal-Wallis Test",
     "regression":          "Linear Regression",
     "multiple_regression": "Multiple Regression",
+    "logistic_regression": "Logistic Regression",
+    "pca":                 "Principal Component Analysis (PCA)",
     "factor_analysis":     "Factor Analysis",
+    "arima":               "Time Series Forecasting (ARIMA)",
     "reliability":         "Reliability Test (Cronbach's Alpha)",
     "thesis_package":      "Full Research / Thesis Package",
     "ai_interpretation":   "AI-Powered Interpretation",
@@ -117,7 +123,8 @@ def get_full_pricing_table() -> list:
     seen = set()
     order = ["cleaning", "descriptive", "chi_square", "correlation", "t_test",
              "mann_whitney", "anova", "kruskal_wallis", "regression",
-             "multiple_regression", "factor_analysis", "reliability",
+             "multiple_regression", "logistic_regression", "pca",
+             "factor_analysis", "arima", "reliability",
              "ai_interpretation", "export_docx", "export_pdf", "export_xlsx",
              "thesis_package"]
     for key in order:
