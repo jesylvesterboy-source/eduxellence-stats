@@ -483,6 +483,41 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+/* ═══════════ THESIS PACKAGE DETECTION ═══════════ */
+// Check if URL has ?package=thesis parameter
+(function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('package') === 'thesis') {
+    // Show user-friendly modal
+    showThesisPrompt();
+  }
+})();
+
+function showThesisPrompt() {
+  // Create a modal asking if they want to use the Thesis Package
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position: fixed; inset: 0; background: rgba(11,24,41,.85); z-index: 1000;
+    display: flex; align-items: center; justify-content: center; padding: 1rem;
+  `;
+  modal.innerHTML = `
+    <div style="background: #fff; border-radius: 24px; padding: 2.5rem; max-width: 480px; width: 100%; text-align: center; box-shadow: 0 12px 40px rgba(0,0,0,.14); position: relative;">
+      <button onclick="this.closest('div[style]').remove()" style="position:absolute;top:1rem;right:1.25rem;background:none;border:none;font-size:1.25rem;color:#64748B;cursor:pointer;font-family:'DM Sans',sans-serif;">✕</button>
+      <div style="font-size: 3rem; margin-bottom: 1rem;">🎓</div>
+      <h2 style="font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; color: #0F172A; margin-bottom: .5rem;">Thesis Package Detected</h2>
+      <p style="color: #64748B; font-size: .95rem; line-height: 1.6; margin-bottom: 1.5rem;">
+        You're being redirected to the complete <strong>Thesis Package</strong> workflow — run all your analyses in one go.
+      </p>
+      <div style="display: flex; gap: .75rem; flex-wrap: wrap; justify-content: center;">
+        <a href="/thesis" style="background: #0FC9A0; color: #0B1829; font-family: 'Syne', sans-serif; font-weight: 700; padding: .7rem 2rem; border-radius: 10px; text-decoration: none; transition: all .15s;" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">Continue to Thesis Package →</a>
+        <button onclick="this.closest('div[style]').remove()" style="background: transparent; border: 1.5px solid #E2E8F0; color: #64748B; font-family: 'DM Sans', sans-serif; font-weight: 500; padding: .7rem 1.5rem; border-radius: 10px; cursor: pointer; transition: all .15s;" onmouseover="this.style.borderColor='#1E6BFF';this.style.color='#1E6BFF'" onmouseout="this.style.borderColor='#E2E8F0';this.style.color='#64748B'">Continue to Individual Tests</button>
+      </div>
+      <p style="font-size:.75rem;color:#94A3B8;margin-top:1.25rem;">🎯 The Thesis Package runs all 12 tests on your dataset in one batch.</p>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
 /* ═══════════ STATE ═══════════ */
 const S={metaPath:null,filename:null,cols:[],test:null,params:null,results:null,assumptions:[],aiMode:'simple',fileData:null,creditBalance:null,creditCosts:null};
 
