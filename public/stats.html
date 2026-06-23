@@ -4,7 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" type="image/x-icon" href="/Eduxellence.ico">
 <title>Statistical Analysis Tool — Eduxellence Analytics</title>
-<meta name="description" content="Free professional statistical analysis online: Chi-Square, T-Test, ANOVA, Regression, Correlation. Charts, APA tables, plain-English interpretation.">
+<meta name="description" content="Free professional statistical analysis online: Chi-Square, T-Test, ANOVA, Regression, Correlation, PCA, Factor Analysis, ARIMA. Charts, APA tables, plain-English interpretation.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
@@ -26,7 +26,6 @@ code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:#f1f5f9;p
 .nav-links{display:flex;gap:1.25rem;align-items:center}
 .nav-links a{color:rgba(255,255,255,.65);font-size:.85rem;font-weight:500;transition:color .15s}
 .nav-links a:hover{color:#fff;text-decoration:none}
-/* NEW: Referral link in nav */
 .nav-links .nav-refer{color:rgba(255,255,255,.65);font-size:.85rem;font-weight:500;cursor:pointer;transition:color .15s;background:none;border:none;font-family:'DM Sans',sans-serif}
 .nav-links .nav-refer:hover{color:#0FC9A0;text-decoration:none}
 .nav-cta{background:var(--tl)!important;color:var(--ny)!important;padding:5px 14px;border-radius:20px;font-weight:600!important}
@@ -125,7 +124,7 @@ code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:#f1f5f9;p
 .t-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;color:var(--tx);margin-bottom:.25rem}
 .t-desc{font-size:.78rem;color:var(--sl);line-height:1.5}
 .t-bdg{display:inline-block;font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:10px;margin-top:.5rem}
-.b-par{background:#DBEAFE;color:#1E40AF}.b-np{background:#FEF3C7;color:#92400E}.b-dsc{background:#F3E8FF;color:#6B21A8}
+.b-par{background:#DBEAFE;color:#1E40AF}.b-np{background:#FEF3C7;color:#92400E}.b-dsc{background:#F3E8FF;color:#6B21A8}.b-adv{background:#D1FAE5;color:#065F46}
 /* RECOMMENDATIONS */
 .recs{background:rgba(15,201,160,.06);border:1.5px solid rgba(15,201,160,.2);border-radius:var(--r12);padding:1rem 1.25rem;margin-bottom:1.25rem}
 .rec-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--ny);margin-bottom:.6rem}
@@ -268,7 +267,6 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
     <a href="https://eduxellence.org">Home</a>
     <a href="https://clean.eduxellence.org">Data Cleaner</a>
     <a href="https://eduxellence.org/services">Services</a>
-    <!-- NEW: Referral link in nav -->
     <button class="nav-refer" onclick="openReferralModal()">🎁 Refer</button>
     <a href="/pricing" style="color:rgba(255,255,255,.65);font-size:.85rem;font-weight:500;transition:color .15s">💰 Pricing</a>
     <a href="https://eduxellence.org/#contact" class="nav-cta">Book Audit</a>
@@ -289,6 +287,7 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
     <span>📊 Descriptive</span><span>🔲 Chi-Square</span><span>⚖️ T-Test</span>
     <span>📈 ANOVA</span><span>🔗 Correlation</span><span>📉 Regression</span>
     <span>🥊 Mann-Whitney</span><span>🏆 Kruskal-Wallis</span>
+    <span>📋 Logistic</span><span>📊 PCA</span><span>🔬 Factor</span><span>📈 ARIMA</span>
   </div>
 </section>
 
@@ -401,7 +400,6 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
         <button class="btn btn-ok btn-sm" id="btn-docx" onclick="exportFmt('docx')" title="Download APA Word (.docx)" style="background:linear-gradient(135deg,#1E6BFF,#1452CC)">⬇ Word</button>
         <button class="btn btn-ok btn-sm" id="btn-pdf"  onclick="exportFmt('pdf')"  title="Download PDF" style="background:linear-gradient(135deg,#DC2626,#991B1B)">⬇ PDF</button>
         <button class="btn btn-share btn-sm" id="btn-share" onclick="openShareModal()" title="Create a shareable link">🔗 Share</button>
-        <!-- NEW: Code button -->
         <button class="btn btn-ok btn-sm" id="btn-code" onclick="downloadCode()" title="Download Python code to reproduce this analysis" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9)">🐍 Code</button>
       </div>
     </div>
@@ -441,7 +439,7 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
   </div>
 </div>
 
-<!-- NEW: REFERRAL MODAL -->
+<!-- REFERRAL MODAL -->
 <div id="referral-modal">
   <div class="referral-modal-box">
     <button class="close-btn" onclick="closeReferralModal()">✕</button>
@@ -558,7 +556,7 @@ async function loadCreditCosts(){
 loadBalance();
 loadCreditCosts();
 
-/* ═══════════ TEST DEFS ═══════════ */
+/* ═══════════ TEST DEFS — UPDATED WITH 4 NEW TESTS ═══════════ */
 const TESTS=[
   {id:"descriptive",ico:"📊",name:"Descriptive Statistics",bdg:"dsc",bl:"Descriptive",
    desc:"Mean, median, SD, skewness, kurtosis. Histograms, boxplots, Q-Q plots, pie charts.",
@@ -584,8 +582,21 @@ const TESTS=[
   {id:"kruskal_wallis",ico:"🏆",name:"Kruskal-Wallis",bdg:"np",bl:"Non-Parametric",
    desc:"Non-parametric ANOVA. Use for skewed data or ordinal outcomes.",
    hint:"Need: 1 numeric + 1 grouping column (3+ groups)."},
+  // ===== NEW TESTS ADDED =====
+  {id:"logistic_regression",ico:"📋",name:"Logistic Regression",bdg:"adv",bl:"Advanced",
+   desc:"Predict binary outcomes. Odds ratios, confusion matrix, ROC AUC, VIF.",
+   hint:"Need: 1 binary categorical dependent + 1+ numeric predictors."},
+  {id:"pca",ico:"📊",name:"Principal Component Analysis",bdg:"adv",bl:"Dimension Reduction",
+   desc:"Reduce dimensionality. Eigenvalues, variance explained, scree plot, loadings.",
+   hint:"Need: 2+ numeric columns."},
+  {id:"factor_analysis",ico:"🔬",name:"Factor Analysis",bdg:"adv",bl:"Dimension Reduction",
+   desc:"ML extraction, KMO, Varimax rotation, factor loadings, communalities.",
+   hint:"Need: 3+ numeric columns."},
+  {id:"arima",ico:"📈",name:"ARIMA Forecast",bdg:"adv",bl:"Time Series",
+   desc:"Auto-regressive forecasting. ADF stationarity test, AIC order selection, forecast plot.",
+   hint:"Need: 1 date/time column + 1 numeric column to forecast."},
 ];
-const BDG={par:"b-par",np:"b-np",dsc:"b-dsc"};
+const BDG={par:"b-par",np:"b-np",dsc:"b-dsc",adv:"b-adv"};
 
 /* ═══════════ STEP NAV ═══════════ */
 function gs(n){
@@ -649,7 +660,6 @@ async function handleFile(file){
   hideA("ue"); document.getElementById("finfo").style.display="none"; document.getElementById("btn2").disabled=true;
   showP("upw"); animP("up-fill","up-pct",3500,"up-lbl","Uploading…");
   
-  // Store file data for later use in analysis
   S.fileData = await fileToBase64(file);
   
   const fd=new FormData(); fd.append("file",file);
@@ -708,7 +718,7 @@ function renderTests(){
 }
 function selectTest(id){S.test=id;document.querySelectorAll(".tc").forEach(c=>c.classList.remove("sel"));const el=document.getElementById(`tc-${id}`);if(el)el.classList.add("sel");document.getElementById("btn3").disabled=false;}
 
-/* ═══════════ S3: VARIABLES ═══════════ */
+/* ═══════════ S3: VARIABLES — UPDATED FOR NEW TESTS ═══════════ */
 const numC=()=>S.cols.filter(c=>c.dtype.startsWith("num"));
 const catC=()=>S.cols.filter(c=>!c.dtype.startsWith("num"));
 const allC=()=>S.cols;
@@ -721,10 +731,15 @@ function renderVars(){
   const id=S.test; let h="";
   if(id==="descriptive") h=`<div class="vs"><div class="vs-lbl">Select columns to analyse</div><div class="vs-hint">Choose any mix of numeric and categorical (minimum 1).</div>${mchk(allC(),"dc")}</div>`;
   else if(id==="chi_square") h=`<div class="vs"><div class="vs-lbl">Variable 1 (rows)</div><div class="vs-hint">e.g. Gender, Region, Faculty</div><select class="vs-sel" id="v1">${opts(allC())}</select></div><div class="vs"><div class="vs-lbl">Variable 2 (columns)</div><div class="vs-hint">e.g. Satisfied, Pass/Fail, Scholarship</div><select class="vs-sel" id="v2">${opts(allC())}</select></div>`;
-  else if(["t_test","mann_whitney"].includes(id)) h=`<div class="vs"><div class="vs-lbl">Numeric (dependent) variable</div><div class="vs-hint">The measurement to compare (e.g. Score, Income)</div><select class="vs-sel" id="nv">${opts(numC())}</select></div><div class="vs"><div class="vs-lbl">Grouping variable</div><div class="vs-hint">Must have exactly 2 categories</div><select class="vs-sel" id="gv">${opts(allC())}</select></div>`;
-  else if(["anova","kruskal_wallis"].includes(id)) h=`<div class="vs"><div class="vs-lbl">Numeric (dependent) variable</div><div class="vs-hint">The measurement to compare</div><select class="vs-sel" id="nv">${opts(numC())}</select></div><div class="vs"><div class="vs-lbl">Grouping variable</div><div class="vs-hint">Must have 3+ categories</div><select class="vs-sel" id="gv">${opts(allC())}</select></div>`;
+  else if(["t_test","mann_whitney"].includes(id)) h=`<div class="vs"><div class="vs-lbl">Numeric (dependent) variable</div><div class="vs-hint">The measurement to compare (e.g. Score, Income)</div><select class="vs-sel" id="nv">${opts(numC())}</select></div><div class="vs"><div class="vs-lbl">Grouping variable</div><div class="vs-hint">Must have exactly 2 categories</div><select class="vs-sel" id="gv">${opts(catC())}</select></div>`;
+  else if(["anova","kruskal_wallis"].includes(id)) h=`<div class="vs"><div class="vs-lbl">Numeric (dependent) variable</div><div class="vs-hint">The measurement to compare</div><select class="vs-sel" id="nv">${opts(numC())}</select></div><div class="vs"><div class="vs-lbl">Grouping variable</div><div class="vs-hint">Must have 3+ categories</div><select class="vs-sel" id="gv">${opts(catC())}</select></div>`;
   else if(id==="correlation") h=`<div class="vs"><div class="vs-lbl">Select numeric columns (minimum 2)</div>${mchk(numC(),"cc")}</div><div class="vs"><div class="vs-lbl">Method</div><div class="mr"><label><input type="radio" name="cm" value="pearson" checked> Pearson (parametric)</label><label><input type="radio" name="cm" value="spearman"> Spearman (non-parametric)</label></div></div>`;
   else if(id==="regression") h=`<div class="vs"><div class="vs-lbl">Dependent (outcome) variable</div><div class="vs-hint">The variable to predict</div><select class="vs-sel" id="dv">${opts(numC())}</select></div><div class="vs"><div class="vs-lbl">Predictor(s)</div><div class="vs-hint">Select one or more numeric predictors</div>${mchk(numC(),"pc")}</div>`;
+  // ===== NEW TESTS =====
+  else if(id==="logistic_regression") h=`<div class="vs"><div class="vs-lbl">Dependent (binary outcome) variable</div><div class="vs-hint">Must have exactly 2 categories (e.g. Pass/Fail, Yes/No)</div><select class="vs-sel" id="dv">${opts(catC())}</select></div><div class="vs"><div class="vs-lbl">Predictor(s)</div><div class="vs-hint">Select one or more numeric predictors</div>${mchk(numC(),"pc")}</div>`;
+  else if(id==="pca") h=`<div class="vs"><div class="vs-lbl">Select numeric columns for PCA (minimum 2)</div><div class="vs-hint">Variables should be measured on comparable scales</div>${mchk(numC(),"cc")}</div><div class="vs"><div class="vs-lbl">Number of components (optional)</div><div class="vs-hint">Leave blank for auto-selection based on Kaiser criterion</div><input type="number" id="n_components" min="2" max="10" placeholder="e.g. 3" style="width:100%;padding:.65rem .9rem;border:1.5px solid var(--bd);border-radius:var(--r8);font-size:.9rem;font-family:'DM Sans',sans-serif;"></div>`;
+  else if(id==="factor_analysis") h=`<div class="vs"><div class="vs-lbl">Select numeric columns for Factor Analysis (minimum 3)</div><div class="vs-hint">Variables should be correlated and conceptually related</div>${mchk(numC(),"cc")}</div><div class="vs"><div class="vs-lbl">Number of factors (optional)</div><div class="vs-hint">Leave blank for auto-selection (max 3 factors)</div><input type="number" id="n_factors" min="2" max="5" placeholder="e.g. 2" style="width:100%;padding:.65rem .9rem;border:1.5px solid var(--bd);border-radius:var(--r8);font-size:.9rem;font-family:'DM Sans',sans-serif;"></div>`;
+  else if(id==="arima") h=`<div class="vs"><div class="vs-lbl">Date/Time column</div><div class="vs-hint">The column containing dates or timestamps</div><select class="vs-sel" id="tv">${opts(allC())}</select></div><div class="vs"><div class="vs-lbl">Value to forecast</div><div class="vs-hint">The numeric time series to forecast</div><select class="vs-sel" id="vv">${opts(numC())}</select></div><div class="vs"><div class="vs-lbl">Forecast periods</div><div class="vs-hint">Number of future periods to forecast (default: 12)</div><input type="number" id="fp" min="1" max="24" value="12" style="width:100%;padding:.65rem .9rem;border:1.5px solid var(--bd);border-radius:var(--r8);font-size:.9rem;font-family:'DM Sans',sans-serif;"></div>`;
   document.getElementById("vb").innerHTML=h;
 }
 
@@ -735,6 +750,11 @@ function buildParams(){
   if(["t_test","anova","mann_whitney","kruskal_wallis"].includes(id)){const n=document.getElementById("nv")?.value,g=document.getElementById("gv")?.value;if(!n||!g)return{err:"Select both variables."};if(n===g)return{err:"Variables must be different."};return{ok:1,p:{numeric_var:n,group_var:g}};}
   if(id==="correlation"){const c=[...document.querySelectorAll('[name="cc"]:checked')].map(e=>e.value);if(c.length<2)return{err:"Select at least 2 columns."};const m=document.querySelector('[name="cm"]:checked')?.value||"pearson";return{ok:1,p:{columns:c,method:m}};}
   if(id==="regression"){const d=document.getElementById("dv")?.value,pr=[...document.querySelectorAll('[name="pc"]:checked')].map(e=>e.value);if(!d)return{err:"Select dependent variable."};if(!pr.length)return{err:"Select at least 1 predictor."};if(pr.includes(d))return{err:"Dependent cannot also be a predictor."};return{ok:1,p:{dependent:d,predictors:pr}};}
+  // ===== NEW TESTS =====
+  if(id==="logistic_regression"){const d=document.getElementById("dv")?.value,pr=[...document.querySelectorAll('[name="pc"]:checked')].map(e=>e.value);if(!d)return{err:"Select dependent variable."};if(!pr.length)return{err:"Select at least 1 predictor."};return{ok:1,p:{dependent:d,predictors:pr}};}
+  if(id==="pca"){const c=[...document.querySelectorAll('[name="cc"]:checked')].map(e=>e.value);if(c.length<2)return{err:"Select at least 2 columns."};const nc=document.getElementById("n_components")?.value;return{ok:1,p:{columns:c,n_components:nc?parseInt(nc):null}};}
+  if(id==="factor_analysis"){const c=[...document.querySelectorAll('[name="cc"]:checked')].map(e=>e.value);if(c.length<3)return{err:"Select at least 3 columns."};const nf=document.getElementById("n_factors")?.value;return{ok:1,p:{columns:c,n_factors:nf?parseInt(nf):null}};}
+  if(id==="arima"){const tv=document.getElementById("tv")?.value,vv=document.getElementById("vv")?.value,fp=document.getElementById("fp")?.value;if(!tv||!vv)return{err:"Select both date and value columns."};return{ok:1,p:{time_var:tv,value_var:vv,forecast_periods:fp?parseInt(fp):12}};}
   return{err:"Unknown."};
 }
 
@@ -766,19 +786,10 @@ async function runAnalysis(){
   showP("anpw"); const stages=["Loading data…","Parsing columns…","Running test…","Computing effect sizes…","Generating charts…","Building interpretation…","Finalising…"];
   let t=0; const tm=setInterval(()=>{t+=100;const pct=Math.min(92,Math.round(92*(1-Math.pow(1-t/9000,2))));document.getElementById("an-fill").style.width=pct+"%";document.getElementById("an-pct").textContent=pct+"%";document.getElementById("an-sub").textContent=stages[Math.min(Math.floor(pct/(92/stages.length)),stages.length-1)];if(t>=9000)clearInterval(tm);},100);
   try{
-    // Get auth token for the request
     const token = getAuthToken();
-    const headers = {
-      "Content-Type": "application/json"
-    };
-    
-    // Add Authorization header if token exists
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-      console.log("🔑 Auth token included in request");
-    } else {
-      console.log("ℹ️ No auth token found - request will be anonymous");
-    }
+    const headers = {"Content-Type":"application/json"};
+    if(token) {headers["Authorization"]=`Bearer ${token}`; console.log("🔑 Auth token included in request");}
+    else {console.log("ℹ️ No auth token found - request will be anonymous");}
     
     const r = await fetch(`${API_BASE}/api/analyze`,{
       method:"POST",
@@ -793,10 +804,8 @@ async function runAnalysis(){
     });
     const d=await r.json(); clearInterval(tm); hideP("anpw"); document.getElementById("btn-run").disabled=false;
     
-    // Handle credit/authentication errors
     if (r.status === 401) {
       showA("aw","aw-t","Please sign in to run this analysis. 🔑");
-      // Show login modal automatically
       openLoginModal();
       return;
     }
@@ -816,14 +825,12 @@ async function runAnalysis(){
     }
     S.results=d; renderResults(d); gs(5);
     
-    // Refresh balance after analysis
     if(typeof d.credits_charged === 'number' && d.credits_charged > 0){
       loadBalance();
     }
   }catch(e){clearInterval(tm);hideP("anpw");document.getElementById("btn-run").disabled=false;showA("aw","aw-t","Network error: "+e.message);}
 }
 
-// ── Show consultation prompt for large/complex analyses ──
 function showConsultationPrompt(message, ctaText, ctaUrl){
   const container = document.getElementById("res-body");
   container.innerHTML = `
@@ -845,11 +852,9 @@ function renderResults(d){
   document.getElementById("res-meta").textContent=`Generated ${d.generated_at} · Powered by Eduxellence Analytics`;
   let h="";
 
-  // Key stat chips
   const chips=buildChips(d);
   if(chips.length) h+=`<div class="chips">${chips.map(c=>`<div class="chip"><div class="cv ${c.cls}">${c.val}</div><div class="cl">${c.lbl}</div></div>`).join("")}</div>`;
 
-  // AI Interpretation
   if(d.ai_interpretation){
     const src = d.ai_source||'template';
     const badge = src==='gemini'
@@ -875,17 +880,25 @@ function renderResults(d){
     </div>`;
   }
 
-  // APA
   if(d.apa_citation) h+=`<div class="rs"><div class="rs-title">📌 APA Citation <button onclick="copyAPA()" style="font-size:.72rem;padding:2px 8px;border:1px solid var(--bl);border-radius:6px;background:rgba(30,107,255,.08);color:var(--bl);cursor:pointer;font-family:'DM Sans',sans-serif">Copy</button></div><div class="apa"><div class="apa-l">Copy-paste into your Results section</div><div class="apa-t" id="apa-txt">${d.apa_citation}</div></div></div>`;
 
-  // Interpretation
   if(d.interpretation) h+=`<div class="rs"><div class="rs-title">💬 Plain-English Interpretation</div><div class="itb"><p>${bold(d.interpretation)}</p></div></div>`;
 
-  // Charts
   if(d.charts?.length) h+=`<div class="rs"><div class="rs-title">📊 Charts & Visualisations</div><div class="cg">${d.charts.map((c,i)=>`<div class="cc-card"><div class="cc-title"><span>${c.title}</span><span class="dl-img" onclick="dlImg(${i},'${c.title}')">⬇ PNG</span></div><img class="cc-img" id="chart-${i}" src="${c.img}" alt="${c.title}" loading="lazy"></div>`).join("")}</div></div>`;
 
-  // Tables
-  for(const[k,lbl] of[["numeric_summary","Descriptive Statistics"],["summary_table","Group Summary"],["coef_table","Regression Coefficients"],["pairs_table","Correlation Pairs"],["posthoc_table","Post-Hoc (Bonferroni)"]]) if(d[k]?.length) h+=`<div class="rs"><div class="rs-title">📋 ${lbl}</div><div class="rt-w">${mkTable(d[k])}</div></div>`;
+  // Tables - expanded for new tests
+  const tableKeys = [
+    ["numeric_summary","Descriptive Statistics"],
+    ["summary_table","Group Summary"],
+    ["coef_table","Regression Coefficients"],
+    ["pairs_table","Correlation Pairs"],
+    ["posthoc_table","Post-Hoc (Bonferroni)"],
+    ["loadings_table","Factor/PCA Loadings"],
+    ["variance_table","Variance Explained"],
+    ["forecast_table","Forecast"]
+  ];
+  for(const[k,lbl] of tableKeys) if(d[k]?.length) h+=`<div class="rs"><div class="rs-title">📋 ${lbl}</div><div class="rt-w">${mkTable(d[k])}</div></div>`;
+  
   if(d.categorical_summary) for(const cs of d.categorical_summary) h+=`<div class="rs"><div class="rs-title">📋 Frequency Table: ${cs.variable}</div><div class="rt-w">${mkTable(cs.table)}</div></div>`;
   if(d.contingency_table) h+=`<div class="rs"><div class="rs-title">📋 Contingency Table (Observed)</div><div class="rt-w">${mkCT(d.contingency_table)}</div></div>`;
 
@@ -907,6 +920,12 @@ function buildChips(d){
   if(d.eta_squared!=null) c.push({val:d.eta_squared,lbl:"η²",cls:""});
   if(d.effect_size&&d.effect_size!=="—") c.push({val:d.effect_size,lbl:"Effect Size",cls:""});
   if(d.n!=null) c.push({val:d.n,lbl:"Sample (N)",cls:""});
+  // New test chips
+  if(d.auc!=null) c.push({val:d.auc,lbl:"ROC AUC",cls:d.auc>.7?"sig":""});
+  if(d.accuracy!=null) c.push({val:d.accuracy,lbl:"Accuracy",cls:d.accuracy>.7?"sig":""});
+  if(d.kmo_overall!=null) c.push({val:d.kmo_overall,lbl:"KMO",cls:d.kmo_overall>.7?"sig":""});
+  if(d.kaiser_retained!=null) c.push({val:d.kaiser_retained,lbl:"Kaiser Retained",cls:""});
+  if(d.aic!=null) c.push({val:d.aic,lbl:"AIC",cls:""});
   return c.slice(0,9);
 }
 
@@ -927,61 +946,40 @@ function mkCT(ct){
 function bold(t){return t.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\n/g,"<br>");}
 function copyAPA(){const t=document.getElementById("apa-txt")?.textContent;if(t){navigator.clipboard?.writeText(t).then(()=>{const b=event.target;b.textContent="Copied!";setTimeout(()=>b.textContent="Copy",2000);});}}
 
-// ===== FIXED: PNG DOWNLOAD FUNCTION =====
 function dlImg(i, title){
     const img = document.getElementById(`chart-${i}`);
-    if(!img) {
-        alert('Image not found.');
-        return;
-    }
-    
+    if(!img) {alert('Image not found.');return;}
     const imageUrl = img.src;
     const filename = `eduxellence_${title.replace(/\s+/g,"_")}.png`;
-    
-    // If the image is a data URL (base64), download it directly
     if (imageUrl.startsWith('data:image')) {
         const a = document.createElement('a');
-        a.href = imageUrl;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        a.href = imageUrl; a.download = filename;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
         return;
     }
-    
-    // For external URLs (Supabase, Cloudinary, etc.), fetch as blob
     fetch(imageUrl)
         .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            // Check if the response is actually an image
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const contentType = response.headers.get('content-type');
-            if (!contentType || !contentType.startsWith('image/')) {
-                throw new Error('Response is not an image.');
-            }
+            if (!contentType || !contentType.startsWith('image/')) throw new Error('Response is not an image.');
             return response.blob();
         })
         .then(blob => {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            a.href = url; a.download = filename;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
             setTimeout(() => URL.revokeObjectURL(url), 5000);
         })
         .catch(err => {
             console.error('Download failed:', err);
-            // Fallback: Open image in new tab so user can save manually
             if (confirm(`Download failed: ${err.message}. Open image in new tab to save?`)) {
                 window.open(imageUrl, '_blank');
             }
         });
 }
 
-/* ═══════════ EXPORT (xlsx / docx / pdf) ═══════════ */
+/* ═══════════ EXPORT ═══════════ */
 const FMT_LABELS = {xlsx:"⬇ Excel", docx:"⬇ Word", pdf:"⬇ PDF"};
 const FMT_IDS    = {xlsx:"btn-xl", docx:"btn-docx", pdf:"btn-pdf"};
 const FMT_EXT    = {xlsx:"xlsx", docx:"docx", pdf:"pdf"};
@@ -1018,7 +1016,6 @@ async function exportFmt(fmt){
   }
 }
 
-// ===== NEW: DOWNLOAD CODE SNIPPET =====
 async function downloadCode(){
   const btn = document.getElementById('btn-code');
   const orig = btn.textContent;
@@ -1100,6 +1097,10 @@ function guide(){
     "Compare 3+ groups (numeric outcome)?\n→ One-Way ANOVA (parametric) or Kruskal-Wallis (non-parametric)\n\n" +
     "Relationship between numeric variables?\n→ Correlation Analysis (Pearson or Spearman)\n\n" +
     "Predict one variable from another?\n→ Linear Regression\n\n" +
+    "Predict binary outcomes?\n→ Logistic Regression\n\n" +
+    "Reduce many variables to components?\n→ Principal Component Analysis\n\n" +
+    "Identify latent factors in your data?\n→ Factor Analysis\n\n" +
+    "Forecast time series data?\n→ ARIMA Forecast\n\n" +
     "PARAMETRIC vs NON-PARAMETRIC:\n" +
     "Use parametric tests when data is normally distributed.\n" +
     "Use non-parametric when skewed, ordinal, or small sample.");
@@ -1142,16 +1143,13 @@ async function handleLoginSubmit(){
   btn.textContent = 'Processing…';
   
   try {
-    // Try to sign in with Supabase
     const { data, error } = await supabaseClient.auth.signInWithPassword({
       email: email,
       password: password
     });
     
     if (error) {
-      // If user doesn't exist, try signup
       if (error.message.includes('Invalid login credentials')) {
-        // Try signup instead
         const { data: signupData, error: signupError } = await supabaseClient.auth.signUp({
           email: email,
           password: password
@@ -1165,7 +1163,6 @@ async function handleLoginSubmit(){
           return;
         }
         
-        // Check if user needs email confirmation
         if (signupData.user && !signupData.session) {
           successEl.textContent = '✅ Account created! Please check your email to confirm.';
           successEl.style.display = 'block';
@@ -1174,7 +1171,6 @@ async function handleLoginSubmit(){
           return;
         }
         
-        // Signup successful with session
         if (signupData.session) {
           localStorage.setItem('edux_auth_token', signupData.session.access_token);
           if(signupData.user){
@@ -1197,7 +1193,6 @@ async function handleLoginSubmit(){
       return;
     }
     
-    // Login successful
     if (data.session) {
       localStorage.setItem('edux_auth_token', data.session.access_token);
       if(data.user){
@@ -1254,7 +1249,6 @@ function showDevMode(){
   errorEl.style.display = 'block';
 }
 
-// Check for existing session on load
 document.addEventListener('DOMContentLoaded', function(){
   const token = localStorage.getItem('edux_auth_token');
   const userStr = localStorage.getItem('edux_user');
@@ -1302,7 +1296,6 @@ async function renderShareModal(){
   </div>`;
 
   try{
-    // Step 1: save the analysis
     const saveR = await fetch(`${API_BASE}/api/save-analysis`,{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
@@ -1311,7 +1304,6 @@ async function renderShareModal(){
     const saveD = await saveR.json();
     if(!saveR.ok || !saveD.ok){ throw new Error(saveD.error || 'Could not save analysis.'); }
 
-    // Step 2: create the share link
     const shareR = await fetch(`${API_BASE}/api/share/create`,{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
@@ -1357,7 +1349,6 @@ function copyShareUrl(){
 }
 
 /* ═══════════ REFERRAL FUNCTIONS ═══════════ */
-
 function openReferralModal() {
   const token = getAuthToken();
   if (!token) {
@@ -1390,7 +1381,6 @@ async function renderReferralModal() {
     return;
   }
   
-  // Show loading
   body.innerHTML = `
     <div style="text-align:center;padding:1rem 0;">
       <div class="spinner"></div>
@@ -1399,7 +1389,6 @@ async function renderReferralModal() {
   `;
   
   try {
-    // Fetch referral code and stats
     const [codeRes, statsRes] = await Promise.all([
       fetch(`${API_BASE}/api/referrals/code`, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -1543,7 +1532,6 @@ function shareReferral(platform) {
   }
 }
 
-// Close login modal on Esc key
 document.addEventListener('keydown', function(e) {
   if(e.key === 'Escape') {
     closeLoginModal();
@@ -1551,14 +1539,12 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
-// Close login modal on background click
 document.getElementById('login-modal').addEventListener('click', function(e) {
   if(e.target === this) {
     closeLoginModal();
   }
 });
 
-// Close referral modal on background click
 document.getElementById('referral-modal').addEventListener('click', function(e) {
   if(e.target === this) {
     closeReferralModal();
