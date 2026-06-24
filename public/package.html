@@ -718,6 +718,9 @@ async function runThesis() {
       }
     }
     if (completed + failedCount === totalTests) {
+      // ===== FIX 2: Generate package ID when all tests complete =====
+      S.packageId = 'pkg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+      debugLog(`📦 Package ID generated: ${S.packageId}`);
       document.getElementById('progress-label').textContent = failedCount > 0 ? 
         `✅ ${completed} tests complete, ${failedCount} failed` : 
         '✅ All analyses complete!';
@@ -775,11 +778,15 @@ async function runThesis() {
       const d = await r.json();
       debugLog(`📄 Response data keys: ${Object.keys(d).join(', ')}`);
       
+      // ===== FIX 1: Don't redirect on 401 - show error instead =====
       if (r.status === 401) {
         debugLog(`🔑 401 Unauthorized - Please sign in`);
         showToast('🔑 Please sign in to run analyses');
-        // Redirect to stats page with login prompt
-        window.location.href = '/stats';
+        // Show login prompt without redirecting
+        document.getElementById('step-progress').style.display = 'none';
+        document.getElementById('step-tests').style.display = 'block';
+        document.getElementById('btn-run-thesis').disabled = false;
+        showError('test-error', 'test-error-text', 'Please sign in to run analyses. <a href="/stats" style="color:var(--bl);font-weight:600">Sign in here</a>');
         return;
       }
       
