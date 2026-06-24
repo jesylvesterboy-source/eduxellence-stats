@@ -20,7 +20,7 @@ a{color:var(--bl);text-decoration:none}
 .nav-links{display:flex;gap:1.5rem;align-items:center}
 .nav-links a{color:rgba(255,255,255,.65);font-size:.875rem;font-weight:500;transition:color .15s}
 .nav-links a:hover{color:#fff;text-decoration:none}
-.nav-cta{background:var(--tl)!important;color:var(--ny)!important;padding:6px 16px;border-radius:20px;font-weight:600!important}
+.nav-cta{background:var(--tl)!important;color:var(--ny)!important;padding:5px 14px;border-radius:20px;font-weight:600!important}
 
 /* HERO */
 .hero{background:linear-gradient(135deg,var(--ny) 0%,var(--ny2) 100%);padding:2rem 1.5rem 3rem;text-align:center;position:relative;overflow:hidden}
@@ -69,26 +69,36 @@ a{color:var(--bl);text-decoration:none}
 .select-all-row{display:flex;gap:1rem;align-items:center;padding:.4rem 0;border-bottom:1px solid var(--bd);margin-bottom:.6rem;flex-wrap:wrap}
 .select-all-row label{display:flex;align-items:center;gap:.5rem;font-weight:600;cursor:pointer;font-size:.85rem}
 
-/* ASSUMPTION EXPANDER */
-.assumption-expander{background:var(--of);border-radius:var(--r8);margin:.4rem 0 .2rem;overflow:hidden}
-.assumption-toggle{display:flex;align-items:center;gap:.4rem;padding:.4rem .6rem;cursor:pointer;font-size:.7rem;font-weight:600;color:var(--bl);background:transparent;border:none;width:100%;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s}
-.assumption-toggle:hover{background:rgba(30,107,255,.06)}
-.assumption-toggle .arrow{transition:transform .2s;font-size:.6rem}
-.assumption-toggle .arrow.open{transform:rotate(90deg)}
-.assumption-content{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease;padding:0 .6rem}
-.assumption-content.open{max-height:800px;padding:.4rem .6rem .6rem}
-.assumption-item{display:flex;align-items:flex-start;gap:.5rem;padding:.2rem 0;font-size:.7rem;border-bottom:1px solid rgba(0,0,0,.04)}
-.assumption-item:last-child{border-bottom:none}
-.assumption-item .ai-status{font-weight:700;flex-shrink:0;width:16px;text-align:center}
-.assumption-item .ai-status.pass{color:var(--ok)}
-.assumption-item .ai-status.fail{color:var(--er)}
-.assumption-item .ai-name{flex:1;color:var(--txM)}
-.assumption-item .ai-detail{color:var(--sl);font-size:.65rem}
-.assumption-item .ai-suggestion{color:var(--wn);font-size:.65rem;font-style:italic}
-.assumption-summary{font-size:.68rem;color:var(--sl);padding:.2rem 0}
-.assumption-summary .score{font-weight:700;color:var(--tx)}
-.run-anyway-btn{background:transparent;border:1.5px solid var(--wn);color:var(--wn);padding:.15rem .6rem;border-radius:4px;font-size:.65rem;font-weight:600;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;margin-left:.5rem}
-.run-anyway-btn:hover{background:var(--wn);color:#fff}
+/* ASSUMPTION CARDS - MATCHING stats.html */
+.asum-grid{display:flex;flex-direction:column;gap:.5rem;margin-top:1rem}
+.asum{display:flex;gap:.75rem;align-items:flex-start;padding:.75rem 1rem;border-radius:var(--r8);border:1px solid var(--bd);background:var(--wh)}
+.asum.pass{border-color:rgba(22,163,74,.3);background:rgba(22,163,74,.04)}
+.asum.fail{border-color:rgba(220,38,38,.3);background:rgba(220,38,38,.04)}
+.asum-ico{font-size:1.1rem;flex-shrink:0;margin-top:2px}
+.asum-name{font-weight:600;font-size:.85rem;color:var(--tx)}
+.asum-note{font-size:.8rem;color:var(--txM);margin-top:2px;line-height:1.4}
+.asum-fix{display:inline-flex;align-items:center;gap:4px;margin-top:.4rem;font-size:.78rem;font-weight:600;color:var(--bl);background:rgba(30,107,255,.08);padding:3px 10px;border-radius:20px;cursor:pointer;border:1px solid rgba(30,107,255,.2)}
+.asum-fix:hover{background:rgba(30,107,255,.15)}
+
+/* ASSUMPTION MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999;padding:1rem}
+.modal-overlay.show{display:flex}
+.modal{background:var(--wh);border-radius:var(--r24);max-width:600px;width:100%;max-height:80vh;overflow-y:auto;padding:1.5rem;box-shadow:var(--shL);position:relative}
+.modal-close{position:absolute;top:.75rem;right:1rem;background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--sl)}
+.modal h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:.5rem}
+.modal .assumption-detail-item{display:flex;align-items:flex-start;gap:.6rem;padding:.3rem 0;border-bottom:1px solid rgba(0,0,0,.04);font-size:.82rem}
+.modal .assumption-detail-item .status{font-weight:700;flex-shrink:0;width:20px}
+.modal .assumption-detail-item .status.pass{color:var(--ok)}
+.modal .assumption-detail-item .status.fail{color:var(--er)}
+.modal .assumption-detail-item .detail{flex:1}
+.modal .assumption-detail-item .detail .name{font-weight:500}
+.modal .assumption-detail-item .detail .note{color:var(--sl);font-size:.75rem}
+.modal .assumption-detail-item .detail .suggestion{color:var(--wn);font-size:.75rem;font-style:italic}
+.modal .modal-score{font-size:.9rem;margin:.5rem 0;padding:.5rem;background:var(--of);border-radius:var(--r8);text-align:center}
+.modal .modal-score .pass{color:var(--ok);font-weight:700}
+.modal .modal-score .fail{color:var(--er);font-weight:700}
+.modal .modal-btn-row{display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap}
+.modal .modal-btn-row .btn{flex:1;min-width:100px;padding:.5rem 1rem;font-size:.8rem}
 
 /* PROGRESS */
 .progress-section{display:none}
@@ -113,12 +123,7 @@ a{color:var(--bl);text-decoration:none}
 .ri-status.running{background:rgba(217,119,6,.1);color:var(--wn)}
 .ri-status.skipped{background:rgba(100,116,139,.1);color:var(--sl)}
 .result-item .ri-preview{font-size:.78rem;color:var(--sl);line-height:1.5}
-
-/* SOUNDNESS DETAILS */
-.soundness-detail{font-size:.75rem;padding:.4rem .6rem;background:var(--of);border-radius:var(--r8);margin:.4rem 0}
-.soundness-detail .pass{color:var(--ok)}
-.soundness-detail .fail{color:var(--er)}
-.soundness-detail .score{font-weight:700}
+.result-item .ri-apa{background:#F8F7FF;border:1.5px solid #C4B5FD;border-radius:var(--r8);padding:.6rem .8rem;margin:.4rem 0;font-size:.72rem;font-family:'JetBrains Mono',monospace;color:#1E1B4B}
 
 /* BUTTONS */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:'Syne',sans-serif;font-weight:700;border:none;border-radius:var(--r8);cursor:pointer;transition:all .2s;padding:.7rem 1.5rem;font-size:.85rem}
@@ -148,25 +153,9 @@ footer{background:var(--ny);color:rgba(255,255,255,.45);text-align:center;paddin
 footer a{color:var(--tl)}
 footer strong{color:rgba(255,255,255,.75)}
 
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999;padding:1rem}
-.modal-overlay.show{display:flex}
-.modal{background:var(--wh);border-radius:var(--r24);max-width:550px;width:100%;max-height:80vh;overflow-y:auto;padding:1.5rem;box-shadow:var(--shL);position:relative}
-.modal-close{position:absolute;top:.75rem;right:1rem;background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--sl)}
-.modal h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:.5rem}
-.modal .assumption-detail-item{display:flex;align-items:flex-start;gap:.6rem;padding:.3rem 0;border-bottom:1px solid rgba(0,0,0,.04);font-size:.82rem}
-.modal .assumption-detail-item .status{font-weight:700;flex-shrink:0;width:20px}
-.modal .assumption-detail-item .status.pass{color:var(--ok)}
-.modal .assumption-detail-item .status.fail{color:var(--er)}
-.modal .assumption-detail-item .detail{flex:1}
-.modal .assumption-detail-item .detail .name{font-weight:500}
-.modal .assumption-detail-item .detail .note{color:var(--sl);font-size:.75rem}
-.modal .assumption-detail-item .detail .suggestion{color:var(--wn);font-size:.75rem;font-style:italic}
-.modal .modal-score{font-size:.9rem;margin:.5rem 0;padding:.5rem;background:var(--of);border-radius:var(--r8);text-align:center}
-.modal .modal-score .pass{color:var(--ok);font-weight:700}
-.modal .modal-score .fail{color:var(--er);font-weight:700}
-.modal .modal-btn-row{display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap}
-.modal .modal-btn-row .btn{flex:1;min-width:100px;padding:.5rem 1rem;font-size:.8rem}
+/* TOAST */
+.toast-notification{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--ny);color:#fff;padding:.75rem 1.5rem;border-radius:var(--r12);box-shadow:var(--shL);font-size:.85rem;z-index:1000;max-width:90%;border-left:4px solid var(--wn);animation:slideUp .3s ease}
+@keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
 @media(max-width:640px){.test-grid{grid-template-columns:1fr}.nav-links{display:none}.main{padding:0 .75rem}.card{padding:1.25rem}}
 </style>
@@ -222,7 +211,7 @@ footer strong{color:rgba(255,255,255,.75)}
     <p style="color:var(--sl);font-size:.82rem;margin-bottom:.4rem">
       <span style="color:var(--ok);font-weight:600">✅ Green = Statistically sound</span> · 
       <span style="color:var(--er);font-weight:600">❌ Red = Assumptions may be violated</span> · 
-      <span style="color:var(--bl);font-weight:600">Click "Check Assumptions" to see details</span>
+      <span style="color:var(--bl);font-weight:600">Click on any test to see full assumption details</span>
     </p>
     <div class="select-all-row">
       <label><input type="checkbox" id="select-all" onchange="toggleAllTests()"> <span style="font-size:.8rem">Select All Sound Tests</span></label>
@@ -295,17 +284,17 @@ const API_BASE = 'https://Eduxellence-eduxellence-api.hf.space';
 // ===== TEST DEFINITIONS =====
 const ALL_TESTS = [
   { id: 'descriptive',   label: 'Descriptive Statistics', cost: 0,  icon: '📊', category: 'Free', alwaysValid: true },
-  { id: 'chi_square',    label: 'Chi-Square Test',        cost: 1,  icon: '🔲', category: '1 Credit', params: ['var1','var2'] },
-  { id: 't_test',        label: 'Independent T-Test',     cost: 1,  icon: '⚖️', category: '1 Credit', params: ['numeric_var','group_var'] },
-  { id: 'anova',         label: 'One-Way ANOVA',          cost: 2,  icon: '📈', category: '2 Credits', params: ['numeric_var','group_var'] },
-  { id: 'correlation',   label: 'Correlation Analysis',   cost: 1,  icon: '🔗', category: '1 Credit', params: ['columns','method'] },
-  { id: 'regression',    label: 'Linear Regression',      cost: 3,  icon: '📉', category: '3 Credits', params: ['dependent','predictors'] },
-  { id: 'logistic_regression', label: 'Logistic Regression', cost: 5, icon: '🔄', category: '5 Credits', params: ['dependent','predictors'] },
-  { id: 'pca',           label: 'PCA',                    cost: 5,  icon: '📐', category: '5 Credits', params: ['columns'] },
-  { id: 'factor_analysis', label: 'Factor Analysis',      cost: 6,  icon: '🧩', category: '6 Credits', params: ['columns'] },
-  { id: 'arima',         label: 'ARIMA',                  cost: 8,  icon: '📈', category: '8 Credits', params: ['time_var','value_var'] },
-  { id: 'mann_whitney',  label: 'Mann-Whitney U',         cost: 1,  icon: '🥊', category: '1 Credit', params: ['numeric_var','group_var'] },
-  { id: 'kruskal_wallis', label: 'Kruskal-Wallis',        cost: 2,  icon: '🏆', category: '2 Credits', params: ['numeric_var','group_var'] }
+  { id: 'chi_square',    label: 'Chi-Square Test',        cost: 1,  icon: '🔲', category: '1 Credit' },
+  { id: 't_test',        label: 'Independent T-Test',     cost: 1,  icon: '⚖️', category: '1 Credit' },
+  { id: 'anova',         label: 'One-Way ANOVA',          cost: 2,  icon: '📈', category: '2 Credits' },
+  { id: 'correlation',   label: 'Correlation Analysis',   cost: 1,  icon: '🔗', category: '1 Credit' },
+  { id: 'regression',    label: 'Linear Regression',      cost: 3,  icon: '📉', category: '3 Credits' },
+  { id: 'logistic_regression', label: 'Logistic Regression', cost: 5, icon: '🔄', category: '5 Credits' },
+  { id: 'pca',           label: 'PCA',                    cost: 5,  icon: '📐', category: '5 Credits' },
+  { id: 'factor_analysis', label: 'Factor Analysis',      cost: 6,  icon: '🧩', category: '6 Credits' },
+  { id: 'arima',         label: 'ARIMA',                  cost: 8,  icon: '📈', category: '8 Credits' },
+  { id: 'mann_whitney',  label: 'Mann-Whitney U',         cost: 1,  icon: '🥊', category: '1 Credit' },
+  { id: 'kruskal_wallis', label: 'Kruskal-Wallis',        cost: 2,  icon: '🏆', category: '2 Credits' }
 ];
 
 // ===== STATE =====
@@ -317,9 +306,39 @@ let S = {
   columns: [],
   soundness: {},
   packageId: null,
-  pendingTestId: null,
-  testOverrides: {} // tracks which tests user wants to run despite violations
+  testOverrides: {},
+  testParams: {}
 };
+
+// ===== BUILD PARAMS FOR EACH TEST =====
+function buildParamsForTest(testId) {
+  const numCols = S.columns.filter(c => c.dtype === 'numeric').map(c => c.name);
+  const catCols = S.columns.filter(c => c.dtype === 'categorical').map(c => c.name);
+  const allCols = S.columns.map(c => c.name);
+  
+  switch(testId) {
+    case 'descriptive': return { columns: numCols.slice(0, 10) };
+    case 'chi_square': return { var1: catCols[0] || allCols[0], var2: catCols[1] || allCols[1] };
+    case 't_test': return { numeric_var: numCols[0] || allCols[0], group_var: catCols[0] || allCols[1] };
+    case 'anova': return { numeric_var: numCols[0] || allCols[0], group_var: catCols[0] || allCols[1] };
+    case 'correlation': return { columns: numCols.slice(0, 6), method: 'pearson' };
+    case 'regression': {
+      const dep = numCols[0] || allCols[0];
+      const preds = numCols.slice(1, 3);
+      return { dependent: dep, predictors: preds.length ? preds : [allCols[1]] };
+    }
+    case 'logistic_regression': return { dependent: catCols[0] || allCols[0], predictors: numCols.slice(0, 3) };
+    case 'pca': return { columns: numCols.slice(0, 8) };
+    case 'factor_analysis': return { columns: numCols.slice(0, 8), n_factors: 3, rotation: 'varimax' };
+    case 'arima': {
+      const dateCols = S.columns.filter(c => c.name.toLowerCase().includes('date') || c.name.toLowerCase().includes('time'));
+      return { time_var: dateCols[0]?.name || allCols[0], value_var: numCols[0] || allCols[1], forecast_periods: 12 };
+    }
+    case 'mann_whitney': return { numeric_var: numCols[0] || allCols[0], group_var: catCols[0] || allCols[1] };
+    case 'kruskal_wallis': return { numeric_var: numCols[0] || allCols[0], group_var: catCols[0] || allCols[1] };
+    default: return {};
+  }
+}
 
 // ===== RENDER TESTS WITH SOUNDNESS =====
 function renderTests() {
@@ -328,53 +347,16 @@ function renderTests() {
   grid.innerHTML = ALL_TESTS.map(t => {
     const sound = S.soundness[t.id];
     let soundnessHtml = '';
-    let assumptionHtml = '';
-    let overrideHtml = '';
     
-    if (sound) {
+    if (sound && sound.checks !== undefined) {
       const passed = sound.sound || sound.score >= 0.6;
       const label = passed ? '✅ Sound' : '⚠️ Check';
       const cls = passed ? 'pass' : 'fail';
       soundnessHtml = `<span class="to-soundness ${cls}" onclick="event.stopPropagation();openAssumptionModal('${t.id}')">${label}</span>`;
-      
-      // Show override indicator if user chose to run anyway
-      if (S.testOverrides[t.id]) {
-        overrideHtml = `<span style="font-size:.55rem;color:var(--wn);font-weight:700;background:rgba(217,119,6,.1);padding:1px 6px;border-radius:4px">⚠️ Override</span>`;
-      }
     } else if (t.alwaysValid) {
       soundnessHtml = `<span class="to-soundness pass">✅ Always valid</span>`;
     } else {
       soundnessHtml = `<span class="to-soundness unknown" onclick="event.stopPropagation();openAssumptionModal('${t.id}')">⏳ Check</span>`;
-    }
-    
-    // Assumption expander
-    if (sound && sound.checks && sound.checks.length > 0) {
-      const passedChecks = sound.checks.filter(c => c.passed).length;
-      const totalChecks = sound.checks.length;
-      const summaryText = `${passedChecks}/${totalChecks} assumptions met`;
-      assumptionHtml = `
-        <div class="assumption-expander">
-          <button class="assumption-toggle" onclick="event.stopPropagation();toggleAssumptions('${t.id}')">
-            <span class="arrow" id="arrow-${t.id}">▶</span>
-            ${passedChecks === totalChecks ? '✅' : '⚠️'} ${summaryText}
-          </button>
-          <div class="assumption-content" id="assump-${t.id}">
-            ${sound.checks.map(c => `
-              <div class="assumption-item">
-                <span class="ai-status ${c.passed ? 'pass' : 'fail'}">${c.passed ? '✅' : '❌'}</span>
-                <span class="ai-name">${c.name}</span>
-                <span class="ai-detail">${c.note || ''}</span>
-              </div>
-            `).join('')}
-            ${!sound.sound ? `
-              <div style="margin-top:.3rem;padding-top:.3rem;border-top:1px solid var(--bd);display:flex;align-items:center;gap:.4rem;flex-wrap:wrap">
-                <span style="font-size:.65rem;color:var(--wn)">⚠️ This test may not be valid for your data</span>
-                <button class="run-anyway-btn" onclick="event.stopPropagation();overrideAndRun('${t.id}')">Run Anyway</button>
-              </div>
-            ` : ''}
-          </div>
-        </div>
-      `;
     }
     
     return `
@@ -382,25 +364,123 @@ function renderTests() {
         <input type="checkbox" value="${t.id}" onchange="updateTotal()">
         <span class="to-name">${t.icon} ${t.label}</span>
         ${soundnessHtml}
-        ${overrideHtml}
         <span class="to-cost">${t.cost === 0 ? 'Free' : t.cost + ' cr'}</span>
       </label>
-      ${assumptionHtml}
     `;
   }).join('');
 }
 
-// ===== ASSUMPTION EXPANDER TOGGLE =====
-function toggleAssumptions(testId) {
-  const content = document.getElementById(`assump-${testId}`);
-  const arrow = document.getElementById(`arrow-${testId}`);
-  if (content) {
-    content.classList.toggle('open');
-    if (arrow) arrow.classList.toggle('open');
+function updateTotal() {
+  const checked = document.querySelectorAll('#test-grid input:checked');
+  const total = Array.from(checked).reduce((sum, cb) => {
+    const test = ALL_TESTS.find(t => t.id === cb.value);
+    return sum + (test ? test.cost : 0);
+  }, 0);
+  document.getElementById('total-credits-display').textContent = `Total: ${total} credits`;
+  S.selectedTests = Array.from(checked).map(cb => cb.value);
+  document.getElementById('test-error').classList.remove('show');
+}
+
+function toggleAllTests() {
+  const checked = document.getElementById('select-all').checked;
+  document.querySelectorAll('#test-grid input').forEach(cb => {
+    const testId = cb.value;
+    if (checked) {
+      const sound = S.soundness[testId];
+      if (sound && sound.sound !== undefined) {
+        cb.checked = sound.sound || sound.score >= 0.6;
+      } else {
+        cb.checked = false;
+      }
+    } else {
+      cb.checked = false;
+    }
+  });
+  updateTotal();
+}
+
+// ===== FETCH ASSUMPTIONS FOR A SPECIFIC TEST =====
+async function fetchAssumptionsForTest(testId) {
+  if (!S.metaPath) return null;
+  
+  try {
+    const params = buildParamsForTest(testId);
+    S.testParams[testId] = params;
+    
+    const r = await fetch(`${API_BASE}/api/assumptions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        meta_path: S.metaPath, 
+        analysis_type: testId,
+        params: params
+      })
+    });
+    const d = await r.json();
+    
+    if (d.checks && d.checks.length > 0) {
+      const passed = d.checks.filter(c => c.passed).length;
+      const total = d.checks.length;
+      const score = passed / total;
+      
+      return {
+        sound: score >= 0.6,
+        score: score,
+        checks: d.checks,
+        all_passed: d.all_passed
+      };
+    }
+    return null;
+  } catch(e) {
+    console.warn(`Could not fetch assumptions for ${testId}:`, e);
+    return null;
   }
 }
 
-// ===== ASSUMPTION MODAL =====
+// ===== CHECK ALL SOUNDNESS AFTER UPLOAD =====
+async function checkAllSoundness() {
+  if (!S.metaPath) return;
+  
+  document.getElementById('soundness-summary').style.display = 'none';
+  
+  let soundCount = 0;
+  let totalChecked = 0;
+  
+  // Fetch assumptions for each test
+  for (const test of ALL_TESTS) {
+    if (test.alwaysValid) {
+      S.soundness[test.id] = { sound: true, score: 1.0, checks: [] };
+      soundCount++;
+      continue;
+    }
+    
+    const result = await fetchAssumptionsForTest(test.id);
+    if (result) {
+      S.soundness[test.id] = result;
+      totalChecked++;
+      if (result.sound) soundCount++;
+    } else {
+      // Fallback - mark as unknown
+      S.soundness[test.id] = { sound: false, score: 0.5, checks: [] };
+    }
+  }
+  
+  // Update summary
+  const summary = document.getElementById('soundness-summary');
+  const text = document.getElementById('soundness-summary-text');
+  const totalTests = ALL_TESTS.filter(t => !t.alwaysValid).length;
+  text.textContent = `${soundCount}/${totalTests} tests are statistically sound for your data. Click on any test to see full assumption details.`;
+  summary.style.display = 'flex';
+  
+  // Re-render tests
+  renderTests();
+  
+  // Auto-select sound tests
+  document.getElementById('select-all').checked = true;
+  toggleAllTests();
+}
+
+// ===== OPEN ASSUMPTION MODAL =====
 function openAssumptionModal(testId) {
   const modal = document.getElementById('assumption-modal');
   const title = document.getElementById('modal-title');
@@ -408,16 +488,16 @@ function openAssumptionModal(testId) {
   const checksDiv = document.getElementById('modal-checks');
   const runBtn = document.getElementById('modal-run-btn');
   
-  S.pendingTestId = testId;
   const test = ALL_TESTS.find(t => t.id === testId);
   title.textContent = `📊 ${test.icon} ${test.label} — Assumption Checks`;
   
   const sound = S.soundness[testId];
-  if (sound && sound.checks) {
+  
+  if (sound && sound.checks && sound.checks.length > 0) {
     const passed = sound.checks.filter(c => c.passed).length;
     const total = sound.checks.length;
-    const score = sound.score || (passed / total);
-    const isSound = sound.sound || score >= 0.6;
+    const score = passed / total;
+    const isSound = score >= 0.6;
     
     scoreDiv.innerHTML = `
       <strong>Statistical Soundness: ${(score * 100).toFixed(0)}%</strong>
@@ -445,12 +525,17 @@ function openAssumptionModal(testId) {
       runBtn.textContent = '✅ Run Test (Sound)';
       runBtn.style.background = 'var(--ok)';
     }
+  } else if (test.alwaysValid) {
+    scoreDiv.innerHTML = '✅ Always valid — no assumptions to check.';
+    checksDiv.innerHTML = '<div style="color:var(--sl);font-size:.85rem">Descriptive statistics are always valid for any data.</div>';
+    runBtn.style.display = 'none';
   } else {
     scoreDiv.innerHTML = '⏳ Assumptions not yet checked. Upload your data first.';
     checksDiv.innerHTML = '<div style="color:var(--sl);font-size:.85rem">Please upload a dataset to check assumptions.</div>';
     runBtn.style.display = 'none';
   }
   
+  S.pendingTestId = testId;
   modal.classList.add('show');
   document.body.style.overflow = 'hidden';
 }
@@ -461,55 +546,27 @@ function closeAssumptionModal() {
   S.pendingTestId = null;
 }
 
-// ===== RUN TEST ANYWAY (override) =====
 function runTestAnyway() {
   if (S.pendingTestId) {
     S.testOverrides[S.pendingTestId] = true;
     closeAssumptionModal();
-    // Auto-check the test
     const checkbox = document.querySelector(`#to-${S.pendingTestId} input[type="checkbox"]`);
     if (checkbox) {
       checkbox.checked = true;
       updateTotal();
     }
-    // Re-render to show override indicator
     renderTests();
-    // Show toast/feedback
     showToast(`⚠️ "${ALL_TESTS.find(t => t.id === S.pendingTestId)?.label}" will run despite assumption violations.`);
   }
 }
 
-function overrideAndRun(testId) {
-  S.testOverrides[testId] = true;
-  const checkbox = document.querySelector(`#to-${testId} input[type="checkbox"]`);
-  if (checkbox) {
-    checkbox.checked = true;
-    updateTotal();
-  }
-  renderTests();
-  // Close the expanded assumptions
-  const content = document.getElementById(`assump-${testId}`);
-  const arrow = document.getElementById(`arrow-${testId}`);
-  if (content) content.classList.remove('open');
-  if (arrow) arrow.classList.remove('open');
-  showToast(`⚠️ "${ALL_TESTS.find(t => t.id === testId)?.label}" will run despite assumption violations.`);
-}
-
-// ===== TOAST NOTIFICATION =====
+// ===== TOAST =====
 function showToast(message) {
   const existing = document.querySelector('.toast-notification');
   if (existing) existing.remove();
   
   const toast = document.createElement('div');
   toast.className = 'toast-notification';
-  toast.style.cssText = `
-    position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);
-    background:var(--ny);color:#fff;padding:.75rem 1.5rem;
-    border-radius:var(--r12);box-shadow:var(--shL);
-    font-size:.85rem;z-index:1000;max-width:90%;
-    border-left:4px solid var(--wn);
-    animation:slideUp .3s ease;
-  `;
   toast.textContent = message;
   document.body.appendChild(toast);
   
@@ -518,104 +575,6 @@ function showToast(message) {
     toast.style.transition = 'opacity .3s';
     setTimeout(() => toast.remove(), 300);
   }, 4000);
-}
-
-// Add animation style
-const styleSheet = document.createElement('style');
-styleSheet.textContent = `
-  @keyframes slideUp {
-    from { opacity:0; transform:translateX(-50%) translateY(20px); }
-    to { opacity:1; transform:translateX(-50%) translateY(0); }
-  }
-`;
-document.head.appendChild(styleSheet);
-
-// ===== UPDATE TOTAL CREDITS =====
-function updateTotal() {
-  const checked = document.querySelectorAll('#test-grid input:checked');
-  const total = Array.from(checked).reduce((sum, cb) => {
-    const test = ALL_TESTS.find(t => t.id === cb.value);
-    return sum + (test ? test.cost : 0);
-  }, 0);
-  document.getElementById('total-credits-display').textContent = `Total: ${total} credits`;
-  S.selectedTests = Array.from(checked).map(cb => cb.value);
-  document.getElementById('test-error').classList.remove('show');
-}
-
-function toggleAllTests() {
-  const checked = document.getElementById('select-all').checked;
-  document.querySelectorAll('#test-grid input').forEach(cb => {
-    const testId = cb.value;
-    const test = ALL_TESTS.find(t => t.id === testId);
-    if (checked) {
-      const sound = S.soundness[testId];
-      if (sound && sound.sound !== undefined) {
-        cb.checked = sound.sound || sound.score >= 0.6;
-      } else {
-        cb.checked = test && test.alwaysValid || false;
-      }
-    } else {
-      cb.checked = false;
-    }
-  });
-  updateTotal();
-}
-
-// ===== CHECK SOUNDNESS AFTER UPLOAD =====
-async function checkSoundness() {
-  if (!S.metaPath) return;
-  
-  try {
-    const r = await fetch(`${API_BASE}/api/assumptions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        meta_path: S.metaPath, 
-        analysis_type: 'thesis', 
-        params: {} 
-      })
-    });
-    const d = await r.json();
-    
-    if (d.checks) {
-      for (const test of ALL_TESTS) {
-        if (test.alwaysValid) {
-          S.soundness[test.id] = { sound: true, score: 1.0, checks: [] };
-          continue;
-        }
-        
-        const testChecks = d.checks.filter(c => 
-          (c.name && c.name.toLowerCase().includes(test.id)) || 
-          (c.name && test.id.toLowerCase().includes('correlation') && c.name.includes('correlation'))
-        );
-        
-        const passed = testChecks.filter(c => c.passed).length;
-        const total = testChecks.length;
-        const score = total > 0 ? passed / total : 0.5;
-        
-        S.soundness[test.id] = {
-          sound: score >= 0.6,
-          score: score,
-          checks: testChecks
-        };
-      }
-      
-      const soundCount = Object.values(S.soundness).filter(s => s.sound).length;
-      const totalTests = ALL_TESTS.filter(t => !t.alwaysValid).length;
-      const summary = document.getElementById('soundness-summary');
-      const text = document.getElementById('soundness-summary-text');
-      text.textContent = `${soundCount}/${totalTests} tests are statistically sound for your data. Click "Check" on any test to see assumption details.`;
-      summary.style.display = 'flex';
-    }
-    
-    renderTests();
-    document.getElementById('select-all').checked = true;
-    toggleAllTests();
-    
-  } catch(e) {
-    console.warn('Could not check soundness:', e);
-    renderTests();
-  }
 }
 
 // ===== UPLOAD =====
@@ -652,7 +611,8 @@ async function handleFile(file) {
     document.getElementById('step-upload').style.display = 'none';
     document.getElementById('step-tests').style.display = 'block';
     
-    await checkSoundness();
+    // Check all assumptions
+    await checkAllSoundness();
     
   } catch(e) {
     document.getElementById('upload-progress').style.display = 'none';
@@ -668,39 +628,6 @@ function resetUpload() {
   document.getElementById('step-upload').style.display = 'block';
   hideError('upload-error');
   document.getElementById('soundness-summary').style.display = 'none';
-}
-
-// ===== BUILD PARAMS =====
-function buildParams(testId) {
-  const test = ALL_TESTS.find(t => t.id === testId);
-  if (!test) return {};
-  
-  const numCols = S.columns.filter(c => c.dtype === 'numeric').map(c => c.name);
-  const catCols = S.columns.filter(c => c.dtype === 'categorical').map(c => c.name);
-  const allCols = S.columns.map(c => c.name);
-  
-  switch(testId) {
-    case 'descriptive': return { columns: numCols.slice(0, 10) };
-    case 'chi_square': return { var1: catCols[0] || allCols[0], var2: catCols[1] || allCols[1] };
-    case 't_test': return { numeric_var: numCols[0] || allCols[0], group_var: catCols[0] || allCols[1] };
-    case 'anova': return { numeric_var: numCols[0] || allCols[0], group_var: catCols[0] || allCols[1] };
-    case 'correlation': return { columns: numCols.slice(0, 6), method: 'pearson' };
-    case 'regression': {
-      const dep = numCols[0] || allCols[0];
-      const preds = numCols.slice(1, 3);
-      return { dependent: dep, predictors: preds.length ? preds : [allCols[1]] };
-    }
-    case 'logistic_regression': return { dependent: catCols[0] || allCols[0], predictors: numCols.slice(0, 3) };
-    case 'pca': return { columns: numCols.slice(0, 8) };
-    case 'factor_analysis': return { columns: numCols.slice(0, 8), n_factors: 3, rotation: 'varimax' };
-    case 'arima': {
-      const dateCols = S.columns.filter(c => c.name.includes('date') || c.name.includes('Date') || c.name.includes('time') || c.name.includes('Time'));
-      return { time_var: dateCols[0]?.name || allCols[0], value_var: numCols[0] || allCols[1], forecast_periods: 12 };
-    }
-    case 'mann_whitney': return { numeric_var: numCols[0] || allCols[0], group_var: catCols[0] || allCols[1] };
-    case 'kruskal_wallis': return { numeric_var: numCols[0] || allCols[0], group_var: catCols[0] || allCols[1] };
-    default: return {};
-  }
 }
 
 // ===== RUN THESIS =====
@@ -731,7 +658,7 @@ async function runThesis() {
     if (item) {
       const statusEl = item.querySelector('.ri-status');
       statusEl.textContent = status;
-      statusEl.className = 'ri-status ' + (status === 'Done ✓' ? 'ok' : status === '⚠️ Skipped' ? 'skipped' : status === 'Error' ? 'err' : 'running');
+      statusEl.className = 'ri-status ' + (status === 'Done ✓' ? 'ok' : status === 'Error' ? 'err' : 'running');
       const previewEl = item.querySelector('.ri-preview');
       if (message) previewEl.textContent = message;
     }
@@ -767,6 +694,7 @@ async function runThesis() {
     }
   };
 
+  // Show each test being run
   selected.forEach(id => {
     const test = ALL_TESTS.find(t => t.id === id);
     progressEl.innerHTML += `
@@ -780,21 +708,21 @@ async function runThesis() {
     `;
   });
 
+  // Run each test sequentially
   for (const testId of selected) {
     const test = ALL_TESTS.find(t => t.id === testId);
     document.getElementById('progress-label').textContent = `Running ${test.label}…`;
     updateProgress(testId, 'Running…', 'Processing…');
     
     try {
-      const params = buildParams(testId);
+      const params = buildParamsForTest(testId);
       const r = await fetch(`${API_BASE}/api/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           meta_path: S.metaPath, 
           analysis_type: testId, 
-          params,
-          file_data: null
+          params
         })
       });
       const d = await r.json();
@@ -802,11 +730,6 @@ async function runThesis() {
       if (!r.ok || d.error) {
         updateProgress(testId, 'Error', d.error || 'Failed');
         completeTest(testId, null, d.error || 'Analysis failed');
-        continue;
-      }
-      
-      if (d.error) {
-        completeTest(testId, null, d.error);
         continue;
       }
       
@@ -844,11 +767,12 @@ function showResults() {
     const icon = test ? test.icon : '📊';
     const apa = data.apa_citation || 'No APA citation available.';
     const interp = data.interpretation || 'No interpretation available.';
+    
     const sound = S.soundness[id];
-    const soundnessHtml = sound ? `
-      <div class="soundness-detail">
-        <span class="score">Statistical Soundness: ${(sound.score * 100).toFixed(0)}%</span>
-        ${sound.sound ? ' <span class="pass">✅ Passed</span>' : ' <span class="fail">⚠️ Assumptions may be violated (overridden)</span>'}
+    const soundnessHtml = sound && sound.checks && sound.checks.length > 0 ? `
+      <div style="font-size:.75rem;padding:.3rem .6rem;background:var(--of);border-radius:var(--r8);margin:.3rem 0">
+        <span class="score">Soundness: ${(sound.score * 100).toFixed(0)}%</span>
+        ${sound.sound ? ' <span style="color:var(--ok)">✅ Passed</span>' : ' <span style="color:var(--er)">⚠️ Assumptions may be violated</span>'}
       </div>
     ` : '';
     
@@ -859,11 +783,8 @@ function showResults() {
           <span class="ri-status ok">✅ Complete</span>
         </div>
         ${soundnessHtml}
-        <div style="background:#F8F7FF;border:1.5px solid #C4B5FD;border-radius:var(--r8);padding:.6rem .8rem;margin:.4rem 0;font-size:.72rem;font-family:'JetBrains Mono',monospace;color:#1E1B4B">${apa}</div>
+        <div class="ri-apa">${apa}</div>
         <div class="ri-preview" style="margin-top:.4rem;font-size:.82rem;color:var(--tx)">${interp.slice(0, 200)}${interp.length > 200 ? '…' : ''}</div>
-        <div style="margin-top:.4rem;display:flex;gap:.3rem;flex-wrap:wrap">
-          <span style="font-size:.65rem;color:var(--sl);background:var(--of);padding:2px 8px;border-radius:10px">${test ? test.cost + ' credits' : ''}</span>
-        </div>
       </div>
     `;
   }
@@ -871,7 +792,7 @@ function showResults() {
   document.getElementById('results-meta').textContent = `Thesis Package · ${total} tests · ${new Date().toLocaleString()}`;
 }
 
-// ===== EXPORT FUNCTIONS =====
+// ===== EXPORT =====
 async function exportThesis(format) {
   if (!S.packageId) {
     S.packageId = 'pkg_' + Date.now();
@@ -909,7 +830,7 @@ function goBack() {
 }
 
 function resetAll() {
-  S = { metaPath: null, filename: null, selectedTests: [], results: null, columns: [], soundness: {}, packageId: null, testOverrides: {} };
+  S = { metaPath: null, filename: null, selectedTests: [], results: null, columns: [], soundness: {}, packageId: null, testOverrides: {}, testParams: {} };
   document.getElementById('step-results').style.display = 'none';
   document.getElementById('step-progress').style.display = 'none';
   document.getElementById('step-tests').style.display = 'none';
