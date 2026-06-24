@@ -70,7 +70,7 @@ a{color:var(--bl);text-decoration:none}
 .select-all-row label{display:flex;align-items:center;gap:.5rem;font-weight:600;cursor:pointer;font-size:.8rem}
 .select-all-row #total-credits-display{font-size:.68rem;color:var(--sl);margin-left:auto}
 
-/* ASSUMPTION CARDS - MATCHING stats.html */
+/* ASSUMPTION CARDS */
 .asum-grid{display:flex;flex-direction:column;gap:.4rem;margin-top:.75rem}
 .asum{display:flex;gap:.6rem;align-items:flex-start;padding:.6rem .8rem;border-radius:var(--r8);border:1px solid var(--bd);background:var(--wh)}
 .asum.pass{border-color:rgba(22,163,74,.3);background:rgba(22,163,74,.04)}
@@ -78,8 +78,6 @@ a{color:var(--bl);text-decoration:none}
 .asum-ico{font-size:.95rem;flex-shrink:0;margin-top:1px}
 .asum-name{font-weight:600;font-size:.78rem;color:var(--tx)}
 .asum-note{font-size:.72rem;color:var(--txM);margin-top:1px;line-height:1.4}
-.asum-fix{display:inline-flex;align-items:center;gap:4px;margin-top:.3rem;font-size:.7rem;font-weight:600;color:var(--bl);background:rgba(30,107,255,.08);padding:2px 8px;border-radius:20px;cursor:pointer;border:1px solid rgba(30,107,255,.2)}
-.asum-fix:hover{background:rgba(30,107,255,.15)}
 
 /* ASSUMPTION MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999;padding:1rem}
@@ -96,8 +94,6 @@ a{color:var(--bl);text-decoration:none}
 .modal .assumption-detail-item .detail .note{color:var(--sl);font-size:.7rem}
 .modal .assumption-detail-item .detail .suggestion{color:var(--wn);font-size:.7rem;font-style:italic}
 .modal .modal-score{font-size:.82rem;margin:.4rem 0;padding:.4rem;background:var(--of);border-radius:var(--r8);text-align:center}
-.modal .modal-score .pass{color:var(--ok);font-weight:700}
-.modal .modal-score .fail{color:var(--er);font-weight:700}
 .modal .modal-btn-row{display:flex;gap:.5rem;margin-top:.75rem;flex-wrap:wrap}
 .modal .modal-btn-row .btn{flex:1;min-width:80px;padding:.4rem .8rem;font-size:.72rem}
 
@@ -139,6 +135,8 @@ a{color:var(--bl);text-decoration:none}
 .btn-teal:hover{opacity:.9}
 .btn-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.75rem}
 .btn-sm{padding:.3rem .7rem;font-size:.65rem}
+.btn-code{background:linear-gradient(135deg,#8B5CF6,#6D28D9);color:#fff;padding:.3rem .7rem;font-size:.65rem;border:none;border-radius:var(--r8);cursor:pointer;transition:all .2s;font-family:'Syne',sans-serif;font-weight:700}
+.btn-code:hover{opacity:.9;transform:translateY(-1px)}
 
 /* ALERTS */
 .alert{border-radius:var(--r8);padding:.6rem .8rem;display:none;align-items:flex-start;gap:.5rem;margin-top:.5rem}
@@ -159,11 +157,9 @@ footer strong{color:rgba(255,255,255,.75)}
 .toast-notification{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--ny);color:#fff;padding:.6rem 1.2rem;border-radius:var(--r12);box-shadow:var(--shL);font-size:.78rem;z-index:1000;max-width:90%;border-left:4px solid var(--wn);animation:slideUp .3s ease}
 @keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
-/* HEADINGS */
 .card-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;margin-bottom:.15rem}
 .card-sub{color:var(--sl);font-size:.78rem;margin-bottom:.6rem}
 
-/* RESPONSIVE */
 @media(max-width:640px){.test-grid{grid-template-columns:1fr}.nav-links{display:none}.main{padding:0 .75rem}.card{padding:1rem}}
 </style>
 </head>
@@ -253,6 +249,7 @@ footer strong{color:rgba(255,255,255,.75)}
         <button class="btn btn-success btn-sm" onclick="exportThesis('word')">⬇ Word</button>
         <button class="btn btn-success btn-sm" onclick="exportThesis('pdf')" style="background:linear-gradient(135deg,#DC2626,#991B1B)">⬇ PDF</button>
         <button class="btn btn-success btn-sm" onclick="exportThesis('excel')" style="background:linear-gradient(135deg,#16A34A,#15803D)">⬇ Excel</button>
+        <button class="btn-code btn-sm" onclick="downloadAllCode()">🐍 Code</button>
       </div>
     </div>
     <div class="result-summary" id="result-summary"></div>
@@ -314,7 +311,8 @@ let S = {
   soundness: {},
   packageId: null,
   testOverrides: {},
-  testParams: {}
+  testParams: {},
+  fileData: null  // <-- FIX: Store file data like stats.html does
 };
 
 // ===== BUILD PARAMS FOR EACH TEST =====
@@ -453,7 +451,6 @@ async function checkAllSoundness() {
   let soundCount = 0;
   let totalChecked = 0;
   
-  // Fetch assumptions for each test
   for (const test of ALL_TESTS) {
     if (test.alwaysValid) {
       S.soundness[test.id] = { sound: true, score: 1.0, checks: [] };
@@ -467,22 +464,17 @@ async function checkAllSoundness() {
       totalChecked++;
       if (result.sound) soundCount++;
     } else {
-      // Fallback - mark as unknown
       S.soundness[test.id] = { sound: false, score: 0.5, checks: [] };
     }
   }
   
-  // Update summary
   const summary = document.getElementById('soundness-summary');
   const text = document.getElementById('soundness-summary-text');
   const totalTests = ALL_TESTS.filter(t => !t.alwaysValid).length;
   text.textContent = `${soundCount}/${totalTests} tests are statistically sound for your data. Click on any test to see full assumption details.`;
   summary.style.display = 'flex';
   
-  // Re-render tests
   renderTests();
-  
-  // Auto-select sound tests
   document.getElementById('select-all').checked = true;
   toggleAllTests();
 }
@@ -594,6 +586,16 @@ dz.addEventListener('drop', e => {
 });
 fi.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
 
+// ===== Helper: Convert file to base64 =====
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = error => reject(error);
+  });
+}
+
 async function handleFile(file) {
   const ext = file.name.split('.').pop().toLowerCase();
   if (!['csv','xlsx','xls'].includes(ext)) {
@@ -601,6 +603,10 @@ async function handleFile(file) {
     return;
   }
   hideError('upload-error');
+  
+  // ===== FIX: Store file data like stats.html does =====
+  S.fileData = await fileToBase64(file);
+  
   const fd = new FormData(); fd.append('file', file);
   document.getElementById('upload-progress').style.display = 'block';
   animateProgress('upload-bar', 'upload-pct', 3500);
@@ -618,7 +624,6 @@ async function handleFile(file) {
     document.getElementById('step-upload').style.display = 'none';
     document.getElementById('step-tests').style.display = 'block';
     
-    // Check all assumptions
     await checkAllSoundness();
     
   } catch(e) {
@@ -628,7 +633,7 @@ async function handleFile(file) {
 }
 
 function resetUpload() {
-  S.metaPath = null; S.filename = null; S.columns = []; S.soundness = {}; S.testOverrides = {};
+  S.metaPath = null; S.filename = null; S.columns = []; S.soundness = {}; S.testOverrides = {}; S.fileData = null;
   fi.value = '';
   document.getElementById('file-info').style.display = 'none';
   document.getElementById('step-tests').style.display = 'none';
@@ -654,10 +659,11 @@ async function runThesis() {
   progressEl.innerHTML = '';
 
   let completed = 0;
+  let failedCount = 0;
   const totalTests = selected.length;
 
   const updateProgress = (testId, status, message) => {
-    const pct = Math.round((completed / totalTests) * 100);
+    const pct = Math.round(((completed + failedCount) / totalTests) * 100);
     document.getElementById('run-bar').style.width = pct + '%';
     document.getElementById('progress-pct').textContent = pct + '%';
     document.getElementById('progress-label').textContent = `Running ${testId}...`;
@@ -672,8 +678,12 @@ async function runThesis() {
   };
 
   const completeTest = (testId, result, error) => {
-    completed++;
-    const pct = Math.round((completed / totalTests) * 100);
+    if (error) {
+      failedCount++;
+    } else {
+      completed++;
+    }
+    const pct = Math.round(((completed + failedCount) / totalTests) * 100);
     document.getElementById('run-bar').style.width = pct + '%';
     document.getElementById('progress-pct').textContent = pct + '%';
     const item = document.getElementById(`pr-${testId}`);
@@ -695,8 +705,10 @@ async function runThesis() {
         previewEl.textContent = 'Complete';
       }
     }
-    if (completed === totalTests) {
-      document.getElementById('progress-label').textContent = '✅ All analyses complete!';
+    if (completed + failedCount === totalTests) {
+      document.getElementById('progress-label').textContent = failedCount > 0 ? 
+        `✅ ${completed} tests complete, ${failedCount} failed` : 
+        '✅ All analyses complete!';
       setTimeout(() => showResults(), 500);
     }
   };
@@ -724,7 +736,7 @@ async function runThesis() {
     try {
       const params = buildParamsForTest(testId);
       
-      // FIX: Include file_data in the request body
+      // ===== FIX: Include file_data (like stats.html does) =====
       const r = await fetch(`${API_BASE}/api/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -732,14 +744,21 @@ async function runThesis() {
           meta_path: S.metaPath, 
           analysis_type: testId, 
           params: params,
-          file_data: null  // Required field for the API
+          file_data: S.fileData  // <-- FIX: Send actual file data, not null!
         })
       });
       const d = await r.json();
       
       if (!r.ok || d.error) {
+        console.error(`Test ${testId} failed:`, d.error || 'Unknown error');
         updateProgress(testId, 'Error', d.error || 'Failed');
         completeTest(testId, null, d.error || 'Analysis failed');
+        continue;
+      }
+      
+      if (d.error) {
+        console.error(`Test ${testId} returned error:`, d.error);
+        completeTest(testId, null, d.error);
         continue;
       }
       
@@ -748,6 +767,7 @@ async function runThesis() {
       S.results[testId] = d;
       
     } catch(e) {
+      console.error(`Test ${testId} exception:`, e.message);
       updateProgress(testId, 'Error', e.message);
       completeTest(testId, null, e.message);
     }
@@ -764,7 +784,6 @@ function showResults() {
   const keys = Object.keys(results);
   const total = keys.length;
 
-  // FIX: Smaller text in results summary
   document.getElementById('result-summary').innerHTML = `
     <div class="result-stat"><div class="num" style="font-size:1.1rem">${total}</div><div class="lbl" style="font-size:.55rem">Tests Run</div></div>
     <div class="result-stat"><div class="num" style="font-size:.85rem">${S.filename || 'Unknown'}</div><div class="lbl" style="font-size:.55rem">Dataset</div></div>
@@ -792,6 +811,7 @@ function showResults() {
         <div class="ri-header">
           <span class="ri-name">${icon} ${name}</span>
           <span class="ri-status ok">✅ Complete</span>
+          <button class="btn-code btn-sm" onclick="downloadCode('${id}')" style="font-size:.55rem;padding:.15rem .5rem">🐍 Code</button>
         </div>
         ${soundnessHtml}
         <div class="ri-apa">${apa}</div>
@@ -801,6 +821,61 @@ function showResults() {
   }
   document.getElementById('result-items').innerHTML = html;
   document.getElementById('results-meta').textContent = `Thesis Package · ${total} tests · ${new Date().toLocaleString()}`;
+}
+
+// ===== DOWNLOAD CODE FOR A SINGLE TEST =====
+async function downloadCode(testId) {
+  const params = buildParamsForTest(testId);
+  
+  try {
+    const r = await fetch(`${API_BASE}/api/code-snippet`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        analysis_type: testId,
+        params: params,
+        format: 'py'
+      })
+    });
+    
+    if (!r.ok) {
+      const d = await r.json().catch(() => ({}));
+      alert(d.error || 'Could not generate code for this test.');
+      return;
+    }
+    
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `eduxellence_${testId}_code.py`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    
+  } catch(e) {
+    alert('Error downloading code: ' + e.message);
+  }
+}
+
+// ===== DOWNLOAD ALL CODE =====
+async function downloadAllCode() {
+  const results = S.results || {};
+  const keys = Object.keys(results);
+  
+  if (!keys.length) {
+    alert('No completed tests to generate code for.');
+    return;
+  }
+  
+  // Generate code for the first test (or combine)
+  // For simplicity, download code for the first test
+  const firstTest = keys[0];
+  await downloadCode(firstTest);
+  
+  // Show a message that more codes are available per test
+  showToast('💡 Code for each test is available via the "🐍 Code" button next to each result.');
 }
 
 // ===== EXPORT =====
@@ -841,7 +916,7 @@ function goBack() {
 }
 
 function resetAll() {
-  S = { metaPath: null, filename: null, selectedTests: [], results: null, columns: [], soundness: {}, packageId: null, testOverrides: {}, testParams: {} };
+  S = { metaPath: null, filename: null, selectedTests: [], results: null, columns: [], soundness: {}, packageId: null, testOverrides: {}, testParams: {}, fileData: null };
   document.getElementById('step-results').style.display = 'none';
   document.getElementById('step-progress').style.display = 'none';
   document.getElementById('step-tests').style.display = 'none';
