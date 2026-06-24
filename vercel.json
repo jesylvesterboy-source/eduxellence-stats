@@ -12,6 +12,8 @@
     { "src": "/stats", "dest": "public/stats.html" },
     { "src": "/upload", "dest": "public/upload.html" },
     { "src": "/pricing", "dest": "public/pricing.html" },
+    { "src": "/thesis", "dest": "public/package.html" },
+    { "src": "/package", "dest": "public/package.html" },
     { "src": "/(.*)", "dest": "public/$1" }
   ]
 }
