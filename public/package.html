@@ -201,7 +201,6 @@ footer strong{color:rgba(255,255,255,.75)}
     <div class="progress-bar-wrap"><div class="progress-bar" id="run-bar" style="width:0%"></div></div>
     <div class="progress-stats"><span id="progress-label">Initialising…</span><span id="progress-pct">0%</span></div>
     <div id="progress-results" style="margin-top:.5rem"></div>
-    <!-- Debug log -->
     <div class="debug-log" id="debug-log"></div>
     <button class="btn btn-secondary btn-sm" onclick="toggleDebug()" style="margin-top:.5rem;font-size:.65rem">🐛 Toggle Debug</button>
   </div>
@@ -250,6 +249,13 @@ footer strong{color:rgba(255,255,255,.75)}
 <script>
 // ===== API BASE =====
 const API_BASE = 'https://Eduxellence-eduxellence-api.hf.space';
+
+// ===== AUTH HELPER (copied from stats.html) =====
+function getAuthToken() {
+  return localStorage.getItem('edux_auth_token') || 
+         document.cookie.split('; ').find(row => row.startsWith('supabase_token='))?.split('=')[1] ||
+         null;
+}
 
 // ===== DEBUG LOG =====
 let debugLines = [];
@@ -632,7 +638,7 @@ function resetUpload() {
   document.getElementById('debug-log').textContent = '';
 }
 
-// ===== RUN THESIS - WITH DEBUGGING =====
+// ===== RUN THESIS - WITH AUTHENTICATION =====
 async function runThesis() {
   const selected = S.selectedTests;
   debugLog(`🚀 Starting Thesis Package with ${selected.length} tests: ${selected.join(', ')}`);
@@ -650,6 +656,10 @@ async function runThesis() {
     return;
   }
   debugLog(`📄 fileData length: ${S.fileData.length} characters`);
+  
+  // ===== FIX: Get auth token =====
+  const token = getAuthToken();
+  debugLog(`🔑 Auth token present: ${token ? '✅ Yes' : '❌ No'}`);
   
   document.getElementById('step-tests').style.display = 'none';
   document.getElementById('step-progress').style.display = 'block';
@@ -740,17 +750,23 @@ async function runThesis() {
       const params = buildParamsForTest(testId);
       debugLog(`📤 Sending request for ${testId} with params: ${JSON.stringify(params)}`);
       
+      // ===== FIX: Build headers with auth token =====
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+        debugLog(`🔑 Added Authorization header`);
+      }
+      
       const requestBody = { 
         meta_path: S.metaPath, 
         analysis_type: testId, 
         params: params,
         file_data: S.fileData
       };
-      debugLog(`📦 Request body keys: ${Object.keys(requestBody).join(', ')}`);
       
       const r = await fetch(`${API_BASE}/api/analyze`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: headers,
         body: JSON.stringify(requestBody)
       });
       
@@ -758,6 +774,14 @@ async function runThesis() {
       
       const d = await r.json();
       debugLog(`📄 Response data keys: ${Object.keys(d).join(', ')}`);
+      
+      if (r.status === 401) {
+        debugLog(`🔑 401 Unauthorized - Please sign in`);
+        showToast('🔑 Please sign in to run analyses');
+        // Redirect to stats page with login prompt
+        window.location.href = '/stats';
+        return;
+      }
       
       if (!r.ok || d.error) {
         debugLog(`❌ Test ${testId} returned error: ${d.error || 'Unknown error'}`);
