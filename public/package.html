@@ -288,8 +288,17 @@ footer strong{color:rgba(255,255,255,.75)}
 </footer>
 
 <script>
-// ===== API BASE =====
-const API_BASE = 'https://Eduxellence-eduxellence-api.hf.space';
+// ===== API BASE - FIXED: Auto-detect environment =====
+const API_BASE = (() => {
+  // If running on localhost, use local API
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:7860';
+  }
+  // Otherwise use Hugging Face space
+  return 'https://Eduxellence-eduxellence-api.hf.space';
+})();
+
+console.log(`🔗 API_BASE: ${API_BASE}`);
 
 // ===== AUTH HELPER =====
 function getAuthToken() {
@@ -920,12 +929,22 @@ async function runThesis() {
       }
     }
     if (completed + failedCount === totalTests) {
-      // ===== FIX: Use the server's package ID (already set) =====
-      // Do NOT generate a new ID here - the server already gave us one
+      // ===== FIX: Save the package ID from the server response =====
+      // The server sets the package ID in the response
+      // We need to store it for export
       if (!S.packageId) {
-        // Only generate fallback if server didn't provide one (shouldn't happen)
-        S.packageId = 'pkg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
-        debugLog(`⚠️ Fallback package ID generated: ${S.packageId}`);
+        // Check if any result has a package_id or generate fallback
+        for (const [id, data] of Object.entries(S.results || {})) {
+          if (data.package_id) {
+            S.packageId = data.package_id;
+            debugLog(`📦 Found package ID in results: ${S.packageId}`);
+            break;
+          }
+        }
+        if (!S.packageId) {
+          S.packageId = 'pkg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+          debugLog(`⚠️ Fallback package ID generated: ${S.packageId}`);
+        }
       } else {
         debugLog(`📦 Using server package ID: ${S.packageId}`);
       }
@@ -1016,6 +1035,12 @@ async function runThesis() {
         continue;
       }
       
+      // ===== FIX: Store package ID from server response =====
+      if (d.package_id) {
+        S.packageId = d.package_id;
+        debugLog(`📦 Server returned package ID: ${S.packageId}`);
+      }
+      
       debugLog(`✅ Test ${testId} completed with result keys: ${Object.keys(d).join(', ')}`);
       completeTest(testId, d, null);
       S.results = S.results || {};
@@ -1085,6 +1110,8 @@ function showResults() {
   }
   document.getElementById('result-items').innerHTML = html;
   document.getElementById('results-meta').textContent = `Thesis Package · ${total} tests · ${new Date().toLocaleString()}`;
+  
+  debugLog(`📦 Package ID for export: ${S.packageId}`);
 }
 
 // ===== CODE DOWNLOAD =====
@@ -1141,9 +1168,9 @@ async function downloadAllCode() {
   showToast('💡 Code for each test is available via the "🐍 Code" button next to each result.');
 }
 
-// ===== EXPORT =====
+// ===== EXPORT - FIXED: Use correct API endpoint =====
 async function exportThesis(format) {
-  // If no package ID, generate one (fallback - should not happen if server provided one)
+  // If no package ID, generate one (fallback)
   if (!S.packageId) {
     S.packageId = 'pkg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
     debugLog(`⚠️ Fallback package ID generated: ${S.packageId}`);
@@ -1159,20 +1186,34 @@ async function exportThesis(format) {
   };
   
   const backendFormat = formatMap[format] || format;
+  const exportUrl = `${API_BASE}/api/package/export/${S.packageId}?format=${backendFormat}`;
+  
+  debugLog(`📤 Export URL: ${exportUrl}`);
   
   try {
-    const r = await fetch(`${API_BASE}/api/package/export/${S.packageId}?format=${backendFormat}`, {
-      method: 'GET'
+    // Show loading state
+    showToast(`⏳ Generating ${format} export...`);
+    
+    const r = await fetch(exportUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': getAuthToken() ? `Bearer ${getAuthToken()}` : ''
+      }
     });
     
     if (!r.ok) {
-      debugLog(`❌ Export failed: ${r.status} ${r.statusText}`);
+      let errorMsg = `Export failed (${r.status})`;
+      try {
+        const d = await r.json();
+        if (d.error) errorMsg = d.error;
+      } catch(e) {}
       
-      // If 404, the backend route might not exist yet
+      debugLog(`❌ Export failed: ${errorMsg}`);
+      
       if (r.status === 404) {
-        alert('Export feature is being configured. Please try again in a few minutes.\n\nIf this persists, contact support.');
+        alert(`Export feature is being configured. Please try again in a few minutes.\n\nIf this persists, contact support.\n\nError: ${errorMsg}`);
       } else {
-        alert('Export failed. Please try again.');
+        alert(`Export failed: ${errorMsg}\n\nPlease try again.`);
       }
       return;
     }
@@ -1186,12 +1227,14 @@ async function exportThesis(format) {
       'pdf': 'pdf',
       'excel': 'xlsx'
     };
-    a.download = `thesis_package_${new Date().toISOString().slice(0,10)}.${extMap[format] || format}`;
+    const filename = `thesis_package_${new Date().toISOString().slice(0,10)}.${extMap[format] || format}`;
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    debugLog(`✅ Export successful`);
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    debugLog(`✅ Export successful: ${filename}`);
+    showToast(`✅ ${format} export downloaded successfully!`);
     
   } catch(e) {
     debugLog(`💥 Export error: ${e.message}`);
@@ -1234,6 +1277,7 @@ function animateProgress(barId, pctId, dur) {
 
 // ===== INIT =====
 debugLog('🚀 Thesis Package loaded');
+debugLog(`🔗 API_BASE: ${API_BASE}`);
 if (window.location.search.includes('package=thesis')) {
   document.getElementById('step-upload').style.display = 'block';
   debugLog('📌 Thesis Package mode detected');
