@@ -819,7 +819,7 @@ function resetUpload() {
   document.getElementById('debug-log').textContent = '';
 }
 
-// ===== RUN THESIS - WITH AUTHENTICATION =====
+// ===== RUN THESIS - WITH AUTHENTICATION AND TIMEOUT =====
 async function runThesis() {
   const selected = S.selectedTests;
   debugLog(`🚀 Starting Thesis Package with ${selected.length} tests: ${selected.join(', ')}`);
@@ -920,9 +920,15 @@ async function runThesis() {
       }
     }
     if (completed + failedCount === totalTests) {
-      // Generate package ID when all tests complete
-      S.packageId = 'pkg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
-      debugLog(`📦 Package ID generated: ${S.packageId}`);
+      // ===== FIX: Use the server's package ID (already set) =====
+      // Do NOT generate a new ID here - the server already gave us one
+      if (!S.packageId) {
+        // Only generate fallback if server didn't provide one (shouldn't happen)
+        S.packageId = 'pkg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+        debugLog(`⚠️ Fallback package ID generated: ${S.packageId}`);
+      } else {
+        debugLog(`📦 Using server package ID: ${S.packageId}`);
+      }
       document.getElementById('progress-label').textContent = failedCount > 0 ? 
         `✅ ${completed} tests complete, ${failedCount} failed` : 
         '✅ All analyses complete!';
@@ -945,7 +951,7 @@ async function runThesis() {
     `;
   });
 
-  // Run each test sequentially
+  // Run each test sequentially with timeout
   for (const testId of selected) {
     const test = ALL_TESTS.find(t => t.id === testId);
     document.getElementById('progress-label').textContent = `Running ${test.label}…`;
@@ -969,11 +975,18 @@ async function runThesis() {
         file_data: S.fileData
       };
       
+      // ===== ADD TIMEOUT (45 seconds) =====
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 45000);
+      
       const r = await fetch(`${API_BASE}/api/analyze`, {
         method: 'POST',
         headers: headers,
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody),
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
       
       debugLog(`📥 Response status for ${testId}: ${r.status} ${r.statusText}`);
       
@@ -1009,9 +1022,16 @@ async function runThesis() {
       S.results[testId] = d;
       
     } catch(e) {
-      debugLog(`💥 Test ${testId} exception: ${e.message}`);
-      updateProgress(testId, 'Error', e.message);
-      completeTest(testId, null, e.message);
+      // ===== HANDLE TIMEOUT =====
+      if (e.name === 'AbortError') {
+        debugLog(`⏰ Test ${testId} timed out after 45 seconds`);
+        updateProgress(testId, 'Timeout', 'Test took too long - try again with fewer tests');
+        completeTest(testId, null, 'Timeout - test took too long');
+      } else {
+        debugLog(`💥 Test ${testId} exception: ${e.message}`);
+        updateProgress(testId, 'Error', e.message);
+        completeTest(testId, null, e.message);
+      }
     }
   }
 }
@@ -1123,10 +1143,10 @@ async function downloadAllCode() {
 
 // ===== EXPORT =====
 async function exportThesis(format) {
-  // If no package ID, generate one
+  // If no package ID, generate one (fallback - should not happen if server provided one)
   if (!S.packageId) {
     S.packageId = 'pkg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
-    debugLog(`📦 Generated new package ID for export: ${S.packageId}`);
+    debugLog(`⚠️ Fallback package ID generated: ${S.packageId}`);
   }
   
   debugLog(`📤 Exporting as ${format}`);
