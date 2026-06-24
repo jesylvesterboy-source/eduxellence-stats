@@ -55,29 +55,30 @@ a{color:var(--bl);text-decoration:none}
 .file-info .close{background:none;border:none;cursor:pointer;color:var(--sl);font-size:1rem;margin-left:auto}
 
 /* TEST SELECTOR */
-.test-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.6rem;margin:.75rem 0}
-.test-option{display:flex;align-items:center;gap:.5rem;padding:.6rem .8rem;border:1.5px solid var(--bd);border-radius:var(--r8);cursor:pointer;transition:all .15s;background:var(--wh);position:relative}
+.test-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:.6rem;margin:.75rem 0}
+.test-option{display:flex;align-items:center;gap:.4rem;padding:.5rem .7rem;border:1.5px solid var(--bd);border-radius:var(--r8);cursor:pointer;transition:all .15s;background:var(--wh);position:relative}
 .test-option:hover{border-color:var(--bl);background:rgba(30,107,255,.04)}
 .test-option.checked{border-color:var(--bl);background:rgba(30,107,255,.06)}
-.test-option input[type="checkbox"]{width:15px;height:15px;accent-color:var(--bl);cursor:pointer;flex-shrink:0}
-.test-option .to-name{font-size:.78rem;font-weight:600;color:var(--tx);flex:1}
-.test-option .to-cost{font-size:.68rem;color:var(--sl);font-weight:500;white-space:nowrap}
-.test-option .to-soundness{font-size:.6rem;padding:1px 6px;border-radius:8px;margin-left:3px;cursor:pointer;white-space:nowrap}
+.test-option input[type="checkbox"]{width:14px;height:14px;accent-color:var(--bl);cursor:pointer;flex-shrink:0}
+.test-option .to-name{font-size:.72rem;font-weight:600;color:var(--tx);flex:1}
+.test-option .to-cost{font-size:.62rem;color:var(--sl);font-weight:500;white-space:nowrap}
+.test-option .to-soundness{font-size:.55rem;padding:1px 5px;border-radius:8px;margin-left:2px;cursor:pointer;white-space:nowrap}
 .to-soundness.pass{background:rgba(22,163,74,.12);color:var(--ok)}
 .to-soundness.fail{background:rgba(220,38,38,.1);color:var(--er)}
 .to-soundness.unknown{background:var(--of);color:var(--sl)}
-.select-all-row{display:flex;gap:1rem;align-items:center;padding:.4rem 0;border-bottom:1px solid var(--bd);margin-bottom:.6rem;flex-wrap:wrap}
-.select-all-row label{display:flex;align-items:center;gap:.5rem;font-weight:600;cursor:pointer;font-size:.85rem}
+.select-all-row{display:flex;gap:1rem;align-items:center;padding:.3rem 0;border-bottom:1px solid var(--bd);margin-bottom:.5rem;flex-wrap:wrap}
+.select-all-row label{display:flex;align-items:center;gap:.5rem;font-weight:600;cursor:pointer;font-size:.8rem}
+.select-all-row #total-credits-display{font-size:.68rem;color:var(--sl);margin-left:auto}
 
 /* ASSUMPTION CARDS - MATCHING stats.html */
-.asum-grid{display:flex;flex-direction:column;gap:.5rem;margin-top:1rem}
-.asum{display:flex;gap:.75rem;align-items:flex-start;padding:.75rem 1rem;border-radius:var(--r8);border:1px solid var(--bd);background:var(--wh)}
+.asum-grid{display:flex;flex-direction:column;gap:.4rem;margin-top:.75rem}
+.asum{display:flex;gap:.6rem;align-items:flex-start;padding:.6rem .8rem;border-radius:var(--r8);border:1px solid var(--bd);background:var(--wh)}
 .asum.pass{border-color:rgba(22,163,74,.3);background:rgba(22,163,74,.04)}
 .asum.fail{border-color:rgba(220,38,38,.3);background:rgba(220,38,38,.04)}
-.asum-ico{font-size:1.1rem;flex-shrink:0;margin-top:2px}
-.asum-name{font-weight:600;font-size:.85rem;color:var(--tx)}
-.asum-note{font-size:.8rem;color:var(--txM);margin-top:2px;line-height:1.4}
-.asum-fix{display:inline-flex;align-items:center;gap:4px;margin-top:.4rem;font-size:.78rem;font-weight:600;color:var(--bl);background:rgba(30,107,255,.08);padding:3px 10px;border-radius:20px;cursor:pointer;border:1px solid rgba(30,107,255,.2)}
+.asum-ico{font-size:.95rem;flex-shrink:0;margin-top:1px}
+.asum-name{font-weight:600;font-size:.78rem;color:var(--tx)}
+.asum-note{font-size:.72rem;color:var(--txM);margin-top:1px;line-height:1.4}
+.asum-fix{display:inline-flex;align-items:center;gap:4px;margin-top:.3rem;font-size:.7rem;font-weight:600;color:var(--bl);background:rgba(30,107,255,.08);padding:2px 8px;border-radius:20px;cursor:pointer;border:1px solid rgba(30,107,255,.2)}
 .asum-fix:hover{background:rgba(30,107,255,.15)}
 
 /* ASSUMPTION MODAL */
@@ -85,79 +86,85 @@ a{color:var(--bl);text-decoration:none}
 .modal-overlay.show{display:flex}
 .modal{background:var(--wh);border-radius:var(--r24);max-width:600px;width:100%;max-height:80vh;overflow-y:auto;padding:1.5rem;box-shadow:var(--shL);position:relative}
 .modal-close{position:absolute;top:.75rem;right:1rem;background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--sl)}
-.modal h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:.5rem}
-.modal .assumption-detail-item{display:flex;align-items:flex-start;gap:.6rem;padding:.3rem 0;border-bottom:1px solid rgba(0,0,0,.04);font-size:.82rem}
-.modal .assumption-detail-item .status{font-weight:700;flex-shrink:0;width:20px}
+.modal h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:.4rem}
+.modal .assumption-detail-item{display:flex;align-items:flex-start;gap:.5rem;padding:.25rem 0;border-bottom:1px solid rgba(0,0,0,.04);font-size:.76rem}
+.modal .assumption-detail-item .status{font-weight:700;flex-shrink:0;width:18px}
 .modal .assumption-detail-item .status.pass{color:var(--ok)}
 .modal .assumption-detail-item .status.fail{color:var(--er)}
 .modal .assumption-detail-item .detail{flex:1}
 .modal .assumption-detail-item .detail .name{font-weight:500}
-.modal .assumption-detail-item .detail .note{color:var(--sl);font-size:.75rem}
-.modal .assumption-detail-item .detail .suggestion{color:var(--wn);font-size:.75rem;font-style:italic}
-.modal .modal-score{font-size:.9rem;margin:.5rem 0;padding:.5rem;background:var(--of);border-radius:var(--r8);text-align:center}
+.modal .assumption-detail-item .detail .note{color:var(--sl);font-size:.7rem}
+.modal .assumption-detail-item .detail .suggestion{color:var(--wn);font-size:.7rem;font-style:italic}
+.modal .modal-score{font-size:.82rem;margin:.4rem 0;padding:.4rem;background:var(--of);border-radius:var(--r8);text-align:center}
 .modal .modal-score .pass{color:var(--ok);font-weight:700}
 .modal .modal-score .fail{color:var(--er);font-weight:700}
-.modal .modal-btn-row{display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap}
-.modal .modal-btn-row .btn{flex:1;min-width:100px;padding:.5rem 1rem;font-size:.8rem}
+.modal .modal-btn-row{display:flex;gap:.5rem;margin-top:.75rem;flex-wrap:wrap}
+.modal .modal-btn-row .btn{flex:1;min-width:80px;padding:.4rem .8rem;font-size:.72rem}
 
 /* PROGRESS */
 .progress-section{display:none}
 .progress-section.show{display:block}
-.progress-bar-wrap{height:8px;background:var(--bd);border-radius:4px;overflow:hidden;margin:.75rem 0}
-.progress-bar{height:100%;background:linear-gradient(90deg,var(--tl),var(--bl));border-radius:4px;width:0;transition:width .4s ease}
-.progress-stats{display:flex;justify-content:space-between;font-size:.78rem;color:var(--sl);margin-top:.2rem}
-.progress-status{font-size:.82rem;color:var(--txM);margin:.5rem 0}
+.progress-bar-wrap{height:6px;background:var(--bd);border-radius:3px;overflow:hidden;margin:.5rem 0}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--tl),var(--bl));border-radius:3px;width:0;transition:width .4s ease}
+.progress-stats{display:flex;justify-content:space-between;font-size:.7rem;color:var(--sl);margin-top:.1rem}
+.progress-status{font-size:.75rem;color:var(--txM);margin:.4rem 0}
 
 /* RESULTS */
-.result-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.75rem;margin:.75rem 0}
-.result-stat{background:var(--of);border-radius:var(--r12);padding:.75rem;text-align:center}
-.result-stat .num{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--tx)}
-.result-stat .lbl{font-size:.65rem;color:var(--sl);text-transform:uppercase;letter-spacing:.04em}
+.result-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:.5rem;margin:.5rem 0}
+.result-stat{background:var(--of);border-radius:var(--r12);padding:.5rem;text-align:center}
+.result-stat .num{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--tx)}
+.result-stat .lbl{font-size:.55rem;color:var(--sl);text-transform:uppercase;letter-spacing:.04em}
 
-.result-item{border:1px solid var(--bd);border-radius:var(--r12);padding:1rem;margin-bottom:.6rem;background:var(--wh)}
-.result-item .ri-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem;flex-wrap:wrap;gap:.3rem}
-.result-item .ri-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--tx)}
-.result-item .ri-status{font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:10px}
+.result-item{border:1px solid var(--bd);border-radius:var(--r12);padding:.75rem;margin-bottom:.4rem;background:var(--wh)}
+.result-item .ri-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.25rem;flex-wrap:wrap;gap:.2rem}
+.result-item .ri-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;color:var(--tx)}
+.result-item .ri-status{font-size:.6rem;font-weight:600;padding:1px 7px;border-radius:10px}
 .ri-status.ok{background:rgba(22,163,74,.1);color:var(--ok)}
 .ri-status.err{background:rgba(220,38,38,.1);color:var(--er)}
 .ri-status.running{background:rgba(217,119,6,.1);color:var(--wn)}
 .ri-status.skipped{background:rgba(100,116,139,.1);color:var(--sl)}
-.result-item .ri-preview{font-size:.78rem;color:var(--sl);line-height:1.5}
-.result-item .ri-apa{background:#F8F7FF;border:1.5px solid #C4B5FD;border-radius:var(--r8);padding:.6rem .8rem;margin:.4rem 0;font-size:.72rem;font-family:'JetBrains Mono',monospace;color:#1E1B4B}
+.result-item .ri-preview{font-size:.7rem;color:var(--sl);line-height:1.4}
+.result-item .ri-apa{background:#F8F7FF;border:1.5px solid #C4B5FD;border-radius:var(--r8);padding:.4rem .6rem;margin:.25rem 0;font-size:.65rem;font-family:'JetBrains Mono',monospace;color:#1E1B4B;word-break:break-word}
 
 /* BUTTONS */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:'Syne',sans-serif;font-weight:700;border:none;border-radius:var(--r8);cursor:pointer;transition:all .2s;padding:.7rem 1.5rem;font-size:.85rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:'Syne',sans-serif;font-weight:700;border:none;border-radius:var(--r8);cursor:pointer;transition:all .2s;padding:.6rem 1.2rem;font-size:.78rem}
 .btn-primary{background:linear-gradient(135deg,var(--bl),#1452CC);color:#fff;box-shadow:0 4px 14px rgba(30,107,255,.3);width:100%}
 .btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 20px rgba(30,107,255,.4)}
 .btn-primary:disabled{background:var(--slL);cursor:not-allowed;box-shadow:none}
-.btn-secondary{background:transparent;border:1.5px solid var(--bd);color:var(--sl);padding:.6rem 1.2rem;font-size:.8rem;font-family:'DM Sans',sans-serif;font-weight:500}
+.btn-secondary{background:transparent;border:1.5px solid var(--bd);color:var(--sl);padding:.5rem 1rem;font-size:.72rem;font-family:'DM Sans',sans-serif;font-weight:500}
 .btn-secondary:hover{border-color:var(--bl);color:var(--bl)}
-.btn-success{background:linear-gradient(135deg,var(--ok),#15803D);color:#fff;padding:.6rem 1.2rem;font-size:.8rem}
+.btn-success{background:linear-gradient(135deg,var(--ok),#15803D);color:#fff;padding:.5rem 1rem;font-size:.72rem}
 .btn-success:hover{opacity:.9}
-.btn-teal{background:var(--tl);color:var(--ny);padding:.6rem 1.2rem;font-size:.8rem}
+.btn-teal{background:var(--tl);color:var(--ny);padding:.5rem 1rem;font-size:.72rem}
 .btn-teal:hover{opacity:.9}
-.btn-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1rem}
-.btn-sm{padding:.35rem .8rem;font-size:.7rem}
+.btn-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.75rem}
+.btn-sm{padding:.3rem .7rem;font-size:.65rem}
 
 /* ALERTS */
-.alert{border-radius:var(--r8);padding:.75rem 1rem;display:none;align-items:flex-start;gap:.6rem;margin-top:.6rem}
+.alert{border-radius:var(--r8);padding:.6rem .8rem;display:none;align-items:flex-start;gap:.5rem;margin-top:.5rem}
 .alert.show{display:flex}
 .alert-error{background:rgba(220,38,38,.06);border:1.5px solid rgba(220,38,38,.25);color:var(--er)}
 .alert-success{background:rgba(22,163,74,.06);border:1.5px solid rgba(22,163,74,.25);color:var(--ok)}
 .alert-info{background:rgba(30,107,255,.06);border:1.5px solid rgba(30,107,255,.2);color:var(--bl)}
 .alert-warning{background:rgba(217,119,6,.07);border:1.5px solid rgba(217,119,6,.25);color:var(--wn)}
-.alert-ico{font-size:1rem;flex-shrink:0;margin-top:1px}
+.alert-ico{font-size:.85rem;flex-shrink:0;margin-top:1px}
+.alert .al-body p{font-size:.78rem}
 
 /* FOOTER */
-footer{background:var(--ny);color:rgba(255,255,255,.45);text-align:center;padding:1.5rem;font-size:.8rem;margin-top:1rem}
+footer{background:var(--ny);color:rgba(255,255,255,.45);text-align:center;padding:1.25rem;font-size:.72rem;margin-top:1rem}
 footer a{color:var(--tl)}
 footer strong{color:rgba(255,255,255,.75)}
 
 /* TOAST */
-.toast-notification{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--ny);color:#fff;padding:.75rem 1.5rem;border-radius:var(--r12);box-shadow:var(--shL);font-size:.85rem;z-index:1000;max-width:90%;border-left:4px solid var(--wn);animation:slideUp .3s ease}
+.toast-notification{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--ny);color:#fff;padding:.6rem 1.2rem;border-radius:var(--r12);box-shadow:var(--shL);font-size:.78rem;z-index:1000;max-width:90%;border-left:4px solid var(--wn);animation:slideUp .3s ease}
 @keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
-@media(max-width:640px){.test-grid{grid-template-columns:1fr}.nav-links{display:none}.main{padding:0 .75rem}.card{padding:1.25rem}}
+/* HEADINGS */
+.card-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;margin-bottom:.15rem}
+.card-sub{color:var(--sl);font-size:.78rem;margin-bottom:.6rem}
+
+/* RESPONSIVE */
+@media(max-width:640px){.test-grid{grid-template-columns:1fr}.nav-links{display:none}.main{padding:0 .75rem}.card{padding:1rem}}
 </style>
 </head>
 <body>
@@ -181,8 +188,8 @@ footer strong{color:rgba(255,255,255,.75)}
 
   <!-- STEP 1: UPLOAD -->
   <div class="card" id="step-upload">
-    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:.25rem">📂 Step 1: Upload Your Dataset</div>
-    <p style="color:var(--sl);font-size:.85rem;margin-bottom:.75rem">CSV or Excel. We'll detect column types automatically.</p>
+    <div class="card-title">📂 Step 1: Upload Your Dataset</div>
+    <p class="card-sub">CSV or Excel. We'll detect column types automatically.</p>
     <div class="dz" id="dz" onclick="document.getElementById('fi').click()">
       <div class="dz-ico">📊</div>
       <div class="dz-t">Drop your file here</div>
@@ -194,12 +201,12 @@ footer strong{color:rgba(255,255,255,.75)}
       <button class="btn-browse" onclick="document.getElementById('fi').click()">📁 Browse Files</button>
     </div>
     <div id="file-info" style="display:none" class="file-info">
-      <span style="font-size:1.3rem">📄</span>
+      <span style="font-size:1.1rem">📄</span>
       <div><div class="fn" id="fn"></div><div class="fm" id="fm"></div></div>
       <button class="close" onclick="resetUpload()">✕</button>
     </div>
     <div class="alert alert-error" id="upload-error"><span class="alert-ico">⚠</span><div class="al-body"><p id="upload-error-text"></p></div></div>
-    <div id="upload-progress" style="display:none;margin-top:.75rem">
+    <div id="upload-progress" style="display:none;margin-top:.5rem">
       <div class="progress-bar-wrap"><div class="progress-bar" id="upload-bar" style="width:0%"></div></div>
       <div class="progress-stats"><span>Uploading…</span><span id="upload-pct">0%</span></div>
     </div>
@@ -207,15 +214,15 @@ footer strong{color:rgba(255,255,255,.75)}
 
   <!-- STEP 2: SELECT TESTS -->
   <div class="card" id="step-tests" style="display:none">
-    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:.2rem">🎯 Step 2: Select Your Analyses</div>
-    <p style="color:var(--sl);font-size:.82rem;margin-bottom:.4rem">
-      <span style="color:var(--ok);font-weight:600">✅ Green = Statistically sound</span> · 
-      <span style="color:var(--er);font-weight:600">❌ Red = Assumptions may be violated</span> · 
-      <span style="color:var(--bl);font-weight:600">Click on any test to see full assumption details</span>
+    <div class="card-title">🎯 Step 2: Select Your Analyses</div>
+    <p style="color:var(--sl);font-size:.72rem;margin-bottom:.3rem">
+      <span style="color:var(--ok);font-weight:600">✅ Sound</span> · 
+      <span style="color:var(--er);font-weight:600">❌ Check</span> · 
+      <span style="color:var(--bl);font-weight:600">Click test for details</span>
     </p>
     <div class="select-all-row">
-      <label><input type="checkbox" id="select-all" onchange="toggleAllTests()"> <span style="font-size:.8rem">Select All Sound Tests</span></label>
-      <span style="font-size:.72rem;color:var(--sl);margin-left:auto" id="total-credits-display">Total: 0 credits</span>
+      <label><input type="checkbox" id="select-all" onchange="toggleAllTests()"> <span style="font-size:.72rem">Select All Sound Tests</span></label>
+      <span id="total-credits-display">Total: 0 credits</span>
     </div>
     <div class="test-grid" id="test-grid"></div>
     <div class="alert alert-warning" id="test-error"><span class="alert-ico">⚠</span><div class="al-body"><p id="test-error-text">Please select at least one test to run.</p></div></div>
@@ -228,21 +235,21 @@ footer strong{color:rgba(255,255,255,.75)}
 
   <!-- STEP 3: PROGRESS -->
   <div class="card" id="step-progress" style="display:none">
-    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:.2rem">⚡ Running Your Analysis</div>
-    <p style="color:var(--sl);font-size:.82rem;margin-bottom:.5rem" id="progress-status">Preparing…</p>
+    <div class="card-title">⚡ Running Your Analysis</div>
+    <p style="color:var(--sl);font-size:.72rem;margin-bottom:.4rem" id="progress-status">Preparing…</p>
     <div class="progress-bar-wrap"><div class="progress-bar" id="run-bar" style="width:0%"></div></div>
     <div class="progress-stats"><span id="progress-label">Initialising…</span><span id="progress-pct">0%</span></div>
-    <div id="progress-results" style="margin-top:.75rem"></div>
+    <div id="progress-results" style="margin-top:.5rem"></div>
   </div>
 
   <!-- STEP 4: RESULTS -->
   <div class="card" id="step-results" style="display:none">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.4rem;margin-bottom:.75rem">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.3rem;margin-bottom:.5rem">
       <div>
-        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem">📊 Complete Research Report</div>
-        <div style="font-size:.72rem;color:var(--sl);margin-top:1px" id="results-meta">Thesis Package · Generated just now</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem">📊 Complete Research Report</div>
+        <div style="font-size:.6rem;color:var(--sl);margin-top:1px" id="results-meta">Thesis Package · Generated just now</div>
       </div>
-      <div style="display:flex;gap:.4rem;flex-wrap:wrap">
+      <div style="display:flex;gap:.3rem;flex-wrap:wrap">
         <button class="btn btn-success btn-sm" onclick="exportThesis('word')">⬇ Word</button>
         <button class="btn btn-success btn-sm" onclick="exportThesis('pdf')" style="background:linear-gradient(135deg,#DC2626,#991B1B)">⬇ PDF</button>
         <button class="btn btn-success btn-sm" onclick="exportThesis('excel')" style="background:linear-gradient(135deg,#16A34A,#15803D)">⬇ Excel</button>
@@ -274,7 +281,7 @@ footer strong{color:rgba(255,255,255,.75)}
 
 <footer>
   <p><strong>Eduxellence Analytics</strong> — Research-grade data tools, built free for the world.</p>
-  <p style="margin-top:.3rem"><a href="/">Home</a> · <a href="/stats">Statistical Analysis</a> · <a href="/upload">Data Cleaner</a> · <a href="https://eduxellence.org/#contact">Contact</a></p>
+  <p style="margin-top:.2rem"><a href="/">Home</a> · <a href="/stats">Statistical Analysis</a> · <a href="/upload">Data Cleaner</a> · <a href="https://eduxellence.org/#contact">Contact</a></p>
 </footer>
 
 <script>
@@ -354,7 +361,7 @@ function renderTests() {
       const cls = passed ? 'pass' : 'fail';
       soundnessHtml = `<span class="to-soundness ${cls}" onclick="event.stopPropagation();openAssumptionModal('${t.id}')">${label}</span>`;
     } else if (t.alwaysValid) {
-      soundnessHtml = `<span class="to-soundness pass">✅ Always valid</span>`;
+      soundnessHtml = `<span class="to-soundness pass">✅ Sound</span>`;
     } else {
       soundnessHtml = `<span class="to-soundness unknown" onclick="event.stopPropagation();openAssumptionModal('${t.id}')">⏳ Check</span>`;
     }
@@ -502,7 +509,7 @@ function openAssumptionModal(testId) {
     scoreDiv.innerHTML = `
       <strong>Statistical Soundness: ${(score * 100).toFixed(0)}%</strong>
       <span class="${isSound ? 'pass' : 'fail'}">${isSound ? '✅ PASSED' : '❌ FAILED'}</span>
-      <span style="font-size:.75rem;color:var(--sl);display:block;margin-top:2px">${passed}/${total} assumptions met</span>
+      <span style="font-size:.7rem;color:var(--sl);display:block;margin-top:1px">${passed}/${total} assumptions met</span>
     `;
     
     checksDiv.innerHTML = sound.checks.map(c => `
@@ -527,11 +534,11 @@ function openAssumptionModal(testId) {
     }
   } else if (test.alwaysValid) {
     scoreDiv.innerHTML = '✅ Always valid — no assumptions to check.';
-    checksDiv.innerHTML = '<div style="color:var(--sl);font-size:.85rem">Descriptive statistics are always valid for any data.</div>';
+    checksDiv.innerHTML = '<div style="color:var(--sl);font-size:.78rem">Descriptive statistics are always valid for any data.</div>';
     runBtn.style.display = 'none';
   } else {
     scoreDiv.innerHTML = '⏳ Assumptions not yet checked. Upload your data first.';
-    checksDiv.innerHTML = '<div style="color:var(--sl);font-size:.85rem">Please upload a dataset to check assumptions.</div>';
+    checksDiv.innerHTML = '<div style="color:var(--sl);font-size:.78rem">Please upload a dataset to check assumptions.</div>';
     runBtn.style.display = 'none';
   }
   
@@ -630,7 +637,7 @@ function resetUpload() {
   document.getElementById('soundness-summary').style.display = 'none';
 }
 
-// ===== RUN THESIS =====
+// ===== RUN THESIS - FIXED =====
 async function runThesis() {
   const selected = S.selectedTests;
   if (!selected.length) {
@@ -716,13 +723,16 @@ async function runThesis() {
     
     try {
       const params = buildParamsForTest(testId);
+      
+      // FIX: Include file_data in the request body
       const r = await fetch(`${API_BASE}/api/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           meta_path: S.metaPath, 
           analysis_type: testId, 
-          params
+          params: params,
+          file_data: null  // Required field for the API
         })
       });
       const d = await r.json();
@@ -754,10 +764,11 @@ function showResults() {
   const keys = Object.keys(results);
   const total = keys.length;
 
+  // FIX: Smaller text in results summary
   document.getElementById('result-summary').innerHTML = `
-    <div class="result-stat"><div class="num">${total}</div><div class="lbl">Tests Run</div></div>
-    <div class="result-stat"><div class="num">${S.filename || 'Unknown'}</div><div class="lbl">Dataset</div></div>
-    <div class="result-stat"><div class="num">${new Date().toLocaleDateString()}</div><div class="lbl">Date</div></div>
+    <div class="result-stat"><div class="num" style="font-size:1.1rem">${total}</div><div class="lbl" style="font-size:.55rem">Tests Run</div></div>
+    <div class="result-stat"><div class="num" style="font-size:.85rem">${S.filename || 'Unknown'}</div><div class="lbl" style="font-size:.55rem">Dataset</div></div>
+    <div class="result-stat"><div class="num" style="font-size:1rem">${new Date().toLocaleDateString()}</div><div class="lbl" style="font-size:.55rem">Date</div></div>
   `;
 
   let html = '';
@@ -770,9 +781,9 @@ function showResults() {
     
     const sound = S.soundness[id];
     const soundnessHtml = sound && sound.checks && sound.checks.length > 0 ? `
-      <div style="font-size:.75rem;padding:.3rem .6rem;background:var(--of);border-radius:var(--r8);margin:.3rem 0">
-        <span class="score">Soundness: ${(sound.score * 100).toFixed(0)}%</span>
-        ${sound.sound ? ' <span style="color:var(--ok)">✅ Passed</span>' : ' <span style="color:var(--er)">⚠️ Assumptions may be violated</span>'}
+      <div style="font-size:.65rem;padding:.2rem .5rem;background:var(--of);border-radius:var(--r8);margin:.2rem 0">
+        <span style="font-weight:700">Soundness: ${(sound.score * 100).toFixed(0)}%</span>
+        ${sound.sound ? ' <span style="color:var(--ok)">✅ Passed</span>' : ' <span style="color:var(--er)">⚠️ Violations</span>'}
       </div>
     ` : '';
     
@@ -784,7 +795,7 @@ function showResults() {
         </div>
         ${soundnessHtml}
         <div class="ri-apa">${apa}</div>
-        <div class="ri-preview" style="margin-top:.4rem;font-size:.82rem;color:var(--tx)">${interp.slice(0, 200)}${interp.length > 200 ? '…' : ''}</div>
+        <div class="ri-preview" style="margin-top:.3rem;font-size:.72rem;color:var(--tx)">${interp.slice(0, 180)}${interp.length > 180 ? '…' : ''}</div>
       </div>
     `;
   }
