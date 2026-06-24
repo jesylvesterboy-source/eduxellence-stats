@@ -129,26 +129,6 @@ footer strong{color:rgba(255,255,255,.75)}
 .debug-log{background:#1E1E1E;color:#D4D4D4;font-family:'JetBrains Mono',monospace;font-size:.7rem;padding:.5rem .75rem;border-radius:var(--r8);max-height:200px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;margin-top:.5rem;display:none}
 .debug-log.show{display:block}
 @media(max-width:640px){.test-grid{grid-template-columns:1fr}.nav-links{display:none}.main{padding:0 .75rem}.card{padding:1rem}}
-
-/* ===== LOGIN MODAL ===== */
-.login-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:1000;padding:1rem}
-.login-modal-overlay.show{display:flex}
-.login-modal{background:var(--wh);border-radius:var(--r24);max-width:420px;width:100%;padding:2rem;box-shadow:var(--shL);position:relative}
-.login-modal h2{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:var(--ny);margin-bottom:.2rem}
-.login-modal .sub{color:var(--sl);font-size:.85rem;margin-bottom:1.25rem}
-.login-modal .form-group{margin-bottom:.9rem}
-.login-modal .form-group label{display:block;font-weight:600;font-size:.78rem;color:var(--tx);margin-bottom:.2rem}
-.login-modal .form-group input{width:100%;padding:.6rem .8rem;border:1.5px solid var(--bd);border-radius:var(--r8);font-size:.9rem;transition:all .15s;font-family:'DM Sans',sans-serif}
-.login-modal .form-group input:focus{outline:none;border-color:var(--bl);box-shadow:0 0 0 3px rgba(30,107,255,.12)}
-.login-modal .login-error{background:rgba(220,38,38,.06);border:1.5px solid rgba(220,38,38,.2);color:var(--er);padding:.5rem .7rem;border-radius:var(--r8);font-size:.78rem;display:none;margin-bottom:.8rem}
-.login-modal .login-error.show{display:block}
-.login-modal .btn-login{width:100%;background:linear-gradient(135deg,var(--bl),#1452CC);color:#fff;padding:.7rem;border:none;border-radius:var(--r8);font-weight:700;font-size:.9rem;cursor:pointer;transition:all .2s;font-family:'Syne',sans-serif}
-.login-modal .btn-login:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(30,107,255,.3)}
-.login-modal .btn-login:disabled{opacity:.6;cursor:not-allowed}
-.login-modal .signup-link{text-align:center;font-size:.78rem;color:var(--sl);margin-top:.8rem}
-.login-modal .signup-link a{color:var(--bl);font-weight:600}
-.login-modal .close-btn{position:absolute;top:.75rem;right:1rem;background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--sl)}
-.login-modal .admin-badge{display:inline-block;background:rgba(217,119,6,.12);color:var(--wn);font-size:.65rem;font-weight:700;padding:2px 10px;border-radius:10px;margin-left:.5rem}
 </style>
 </head>
 <body>
@@ -248,7 +228,6 @@ footer strong{color:rgba(255,255,255,.75)}
 
 </div>
 
-<!-- ===== ASSUMPTION MODAL ===== -->
 <div class="modal-overlay" id="assumption-modal">
   <div class="modal">
     <button class="modal-close" onclick="closeAssumptionModal()">✕</button>
@@ -262,26 +241,6 @@ footer strong{color:rgba(255,255,255,.75)}
   </div>
 </div>
 
-<!-- ===== LOGIN MODAL ===== -->
-<div class="login-modal-overlay" id="login-modal">
-  <div class="login-modal">
-    <button class="close-btn" onclick="closeLoginModal()">✕</button>
-    <h2>🔐 Sign In</h2>
-    <p class="sub">Sign in to run analyses. Admins get free access.</p>
-    <div class="login-error" id="login-error">Invalid credentials. Please try again.</div>
-    <div class="form-group">
-      <label for="login-email">Email</label>
-      <input type="email" id="login-email" placeholder="you@example.com" value="jesylvesterboy@gmail.com">
-    </div>
-    <div class="form-group">
-      <label for="login-password">Password</label>
-      <input type="password" id="login-password" placeholder="••••••••">
-    </div>
-    <button class="btn-login" id="btn-login" onclick="handleLogin()">Sign In</button>
-    <div class="signup-link">Don't have an account? <a href="#" onclick="closeLoginModal();window.location.href='/stats'">Sign up free</a></div>
-  </div>
-</div>
-
 <footer>
   <p><strong>Eduxellence Analytics</strong> — Research-grade data tools, built free for the world.</p>
   <p style="margin-top:.2rem"><a href="/">Home</a> · <a href="/stats">Statistical Analysis</a> · <a href="/upload">Data Cleaner</a> · <a href="https://eduxellence.org/#contact">Contact</a></p>
@@ -291,32 +250,11 @@ footer strong{color:rgba(255,255,255,.75)}
 // ===== API BASE =====
 const API_BASE = 'https://Eduxellence-eduxellence-api.hf.space';
 
-// ===== ADMIN EMAIL =====
-const ADMIN_EMAIL = 'jesylvesterboy@gmail.com';
-
-// ===== AUTH HELPERS =====
+// ===== AUTH HELPER (copied from stats.html) =====
 function getAuthToken() {
   return localStorage.getItem('edux_auth_token') || 
          document.cookie.split('; ').find(row => row.startsWith('supabase_token='))?.split('=')[1] ||
          null;
-}
-
-function setAuthToken(token, email) {
-  localStorage.setItem('edux_auth_token', token);
-  localStorage.setItem('edux_user_email', email);
-}
-
-function clearAuthToken() {
-  localStorage.removeItem('edux_auth_token');
-  localStorage.removeItem('edux_user_email');
-}
-
-function getStoredEmail() {
-  return localStorage.getItem('edux_user_email') || null;
-}
-
-function isAdmin(email) {
-  return email === ADMIN_EMAIL;
 }
 
 // ===== DEBUG LOG =====
@@ -366,117 +304,8 @@ let S = {
   packageId: null,
   testOverrides: {},
   testParams: {},
-  fileData: null,
-  isAdmin: false,
-  userEmail: null
+  fileData: null
 };
-
-// ===== LOGIN MODAL =====
-function showLoginModal(message) {
-  const modal = document.getElementById('login-modal');
-  const error = document.getElementById('login-error');
-  if (message) {
-    error.textContent = message;
-    error.classList.add('show');
-  } else {
-    error.classList.remove('show');
-  }
-  // Pre-fill admin email for convenience
-  document.getElementById('login-email').value = ADMIN_EMAIL;
-  modal.classList.add('show');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeLoginModal() {
-  document.getElementById('login-modal').classList.remove('show');
-  document.body.style.overflow = '';
-}
-
-async function handleLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-password').value;
-  const error = document.getElementById('login-error');
-  const btn = document.getElementById('btn-login');
-  
-  if (!email || !password) {
-    error.textContent = 'Please enter both email and password.';
-    error.classList.add('show');
-    return;
-  }
-  
-  btn.disabled = true;
-  btn.textContent = 'Signing in…';
-  error.classList.remove('show');
-  
-  try {
-    debugLog(`🔑 Attempting login for: ${email}`);
-    
-    const r = await fetch(`${API_BASE}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-    
-    const d = await r.json();
-    
-    if (!r.ok || d.error) {
-      error.textContent = d.error || 'Login failed. Please try again.';
-      error.classList.add('show');
-      btn.disabled = false;
-      btn.textContent = 'Sign In';
-      return;
-    }
-    
-    if (d.token) {
-      setAuthToken(d.token, email);
-      S.userEmail = email;
-      S.isAdmin = d.user?.is_admin || isAdmin(email);
-      
-      debugLog(`✅ Login successful. Admin: ${S.isAdmin}`);
-      closeLoginModal();
-      showToast(S.isAdmin ? '👑 Admin access granted — free analyses!' : '✅ Signed in successfully!');
-      
-      // Resume the thesis run
-      runThesis();
-    } else {
-      error.textContent = 'No token received. Please try again.';
-      error.classList.add('show');
-    }
-  } catch(e) {
-    error.textContent = 'Network error: ' + e.message;
-    error.classList.add('show');
-  }
-  
-  btn.disabled = false;
-  btn.textContent = 'Sign In';
-}
-
-// ===== CHECK AUTH ON LOAD =====
-function checkAuth() {
-  const token = getAuthToken();
-  const email = getStoredEmail();
-  
-  if (token && email) {
-    S.userEmail = email;
-    S.isAdmin = isAdmin(email);
-    debugLog(`🔑 Already signed in as: ${email} (Admin: ${S.isAdmin})`);
-    return true;
-  }
-  
-  // Auto-login for admin in dev mode (no password needed)
-  // This allows admin to bypass login
-  const devMode = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  if (devMode) {
-    S.userEmail = ADMIN_EMAIL;
-    S.isAdmin = true;
-    // Generate a fake token for dev
-    setAuthToken('dev_token_' + Date.now(), ADMIN_EMAIL);
-    debugLog(`🔧 DEV MODE: Auto-logged in as ${ADMIN_EMAIL}`);
-    return true;
-  }
-  
-  return false;
-}
 
 // ===== BUILD PARAMS =====
 function buildParamsForTest(testId) {
@@ -498,9 +327,69 @@ function buildParamsForTest(testId) {
     case 'logistic_regression': return { dependent: catCols[0] || allCols[0], predictors: numCols.slice(0, 3) };
     case 'pca': return { columns: numCols.slice(0, 8) };
     case 'factor_analysis': return { columns: numCols.slice(0, 8), n_factors: 3, rotation: 'varimax' };
+    // ===== FIX: ARIMA parameter detection =====
     case 'arima': {
-      const dateCols = S.columns.filter(c => c.name.toLowerCase().includes('date') || c.name.toLowerCase().includes('time'));
-      return { time_var: dateCols[0]?.name || allCols[0], value_var: numCols[0] || allCols[1], forecast_periods: 12 };
+      // Try to find a real date column
+      const dateCols = S.columns.filter(c => {
+        const name = c.name.toLowerCase();
+        return name.includes('date') || name.includes('time') || name.includes('year') || 
+               name.includes('month') || name.includes('day') || name.includes('timestamp');
+      });
+      
+      // Find numeric columns (excluding ID-like columns)
+      const valueCols = S.columns.filter(c => {
+        const name = c.name.toLowerCase();
+        return c.dtype === 'numeric' && 
+               !name.includes('id') && 
+               !name.includes('index') && 
+               !name.includes('student') &&
+               !name.includes('number');
+      });
+      
+      // If no date column, use the first column as time (fallback)
+      const timeVar = dateCols[0]?.name || allCols[0] || 'student_id';
+      
+      // Use first numeric column that's not an ID, or fallback
+      let valueVar = valueCols[0]?.name || numCols[0] || allCols[1] || allCols[0];
+      
+      // If time and value are the same, try to find different columns
+      if (timeVar === valueVar) {
+        const otherNumCols = S.columns.filter(c => c.dtype === 'numeric' && c.name !== timeVar);
+        if (otherNumCols.length > 0) {
+          valueVar = otherNumCols[0].name;
+        } else {
+          // If no other numeric columns, use a different column as time
+          const otherCols = S.columns.filter(c => c.name !== timeVar);
+          if (otherCols.length > 0) {
+            // Use the first non-id column as time, keep valueVar as is
+            const nonIdCols = otherCols.filter(c => !c.name.toLowerCase().includes('id'));
+            if (nonIdCols.length > 0) {
+              // We have a non-id column we could use, but we'll just keep timeVar as is
+            }
+          }
+        }
+      }
+      
+      // Final safety check - if they're still the same, use different columns
+      let finalTimeVar = timeVar;
+      let finalValueVar = valueVar;
+      
+      if (finalTimeVar === finalValueVar) {
+        const otherCols = S.columns.filter(c => c.name !== finalTimeVar);
+        if (otherCols.length > 0) {
+          // Use first other column as time
+          finalTimeVar = otherCols[0].name;
+        }
+      }
+      
+      const isDateColumn = dateCols.some(c => c.name === finalTimeVar);
+      debugLog(`📅 ARIMA: time_var="${finalTimeVar}", value_var="${finalValueVar}", isDate=${isDateColumn}`);
+      
+      return { 
+        time_var: finalTimeVar, 
+        value_var: finalValueVar, 
+        forecast_periods: 12 
+      };
     }
     case 'mann_whitney': return { numeric_var: numCols[0] || allCols[0], group_var: catCols[0] || allCols[1] };
     case 'kruskal_wallis': return { numeric_var: numCols[0] || allCols[0], group_var: catCols[0] || allCols[1] };
@@ -828,40 +717,9 @@ async function runThesis() {
   }
   debugLog(`📄 fileData length: ${S.fileData.length} characters`);
   
-  // ===== CHECK AUTH =====
+  // ===== FIX: Get auth token =====
   const token = getAuthToken();
-  const email = getStoredEmail();
-  const isAdminUser = isAdmin(email);
-  
-  debugLog(`🔑 Auth status: token=${token ? '✅ Yes' : '❌ No'}, email=${email}, admin=${isAdminUser}`);
-  
-  // If no token and not admin, show login modal
-  if (!token && !isAdminUser) {
-    debugLog('🔑 No auth token found - showing login modal');
-    showLoginModal('Please sign in to run analyses.');
-    return;
-  }
-  
-  // If we have token but no email stored, try to get it from token
-  if (token && !email) {
-    // Try to decode token to get email (simple approach)
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      if (payload.email) {
-        S.userEmail = payload.email;
-        localStorage.setItem('edux_user_email', payload.email);
-        debugLog(`📧 Extracted email from token: ${payload.email}`);
-      }
-    } catch(e) {
-      debugLog(`⚠️ Could not decode token: ${e.message}`);
-    }
-  }
-  
-  // If admin but no token (dev mode), generate a dev token
-  if (isAdminUser && !token) {
-    debugLog('👑 Admin detected - generating dev token');
-    setAuthToken('dev_token_' + Date.now(), email);
-  }
+  debugLog(`🔑 Auth token present: ${token ? '✅ Yes' : '❌ No'}`);
   
   document.getElementById('step-tests').style.display = 'none';
   document.getElementById('step-progress').style.display = 'block';
@@ -920,7 +778,7 @@ async function runThesis() {
       }
     }
     if (completed + failedCount === totalTests) {
-      // Generate package ID when all tests complete
+      // ===== FIX 2: Generate package ID when all tests complete =====
       S.packageId = 'pkg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
       debugLog(`📦 Package ID generated: ${S.packageId}`);
       document.getElementById('progress-label').textContent = failedCount > 0 ? 
@@ -955,10 +813,10 @@ async function runThesis() {
       const params = buildParamsForTest(testId);
       debugLog(`📤 Sending request for ${testId} with params: ${JSON.stringify(params)}`);
       
+      // ===== FIX: Build headers with auth token =====
       const headers = { 'Content-Type': 'application/json' };
-      const authToken = getAuthToken();
-      if (authToken) {
-        headers['Authorization'] = `Bearer ${authToken}`;
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
         debugLog(`🔑 Added Authorization header`);
       }
       
@@ -980,13 +838,15 @@ async function runThesis() {
       const d = await r.json();
       debugLog(`📄 Response data keys: ${Object.keys(d).join(', ')}`);
       
-      // If unauthorized, show login modal
+      // ===== FIX 1: Don't redirect on 401 - show error instead =====
       if (r.status === 401) {
-        debugLog(`🔑 401 Unauthorized - showing login modal`);
+        debugLog(`🔑 401 Unauthorized - Please sign in`);
+        showToast('🔑 Please sign in to run analyses');
+        // Show login prompt without redirecting
         document.getElementById('step-progress').style.display = 'none';
         document.getElementById('step-tests').style.display = 'block';
         document.getElementById('btn-run-thesis').disabled = false;
-        showLoginModal('Please sign in to run analyses.');
+        showError('test-error', 'test-error-text', 'Please sign in to run analyses. <a href="/stats" style="color:var(--bl);font-weight:600">Sign in here</a>');
         return;
       }
       
@@ -1164,7 +1024,7 @@ function goBack() {
 }
 
 function resetAll() {
-  S = { metaPath: null, filename: null, selectedTests: [], results: null, columns: [], soundness: {}, packageId: null, testOverrides: {}, testParams: {}, fileData: null, isAdmin: false, userEmail: null };
+  S = { metaPath: null, filename: null, selectedTests: [], results: null, columns: [], soundness: {}, packageId: null, testOverrides: {}, testParams: {}, fileData: null };
   document.getElementById('step-results').style.display = 'none';
   document.getElementById('step-progress').style.display = 'none';
   document.getElementById('step-tests').style.display = 'none';
@@ -1192,23 +1052,10 @@ function animateProgress(barId, pctId, dur) {
 
 // ===== INIT =====
 debugLog('🚀 Thesis Package loaded');
-
-// Check authentication on load
-const isAuthed = checkAuth();
-debugLog(`🔐 Initial auth status: ${isAuthed ? 'Authenticated' : 'Not authenticated'}`);
-
 if (window.location.search.includes('package=thesis')) {
   document.getElementById('step-upload').style.display = 'block';
   debugLog('📌 Thesis Package mode detected');
 }
-
-// Handle Enter key on login
-document.getElementById('login-password').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') handleLogin();
-});
-document.getElementById('login-email').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') document.getElementById('login-password').focus();
-});
 </script>
 </body>
 </html>
