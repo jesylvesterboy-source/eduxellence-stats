@@ -12,8 +12,6 @@
 html{scroll-behavior:smooth}
 body{font-family:'DM Sans',sans-serif;background:var(--of);color:var(--tx);line-height:1.6;padding-top:60px}
 a{color:var(--bl);text-decoration:none}
-
-/* NAV */
 .nav{background:var(--ny);height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;position:fixed;top:0;left:0;right:0;z-index:100}
 .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:#fff;text-decoration:none}
 .logo span{color:var(--tl)}
@@ -21,18 +19,12 @@ a{color:var(--bl);text-decoration:none}
 .nav-links a{color:rgba(255,255,255,.65);font-size:.875rem;font-weight:500;transition:color .15s}
 .nav-links a:hover{color:#fff;text-decoration:none}
 .nav-cta{background:var(--tl)!important;color:var(--ny)!important;padding:5px 14px;border-radius:20px;font-weight:600!important}
-
-/* HERO */
 .hero{background:linear-gradient(135deg,var(--ny) 0%,var(--ny2) 100%);padding:2rem 1.5rem 3rem;text-align:center;position:relative;overflow:hidden}
 .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% -20%,rgba(15,201,160,.2) 0%,transparent 60%);pointer-events:none}
 .hero h1{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:800;color:#fff;margin-bottom:.3rem;letter-spacing:-1px}
 .hero p{color:rgba(255,255,255,.6);max-width:520px;margin:0 auto;font-size:.95rem}
-
-/* MAIN */
 .main{max-width:960px;margin:-2rem auto 3rem;padding:0 1.25rem}
 .card{background:var(--wh);border-radius:var(--r24);box-shadow:var(--shL);padding:1.75rem;margin-bottom:1.25rem}
-
-/* DROPZONE */
 .dz{border:2px dashed var(--bd);border-radius:var(--r16);padding:2rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--of)}
 .dz:hover,.dz.drag{border-color:var(--bl);background:rgba(30,107,255,.04)}
 .dz-ico{width:56px;height:56px;background:linear-gradient(135deg,rgba(30,107,255,.12),rgba(15,201,160,.12));border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto .75rem;font-size:1.75rem}
@@ -41,20 +33,13 @@ a{color:var(--bl);text-decoration:none}
 .dz-tags{display:flex;gap:.4rem;justify-content:center;flex-wrap:wrap}
 .dz-tags span{background:var(--of);border:1px solid var(--bd);color:var(--txM);font-size:.7rem;font-weight:600;padding:2px 9px;border-radius:5px}
 #fi{display:none}
-
-/* UPLOAD BUTTON ROW */
 .upload-row{display:flex;gap:.75rem;align-items:center;justify-content:center;margin-top:.75rem;flex-wrap:wrap}
 .btn-browse{background:var(--bl);color:#fff;padding:.6rem 1.5rem;border-radius:var(--r8);font-weight:600;border:none;cursor:pointer;font-size:.9rem;transition:all .2s;font-family:'DM Sans',sans-serif}
 .btn-browse:hover{background:#1452CC;transform:translateY(-1px)}
-.btn-browse:disabled{opacity:.5;cursor:not-allowed;transform:none}
-
-/* FILE INFO */
 .file-info{display:flex;align-items:center;gap:.75rem;background:rgba(22,163,74,.06);border:1.5px solid rgba(22,163,74,.25);border-radius:var(--r8);padding:.75rem 1rem;margin-top:.75rem}
 .file-info .fn{font-weight:600;font-size:.85rem}
 .file-info .fm{font-size:.75rem;color:var(--sl)}
 .file-info .close{background:none;border:none;cursor:pointer;color:var(--sl);font-size:1rem;margin-left:auto}
-
-/* TEST SELECTOR */
 .test-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:.6rem;margin:.75rem 0}
 .test-option{display:flex;align-items:center;gap:.4rem;padding:.5rem .7rem;border:1.5px solid var(--bd);border-radius:var(--r8);cursor:pointer;transition:all .15s;background:var(--wh);position:relative}
 .test-option:hover{border-color:var(--bl);background:rgba(30,107,255,.04)}
@@ -69,8 +54,6 @@ a{color:var(--bl);text-decoration:none}
 .select-all-row{display:flex;gap:1rem;align-items:center;padding:.3rem 0;border-bottom:1px solid var(--bd);margin-bottom:.5rem;flex-wrap:wrap}
 .select-all-row label{display:flex;align-items:center;gap:.5rem;font-weight:600;cursor:pointer;font-size:.8rem}
 .select-all-row #total-credits-display{font-size:.68rem;color:var(--sl);margin-left:auto}
-
-/* ASSUMPTION CARDS */
 .asum-grid{display:flex;flex-direction:column;gap:.4rem;margin-top:.75rem}
 .asum{display:flex;gap:.6rem;align-items:flex-start;padding:.6rem .8rem;border-radius:var(--r8);border:1px solid var(--bd);background:var(--wh)}
 .asum.pass{border-color:rgba(22,163,74,.3);background:rgba(22,163,74,.04)}
@@ -78,8 +61,6 @@ a{color:var(--bl);text-decoration:none}
 .asum-ico{font-size:.95rem;flex-shrink:0;margin-top:1px}
 .asum-name{font-weight:600;font-size:.78rem;color:var(--tx)}
 .asum-note{font-size:.72rem;color:var(--txM);margin-top:1px;line-height:1.4}
-
-/* ASSUMPTION MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999;padding:1rem}
 .modal-overlay.show{display:flex}
 .modal{background:var(--wh);border-radius:var(--r24);max-width:600px;width:100%;max-height:80vh;overflow-y:auto;padding:1.5rem;box-shadow:var(--shL);position:relative}
@@ -96,21 +77,16 @@ a{color:var(--bl);text-decoration:none}
 .modal .modal-score{font-size:.82rem;margin:.4rem 0;padding:.4rem;background:var(--of);border-radius:var(--r8);text-align:center}
 .modal .modal-btn-row{display:flex;gap:.5rem;margin-top:.75rem;flex-wrap:wrap}
 .modal .modal-btn-row .btn{flex:1;min-width:80px;padding:.4rem .8rem;font-size:.72rem}
-
-/* PROGRESS */
 .progress-section{display:none}
 .progress-section.show{display:block}
 .progress-bar-wrap{height:6px;background:var(--bd);border-radius:3px;overflow:hidden;margin:.5rem 0}
 .progress-bar{height:100%;background:linear-gradient(90deg,var(--tl),var(--bl));border-radius:3px;width:0;transition:width .4s ease}
 .progress-stats{display:flex;justify-content:space-between;font-size:.7rem;color:var(--sl);margin-top:.1rem}
 .progress-status{font-size:.75rem;color:var(--txM);margin:.4rem 0}
-
-/* RESULTS */
 .result-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:.5rem;margin:.5rem 0}
 .result-stat{background:var(--of);border-radius:var(--r12);padding:.5rem;text-align:center}
 .result-stat .num{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--tx)}
 .result-stat .lbl{font-size:.55rem;color:var(--sl);text-transform:uppercase;letter-spacing:.04em}
-
 .result-item{border:1px solid var(--bd);border-radius:var(--r12);padding:.75rem;margin-bottom:.4rem;background:var(--wh)}
 .result-item .ri-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.25rem;flex-wrap:wrap;gap:.2rem}
 .result-item .ri-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;color:var(--tx)}
@@ -121,8 +97,6 @@ a{color:var(--bl);text-decoration:none}
 .ri-status.skipped{background:rgba(100,116,139,.1);color:var(--sl)}
 .result-item .ri-preview{font-size:.7rem;color:var(--sl);line-height:1.4}
 .result-item .ri-apa{background:#F8F7FF;border:1.5px solid #C4B5FD;border-radius:var(--r8);padding:.4rem .6rem;margin:.25rem 0;font-size:.65rem;font-family:'JetBrains Mono',monospace;color:#1E1B4B;word-break:break-word}
-
-/* BUTTONS */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:'Syne',sans-serif;font-weight:700;border:none;border-radius:var(--r8);cursor:pointer;transition:all .2s;padding:.6rem 1.2rem;font-size:.78rem}
 .btn-primary{background:linear-gradient(135deg,var(--bl),#1452CC);color:#fff;box-shadow:0 4px 14px rgba(30,107,255,.3);width:100%}
 .btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 20px rgba(30,107,255,.4)}
@@ -137,8 +111,6 @@ a{color:var(--bl);text-decoration:none}
 .btn-sm{padding:.3rem .7rem;font-size:.65rem}
 .btn-code{background:linear-gradient(135deg,#8B5CF6,#6D28D9);color:#fff;padding:.3rem .7rem;font-size:.65rem;border:none;border-radius:var(--r8);cursor:pointer;transition:all .2s;font-family:'Syne',sans-serif;font-weight:700}
 .btn-code:hover{opacity:.9;transform:translateY(-1px)}
-
-/* ALERTS */
 .alert{border-radius:var(--r8);padding:.6rem .8rem;display:none;align-items:flex-start;gap:.5rem;margin-top:.5rem}
 .alert.show{display:flex}
 .alert-error{background:rgba(220,38,38,.06);border:1.5px solid rgba(220,38,38,.25);color:var(--er)}
@@ -147,19 +119,15 @@ a{color:var(--bl);text-decoration:none}
 .alert-warning{background:rgba(217,119,6,.07);border:1.5px solid rgba(217,119,6,.25);color:var(--wn)}
 .alert-ico{font-size:.85rem;flex-shrink:0;margin-top:1px}
 .alert .al-body p{font-size:.78rem}
-
-/* FOOTER */
 footer{background:var(--ny);color:rgba(255,255,255,.45);text-align:center;padding:1.25rem;font-size:.72rem;margin-top:1rem}
 footer a{color:var(--tl)}
 footer strong{color:rgba(255,255,255,.75)}
-
-/* TOAST */
 .toast-notification{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--ny);color:#fff;padding:.6rem 1.2rem;border-radius:var(--r12);box-shadow:var(--shL);font-size:.78rem;z-index:1000;max-width:90%;border-left:4px solid var(--wn);animation:slideUp .3s ease}
 @keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-
 .card-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;margin-bottom:.15rem}
 .card-sub{color:var(--sl);font-size:.78rem;margin-bottom:.6rem}
-
+.debug-log{background:#1E1E1E;color:#D4D4D4;font-family:'JetBrains Mono',monospace;font-size:.7rem;padding:.5rem .75rem;border-radius:var(--r8);max-height:200px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;margin-top:.5rem;display:none}
+.debug-log.show{display:block}
 @media(max-width:640px){.test-grid{grid-template-columns:1fr}.nav-links{display:none}.main{padding:0 .75rem}.card{padding:1rem}}
 </style>
 </head>
@@ -182,7 +150,6 @@ footer strong{color:rgba(255,255,255,.75)}
 
 <div class="main" id="main-content">
 
-  <!-- STEP 1: UPLOAD -->
   <div class="card" id="step-upload">
     <div class="card-title">📂 Step 1: Upload Your Dataset</div>
     <p class="card-sub">CSV or Excel. We'll detect column types automatically.</p>
@@ -208,7 +175,6 @@ footer strong{color:rgba(255,255,255,.75)}
     </div>
   </div>
 
-  <!-- STEP 2: SELECT TESTS -->
   <div class="card" id="step-tests" style="display:none">
     <div class="card-title">🎯 Step 2: Select Your Analyses</div>
     <p style="color:var(--sl);font-size:.72rem;margin-bottom:.3rem">
@@ -229,16 +195,17 @@ footer strong{color:rgba(255,255,255,.75)}
     </div>
   </div>
 
-  <!-- STEP 3: PROGRESS -->
   <div class="card" id="step-progress" style="display:none">
     <div class="card-title">⚡ Running Your Analysis</div>
     <p style="color:var(--sl);font-size:.72rem;margin-bottom:.4rem" id="progress-status">Preparing…</p>
     <div class="progress-bar-wrap"><div class="progress-bar" id="run-bar" style="width:0%"></div></div>
     <div class="progress-stats"><span id="progress-label">Initialising…</span><span id="progress-pct">0%</span></div>
     <div id="progress-results" style="margin-top:.5rem"></div>
+    <!-- Debug log -->
+    <div class="debug-log" id="debug-log"></div>
+    <button class="btn btn-secondary btn-sm" onclick="toggleDebug()" style="margin-top:.5rem;font-size:.65rem">🐛 Toggle Debug</button>
   </div>
 
-  <!-- STEP 4: RESULTS -->
   <div class="card" id="step-results" style="display:none">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.3rem;margin-bottom:.5rem">
       <div>
@@ -262,7 +229,6 @@ footer strong{color:rgba(255,255,255,.75)}
 
 </div>
 
-<!-- ASSUMPTION MODAL -->
 <div class="modal-overlay" id="assumption-modal">
   <div class="modal">
     <button class="modal-close" onclick="closeAssumptionModal()">✕</button>
@@ -284,6 +250,26 @@ footer strong{color:rgba(255,255,255,.75)}
 <script>
 // ===== API BASE =====
 const API_BASE = 'https://Eduxellence-eduxellence-api.hf.space';
+
+// ===== DEBUG LOG =====
+let debugLines = [];
+
+function debugLog(msg) {
+  const timestamp = new Date().toLocaleTimeString();
+  const line = `[${timestamp}] ${msg}`;
+  debugLines.push(line);
+  const el = document.getElementById('debug-log');
+  if (el) {
+    el.textContent = debugLines.join('\n');
+    el.scrollTop = el.scrollHeight;
+  }
+  console.log(line);
+}
+
+function toggleDebug() {
+  const el = document.getElementById('debug-log');
+  el.classList.toggle('show');
+}
 
 // ===== TEST DEFINITIONS =====
 const ALL_TESTS = [
@@ -312,10 +298,10 @@ let S = {
   packageId: null,
   testOverrides: {},
   testParams: {},
-  fileData: null  // <-- FIX: Store file data like stats.html does
+  fileData: null
 };
 
-// ===== BUILD PARAMS FOR EACH TEST =====
+// ===== BUILD PARAMS =====
 function buildParamsForTest(testId) {
   const numCols = S.columns.filter(c => c.dtype === 'numeric').map(c => c.name);
   const catCols = S.columns.filter(c => c.dtype === 'categorical').map(c => c.name);
@@ -345,7 +331,7 @@ function buildParamsForTest(testId) {
   }
 }
 
-// ===== RENDER TESTS WITH SOUNDNESS =====
+// ===== RENDER TESTS =====
 function renderTests() {
   const grid = document.getElementById('test-grid');
   
@@ -404,7 +390,7 @@ function toggleAllTests() {
   updateTotal();
 }
 
-// ===== FETCH ASSUMPTIONS FOR A SPECIFIC TEST =====
+// ===== FETCH ASSUMPTIONS =====
 async function fetchAssumptionsForTest(testId) {
   if (!S.metaPath) return null;
   
@@ -442,7 +428,7 @@ async function fetchAssumptionsForTest(testId) {
   }
 }
 
-// ===== CHECK ALL SOUNDNESS AFTER UPLOAD =====
+// ===== CHECK ALL SOUNDNESS =====
 async function checkAllSoundness() {
   if (!S.metaPath) return;
   
@@ -479,7 +465,7 @@ async function checkAllSoundness() {
   toggleAllTests();
 }
 
-// ===== OPEN ASSUMPTION MODAL =====
+// ===== ASSUMPTION MODAL =====
 function openAssumptionModal(testId) {
   const modal = document.getElementById('assumption-modal');
   const title = document.getElementById('modal-title');
@@ -559,7 +545,6 @@ function runTestAnyway() {
   }
 }
 
-// ===== TOAST =====
 function showToast(message) {
   const existing = document.querySelector('.toast-notification');
   if (existing) existing.remove();
@@ -586,7 +571,6 @@ dz.addEventListener('drop', e => {
 });
 fi.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
 
-// ===== Helper: Convert file to base64 =====
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -604,8 +588,8 @@ async function handleFile(file) {
   }
   hideError('upload-error');
   
-  // ===== FIX: Store file data like stats.html does =====
   S.fileData = await fileToBase64(file);
+  debugLog(`📁 File loaded: ${file.name} (${file.size} bytes, base64 length: ${S.fileData?.length || 0})`);
   
   const fd = new FormData(); fd.append('file', file);
   document.getElementById('upload-progress').style.display = 'block';
@@ -618,6 +602,9 @@ async function handleFile(file) {
     S.metaPath = d.meta_path; S.filename = d.filename;
     S.columns = d.columns || [];
     
+    debugLog(`✅ Upload successful: ${d.rows} rows, ${d.cols} columns`);
+    debugLog(`📊 metaPath: ${S.metaPath}`);
+    
     document.getElementById('fn').textContent = file.name;
     document.getElementById('fm').textContent = `${d.rows} rows · ${d.cols} columns · ${(file.size/1024).toFixed(1)} KB`;
     document.getElementById('file-info').style.display = 'flex';
@@ -629,6 +616,7 @@ async function handleFile(file) {
   } catch(e) {
     document.getElementById('upload-progress').style.display = 'none';
     showError('upload-error', 'upload-error-text', 'Network error: ' + e.message);
+    debugLog(`❌ Upload error: ${e.message}`);
   }
 }
 
@@ -640,16 +628,28 @@ function resetUpload() {
   document.getElementById('step-upload').style.display = 'block';
   hideError('upload-error');
   document.getElementById('soundness-summary').style.display = 'none';
+  debugLines = [];
+  document.getElementById('debug-log').textContent = '';
 }
 
-// ===== RUN THESIS - FIXED =====
+// ===== RUN THESIS - WITH DEBUGGING =====
 async function runThesis() {
   const selected = S.selectedTests;
+  debugLog(`🚀 Starting Thesis Package with ${selected.length} tests: ${selected.join(', ')}`);
+  
   if (!selected.length) {
     document.getElementById('test-error').classList.add('show');
     document.getElementById('test-error-text').textContent = 'Please select at least one test to run.';
     return;
   }
+  
+  // Check if we have file data
+  if (!S.fileData) {
+    debugLog('❌ ERROR: No fileData available!');
+    showToast('❌ Error: File data not loaded. Please re-upload.');
+    return;
+  }
+  debugLog(`📄 fileData length: ${S.fileData.length} characters`);
   
   document.getElementById('step-tests').style.display = 'none';
   document.getElementById('step-progress').style.display = 'block';
@@ -680,8 +680,10 @@ async function runThesis() {
   const completeTest = (testId, result, error) => {
     if (error) {
       failedCount++;
+      debugLog(`❌ Test ${testId} failed: ${error}`);
     } else {
       completed++;
+      debugLog(`✅ Test ${testId} completed successfully`);
     }
     const pct = Math.round(((completed + failedCount) / totalTests) * 100);
     document.getElementById('run-bar').style.width = pct + '%';
@@ -709,6 +711,7 @@ async function runThesis() {
       document.getElementById('progress-label').textContent = failedCount > 0 ? 
         `✅ ${completed} tests complete, ${failedCount} failed` : 
         '✅ All analyses complete!';
+      debugLog(`🏁 Finished: ${completed} completed, ${failedCount} failed`);
       setTimeout(() => showResults(), 500);
     }
   };
@@ -735,39 +738,47 @@ async function runThesis() {
     
     try {
       const params = buildParamsForTest(testId);
+      debugLog(`📤 Sending request for ${testId} with params: ${JSON.stringify(params)}`);
       
-      // ===== FIX: Include file_data (like stats.html does) =====
+      const requestBody = { 
+        meta_path: S.metaPath, 
+        analysis_type: testId, 
+        params: params,
+        file_data: S.fileData
+      };
+      debugLog(`📦 Request body keys: ${Object.keys(requestBody).join(', ')}`);
+      
       const r = await fetch(`${API_BASE}/api/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          meta_path: S.metaPath, 
-          analysis_type: testId, 
-          params: params,
-          file_data: S.fileData  // <-- FIX: Send actual file data, not null!
-        })
+        body: JSON.stringify(requestBody)
       });
+      
+      debugLog(`📥 Response status for ${testId}: ${r.status} ${r.statusText}`);
+      
       const d = await r.json();
+      debugLog(`📄 Response data keys: ${Object.keys(d).join(', ')}`);
       
       if (!r.ok || d.error) {
-        console.error(`Test ${testId} failed:`, d.error || 'Unknown error');
+        debugLog(`❌ Test ${testId} returned error: ${d.error || 'Unknown error'}`);
         updateProgress(testId, 'Error', d.error || 'Failed');
         completeTest(testId, null, d.error || 'Analysis failed');
         continue;
       }
       
       if (d.error) {
-        console.error(`Test ${testId} returned error:`, d.error);
+        debugLog(`❌ Test ${testId} returned error in data: ${d.error}`);
         completeTest(testId, null, d.error);
         continue;
       }
       
+      debugLog(`✅ Test ${testId} completed with result keys: ${Object.keys(d).join(', ')}`);
       completeTest(testId, d, null);
       S.results = S.results || {};
       S.results[testId] = d;
       
     } catch(e) {
-      console.error(`Test ${testId} exception:`, e.message);
+      debugLog(`💥 Test ${testId} exception: ${e.message}`);
       updateProgress(testId, 'Error', e.message);
       completeTest(testId, null, e.message);
     }
@@ -783,6 +794,8 @@ function showResults() {
   const results = S.results || {};
   const keys = Object.keys(results);
   const total = keys.length;
+  
+  debugLog(`📊 Showing results for ${total} tests`);
 
   document.getElementById('result-summary').innerHTML = `
     <div class="result-stat"><div class="num" style="font-size:1.1rem">${total}</div><div class="lbl" style="font-size:.55rem">Tests Run</div></div>
@@ -823,9 +836,10 @@ function showResults() {
   document.getElementById('results-meta').textContent = `Thesis Package · ${total} tests · ${new Date().toLocaleString()}`;
 }
 
-// ===== DOWNLOAD CODE FOR A SINGLE TEST =====
+// ===== CODE DOWNLOAD =====
 async function downloadCode(testId) {
   const params = buildParamsForTest(testId);
+  debugLog(`📥 Downloading code for ${testId}`);
   
   try {
     const r = await fetch(`${API_BASE}/api/code-snippet`, {
@@ -840,6 +854,7 @@ async function downloadCode(testId) {
     
     if (!r.ok) {
       const d = await r.json().catch(() => ({}));
+      debugLog(`❌ Code download failed: ${d.error || 'Unknown error'}`);
       alert(d.error || 'Could not generate code for this test.');
       return;
     }
@@ -853,13 +868,14 @@ async function downloadCode(testId) {
     a.click();
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 5000);
+    debugLog(`✅ Code downloaded for ${testId}`);
     
   } catch(e) {
+    debugLog(`💥 Code download error: ${e.message}`);
     alert('Error downloading code: ' + e.message);
   }
 }
 
-// ===== DOWNLOAD ALL CODE =====
 async function downloadAllCode() {
   const results = S.results || {};
   const keys = Object.keys(results);
@@ -869,12 +885,8 @@ async function downloadAllCode() {
     return;
   }
   
-  // Generate code for the first test (or combine)
-  // For simplicity, download code for the first test
   const firstTest = keys[0];
   await downloadCode(firstTest);
-  
-  // Show a message that more codes are available per test
   showToast('💡 Code for each test is available via the "🐍 Code" button next to each result.');
 }
 
@@ -884,12 +896,15 @@ async function exportThesis(format) {
     S.packageId = 'pkg_' + Date.now();
   }
   
+  debugLog(`📤 Exporting as ${format}`);
+  
   try {
     const r = await fetch(`${API_BASE}/api/package/export/${S.packageId}?format=${format}`, {
       method: 'GET'
     });
     
     if (!r.ok) {
+      debugLog(`❌ Export failed: ${r.status} ${r.statusText}`);
       alert('Export failed. Please try again.');
       return;
     }
@@ -903,8 +918,10 @@ async function exportThesis(format) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    debugLog(`✅ Export successful`);
     
   } catch(e) {
+    debugLog(`💥 Export error: ${e.message}`);
     alert('Export error: ' + e.message);
   }
 }
@@ -943,8 +960,10 @@ function animateProgress(barId, pctId, dur) {
 }
 
 // ===== INIT =====
+debugLog('🚀 Thesis Package loaded');
 if (window.location.search.includes('package=thesis')) {
   document.getElementById('step-upload').style.display = 'block';
+  debugLog('📌 Thesis Package mode detected');
 }
 </script>
 </body>
