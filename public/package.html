@@ -1,371 +1,747 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Thesis / Research Package — Eduxellence Analytics</title>
-<meta name="description" content="One package, 7 statistical tests, one APA-formatted report. Built for thesis and research projects.">
+<title>Thesis Package — Eduxellence Analytics</title>
+<meta name="description" content="Run all statistical tests on your dataset in one batch. Upload once, select all tests, get a complete research report.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--ny:#0B1829;--ny2:#112240;--bl:#1E6BFF;--tl:#0FC9A0;--wh:#fff;--of:#F7F9FC;
-  --sl:#64748B;--slL:#CBD5E1;--bd:#E2E8F0;--ok:#16A34A;--er:#DC2626;--wn:#D97706;--tx:#0F172A;--txM:#475569;
-  --r8:8px;--r12:12px;--r16:16px;--r24:24px;--shS:0 1px 3px rgba(0,0,0,.08);--shM:0 4px 16px rgba(0,0,0,.1);--shL:0 12px 40px rgba(0,0,0,.14);}
+:root{--ny:#0B1829;--ny2:#112240;--bl:#1E6BFF;--tl:#0FC9A0;--wh:#fff;--of:#F7F9FC;--sl:#64748B;--bd:#E2E8F0;--ok:#16A34A;--er:#DC2626;--wn:#D97706;--tx:#0F172A;--txM:#475569;--shS:0 1px 3px rgba(0,0,0,.08);--shM:0 4px 16px rgba(0,0,0,.1);--shL:0 12px 40px rgba(0,0,0,.14);--r8:8px;--r12:12px;--r16:16px;--r24:24px}
+html{scroll-behavior:smooth}
 body{font-family:'DM Sans',sans-serif;background:var(--of);color:var(--tx);line-height:1.6}
 a{color:var(--bl);text-decoration:none}
-.nav{background:var(--ny);height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;position:sticky;top:0;z-index:100}
-.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;color:#fff;text-decoration:none}
-.nav-logo span{color:var(--tl)}
-.nav-links{display:flex;gap:1.25rem;align-items:center}
-.nav-links a{color:rgba(255,255,255,.65);font-size:.85rem;font-weight:500}
-.nav-cta{background:var(--tl)!important;color:var(--ny)!important;padding:6px 16px;border-radius:20px;font-weight:700!important;font-family:'Syne',sans-serif}
-.hero{background:linear-gradient(135deg,var(--ny),var(--ny2));padding:3.5rem 1.5rem 5rem;text-align:center;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(15,201,160,.18) 0%,transparent 70%);top:-180px;left:50%;transform:translateX(-50%);pointer-events:none}
-.hero h1{font-family:'Syne',sans-serif;font-size:clamp(1.7rem,4vw,2.5rem);font-weight:800;color:#fff;margin-bottom:.6rem;letter-spacing:-1px}
-.hero p{color:rgba(255,255,255,.6);max-width:540px;margin:0 auto}
-.price-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(15,201,160,.15);border:1px solid rgba(15,201,160,.35);color:var(--tl);font-family:'Syne',sans-serif;font-weight:700;padding:8px 20px;border-radius:30px;margin-top:1.25rem;font-size:.95rem}
-.main{max-width:920px;margin:-3rem auto 4rem;padding:0 1.25rem}
-.wizard{background:var(--wh);border-radius:var(--r24);box-shadow:var(--shL);overflow:hidden}
-.sb{display:flex;border-bottom:1px solid var(--bd);background:var(--of);padding:.75rem 1.5rem;gap:0;overflow-x:auto}
-.si{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
-.sc{width:28px;height:28px;border-radius:50%;border:2px solid var(--slL);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:var(--sl)}
-.sc.active{border-color:var(--bl);background:var(--bl);color:#fff}
-.sc.done{border-color:var(--ok);background:var(--ok);color:#fff}
-.sl-label{font-size:.8rem;font-weight:500;color:var(--sl);white-space:nowrap}
-.sl-label.active{color:var(--bl);font-weight:600}
-.ss{width:24px;height:2px;background:var(--bd);margin:0 .5rem}
-.panel{display:none;padding:2rem}
-.panel.active{display:block}
-.dz{border:2px dashed var(--slL);border-radius:var(--r16);padding:2.5rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--of)}
+
+/* NAV */
+.nav{background:var(--ny);height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;position:sticky;top:0;z-index:100}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:#fff;text-decoration:none}
+.logo span{color:var(--tl)}
+.nav-links{display:flex;gap:1.5rem;align-items:center}
+.nav-links a{color:rgba(255,255,255,.65);font-size:.875rem;font-weight:500;transition:color .15s}
+.nav-links a:hover{color:#fff;text-decoration:none}
+.nav-cta{background:var(--tl)!important;color:var(--ny)!important;padding:6px 16px;border-radius:20px;font-weight:600!important}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--ny) 0%,var(--ny2) 100%);padding:3rem 1.5rem 4rem;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% -20%,rgba(15,201,160,.2) 0%,transparent 60%);pointer-events:none}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,4vw,2.75rem);font-weight:800;color:#fff;margin-bottom:.5rem;letter-spacing:-1px}
+.hero p{color:rgba(255,255,255,.6);max-width:520px;margin:0 auto}
+
+/* MAIN */
+.main{max-width:960px;margin:-3rem auto 4rem;padding:0 1.25rem}
+.card{background:var(--wh);border-radius:var(--r24);box-shadow:var(--shL);padding:2rem;margin-bottom:1.5rem}
+
+/* DROPZONE */
+.dz{border:2px dashed var(--bd);border-radius:var(--r16);padding:2.5rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--of)}
 .dz:hover,.dz.drag{border-color:var(--bl);background:rgba(30,107,255,.04)}
-.dz-ico{font-size:1.75rem;margin-bottom:.75rem}
-.dz-t{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:.3rem}
-.dz-s{font-size:.85rem;color:var(--sl)}
+.dz-ico{width:56px;height:56px;background:linear-gradient(135deg,rgba(30,107,255,.12),rgba(15,201,160,.12));border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.75rem}
+.dz-t{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:700;color:var(--tx);margin-bottom:.4rem}
+.dz-s{font-size:.875rem;color:var(--sl);margin-bottom:1rem}
+.dz-tags{display:flex;gap:.4rem;justify-content:center;flex-wrap:wrap}
+.dz-tags span{background:var(--of);border:1px solid var(--bd);color:var(--txM);font-size:.75rem;font-weight:600;padding:2px 9px;border-radius:5px}
 #fi{display:none}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:'Syne',sans-serif;font-weight:700;border:none;border-radius:var(--r8);cursor:pointer;transition:all .2s}
-.btn-p{background:linear-gradient(135deg,var(--bl),#1452CC);color:#fff;padding:.85rem 2rem;font-size:.95rem;width:100%}
-.btn-p:disabled{background:var(--slL);cursor:not-allowed}
-.btn-s{background:transparent;border:1.5px solid var(--bd);color:var(--sl);padding:.7rem 1.5rem;font-size:.875rem;font-family:'DM Sans',sans-serif;font-weight:500}
-.btn-row{display:flex;gap:.75rem;margin-top:1.5rem}
-.test-card{border:1.5px solid var(--bd);border-radius:var(--r12);padding:1.1rem 1.25rem;margin-bottom:.75rem}
-.test-card.ready{border-color:rgba(22,163,74,.4);background:rgba(22,163,74,.03)}
-.test-card.broken{border-color:rgba(220,38,38,.4);background:rgba(220,38,38,.04)}
-.tc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
-.tc-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.92rem;color:var(--tx)}
-.tc-status{font-size:.7rem;font-weight:700;padding:2px 10px;border-radius:20px}
-.tc-status.ready{background:rgba(22,163,74,.12);color:var(--ok)}
-.tc-status.broken{background:rgba(220,38,38,.12);color:var(--er)}
-.tc-reason{font-size:.82rem;color:var(--txM);margin-bottom:.6rem}
-.tc-fix{display:none;gap:.5rem;flex-wrap:wrap;margin-top:.5rem}
-.tc-fix.show{display:flex}
-.tc-fix select{padding:.4rem .7rem;border:1px solid var(--bd);border-radius:6px;font-size:.82rem;font-family:'DM Sans',sans-serif}
-.tc-fix-btn{font-size:.78rem;color:var(--bl);background:none;border:none;cursor:pointer;font-weight:600;text-decoration:underline}
-.alert{border-radius:var(--r8);padding:.9rem 1.1rem;display:none;gap:.75rem;margin-top:1rem}
+
+/* FILE INFO */
+.file-info{display:flex;align-items:center;gap:.75rem;background:rgba(22,163,74,.06);border:1.5px solid rgba(22,163,74,.25);border-radius:var(--r8);padding:.9rem 1.1rem;margin-top:1rem}
+.file-info .fn{font-weight:600;font-size:.9rem}
+.file-info .fm{font-size:.78rem;color:var(--sl)}
+.file-info .close{background:none;border:none;cursor:pointer;color:var(--sl);font-size:1.1rem;margin-left:auto}
+
+/* TEST SELECTOR */
+.test-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.75rem;margin:1rem 0}
+.test-option{display:flex;align-items:center;gap:.6rem;padding:.7rem .9rem;border:1.5px solid var(--bd);border-radius:var(--r8);cursor:pointer;transition:all .15s;background:var(--wh)}
+.test-option:hover{border-color:var(--bl);background:rgba(30,107,255,.04)}
+.test-option.checked{border-color:var(--bl);background:rgba(30,107,255,.06)}
+.test-option input[type="checkbox"]{width:16px;height:16px;accent-color:var(--bl);cursor:pointer;flex-shrink:0}
+.test-option .to-name{font-size:.82rem;font-weight:600;color:var(--tx);flex:1}
+.test-option .to-cost{font-size:.72rem;color:var(--sl);font-weight:500;white-space:nowrap}
+.test-option .to-soundness{font-size:.65rem;padding:1px 6px;border-radius:8px;margin-left:4px}
+.to-soundness.pass{background:rgba(22,163,74,.12);color:var(--ok)}
+.to-soundness.fail{background:rgba(220,38,38,.1);color:var(--er)}
+.to-soundness.unknown{background:var(--of);color:var(--sl)}
+.select-all-row{display:flex;gap:1rem;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--bd);margin-bottom:.75rem}
+.select-all-row label{display:flex;align-items:center;gap:.5rem;font-weight:600;cursor:pointer}
+
+/* PROGRESS */
+.progress-section{display:none}
+.progress-section.show{display:block}
+.progress-bar-wrap{height:8px;background:var(--bd);border-radius:4px;overflow:hidden;margin:1rem 0}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--tl),var(--bl));border-radius:4px;width:0;transition:width .4s ease}
+.progress-stats{display:flex;justify-content:space-between;font-size:.82rem;color:var(--sl);margin-top:.25rem}
+.progress-status{font-size:.85rem;color:var(--txM);margin:.75rem 0}
+
+/* RESULTS */
+.result-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin:1rem 0}
+.result-stat{background:var(--of);border-radius:var(--r12);padding:1rem;text-align:center}
+.result-stat .num{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--tx)}
+.result-stat .lbl{font-size:.72rem;color:var(--sl);text-transform:uppercase;letter-spacing:.04em}
+
+.result-item{border:1px solid var(--bd);border-radius:var(--r12);padding:1.25rem;margin-bottom:.75rem;background:var(--wh)}
+.result-item .ri-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
+.result-item .ri-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;color:var(--tx)}
+.result-item .ri-status{font-size:.72rem;font-weight:600;padding:2px 10px;border-radius:10px}
+.ri-status.ok{background:rgba(22,163,74,.1);color:var(--ok)}
+.ri-status.err{background:rgba(220,38,38,.1);color:var(--er)}
+.ri-status.running{background:rgba(217,119,6,.1);color:var(--wn)}
+.ri-status.skipped{background:rgba(100,116,139,.1);color:var(--sl)}
+.result-item .ri-preview{font-size:.82rem;color:var(--sl);line-height:1.5}
+
+/* SOUNDNESS DETAILS */
+.soundness-detail{font-size:.78rem;padding:.5rem .75rem;background:var(--of);border-radius:var(--r8);margin:.5rem 0}
+.soundness-detail .pass{color:var(--ok)}
+.soundness-detail .fail{color:var(--er)}
+.soundness-detail .score{font-weight:700}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:'Syne',sans-serif;font-weight:700;border:none;border-radius:var(--r8);cursor:pointer;transition:all .2s;padding:.85rem 2rem;font-size:.95rem}
+.btn-primary{background:linear-gradient(135deg,var(--bl),#1452CC);color:#fff;box-shadow:0 4px 14px rgba(30,107,255,.3);width:100%}
+.btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 20px rgba(30,107,255,.4)}
+.btn-primary:disabled{background:var(--slL);cursor:not-allowed;box-shadow:none}
+.btn-secondary{background:transparent;border:1.5px solid var(--bd);color:var(--sl);padding:.7rem 1.5rem;font-size:.875rem;font-family:'DM Sans',sans-serif;font-weight:500}
+.btn-secondary:hover{border-color:var(--bl);color:var(--bl)}
+.btn-success{background:linear-gradient(135deg,var(--ok),#15803D);color:#fff;padding:.7rem 1.5rem;font-size:.875rem}
+.btn-success:hover{opacity:.9}
+.btn-teal{background:var(--tl);color:var(--ny);padding:.7rem 1.5rem;font-size:.875rem}
+.btn-teal:hover{opacity:.9}
+.btn-row{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1.25rem}
+.btn-sm{padding:.4rem .9rem;font-size:.75rem}
+
+/* ALERTS */
+.alert{border-radius:var(--r8);padding:.9rem 1.1rem;display:none;align-items:flex-start;gap:.75rem;margin-top:.75rem}
 .alert.show{display:flex}
-.alert-e{background:rgba(220,38,38,.06);border:1.5px solid rgba(220,38,38,.25);color:var(--er)}
-.alert-w{background:rgba(217,119,6,.07);border:1.5px solid rgba(217,119,6,.25);color:var(--wn)}
-.alert p{font-size:.875rem}
-.pw{display:none;margin-top:1.25rem}
-.pw.show{display:block}
-.pt{height:6px;background:var(--bd);border-radius:3px;overflow:hidden}
-.pf{height:100%;background:linear-gradient(90deg,var(--bl),var(--tl));border-radius:3px;width:0;transition:width .3s}
-.result-card{text-align:center;padding:2rem}
-.result-icon{font-size:3rem;margin-bottom:1rem}
-.result-summary{text-align:left;margin:1.5rem 0;display:flex;flex-direction:column;gap:.5rem}
-.rs-row{display:flex;justify-content:space-between;padding:.6rem .9rem;background:var(--of);border-radius:8px;font-size:.85rem}
-footer{background:var(--ny);color:rgba(255,255,255,.5);text-align:center;padding:2rem;font-size:.83rem;margin-top:2rem}
+.alert-error{background:rgba(220,38,38,.06);border:1.5px solid rgba(220,38,38,.25);color:var(--er)}
+.alert-success{background:rgba(22,163,74,.06);border:1.5px solid rgba(22,163,74,.25);color:var(--ok)}
+.alert-info{background:rgba(30,107,255,.06);border:1.5px solid rgba(30,107,255,.2);color:var(--bl)}
+.alert-warning{background:rgba(217,119,6,.07);border:1.5px solid rgba(217,119,6,.25);color:var(--wn)}
+.alert-ico{font-size:1.1rem;flex-shrink:0;margin-top:1px}
+
+/* FOOTER */
+footer{background:var(--ny);color:rgba(255,255,255,.45);text-align:center;padding:2rem;font-size:.83rem}
 footer a{color:var(--tl)}
-@media(max-width:640px){.panel{padding:1.25rem}.nav-links{display:none}}
+footer strong{color:rgba(255,255,255,.75)}
+
+/* VARIABLE SELECTOR */
+.var-selector{margin:.5rem 0 .75rem;padding:.75rem;background:var(--of);border-radius:var(--r8)}
+.var-selector label{display:block;font-size:.78rem;font-weight:600;color:var(--txM);margin-bottom:2px}
+.var-selector select{width:100%;padding:.4rem .6rem;border:1px solid var(--bd);border-radius:var(--r8);font-size:.85rem;background:var(--wh)}
+
+@media(max-width:640px){.test-grid{grid-template-columns:1fr 1fr}.nav-links{display:none}}
 </style>
 </head>
 <body>
 
 <nav class="nav">
-  <a class="nav-logo" href="/">Eduxellence<span>.</span></a>
+  <a class="logo" href="/">Eduxellence<span>.</span></a>
   <div class="nav-links">
     <a href="/stats">Statistical Analysis</a>
-    <a href="/pricing">Pricing</a>
+    <a href="/upload">Data Cleaner</a>
+    <a href="https://eduxellence.org/services">Services</a>
     <a href="https://eduxellence.org/#contact" class="nav-cta">Book Audit</a>
   </div>
 </nav>
 
 <section class="hero">
-  <h1>The Complete Thesis Package</h1>
-  <p>7 statistical tests. One dataset. One APA-formatted report — Word and PDF, ready to submit.</p>
-  <div class="price-tag">💎 12 credits — one-time, all 7 tests included</div>
+  <h1>🎓 Thesis Package</h1>
+  <p>Upload once. Select all your analyses. Get a complete research report — all in one go.</p>
 </section>
 
-<div class="main">
-<div class="wizard">
-  <div class="sb">
-    <div class="si"><div class="sc active" id="sc1">1</div><span class="sl-label active" id="sl1">Upload</span></div>
-    <div class="ss"></div>
-    <div class="si"><div class="sc" id="sc2">2</div><span class="sl-label" id="sl2">Review Variables</span></div>
-    <div class="ss"></div>
-    <div class="si"><div class="sc" id="sc3">3</div><span class="sl-label" id="sl3">Generate</span></div>
-  </div>
+<div class="main" id="main-content">
 
   <!-- STEP 1: UPLOAD -->
-  <div id="p1" class="panel active">
-    <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:.4rem">Upload Your Dataset</h2>
-    <p style="color:var(--sl);font-size:.9rem;margin-bottom:1.5rem">We'll auto-detect which of the 7 tests fit your data.</p>
+  <div class="card" id="step-upload">
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:.35rem">📂 Step 1: Upload Your Dataset</div>
+    <p style="color:var(--sl);font-size:.9rem;margin-bottom:1.25rem">CSV or Excel. We'll detect column types automatically.</p>
     <div class="dz" id="dz" onclick="document.getElementById('fi').click()">
       <div class="dz-ico">📊</div>
       <div class="dz-t">Drop your file here</div>
       <div class="dz-s">or click to browse — CSV, XLSX, XLS</div>
+      <div class="dz-tags"><span>CSV</span><span>XLSX</span><span>XLS</span><span>Max 10 MB</span></div>
     </div>
     <input type="file" id="fi" accept=".csv,.xlsx,.xls">
-    <div class="alert alert-e" id="ue"><p id="ue-t"></p></div>
-    <div class="pw" id="upw"><div class="pt"><div class="pf" id="up-fill"></div></div></div>
-    <div class="btn-row"><button class="btn btn-p" id="btn2" onclick="goStep(2)" disabled>Continue → Review Variables</button></div>
-  </div>
-
-  <!-- STEP 2: REVIEW -->
-  <div id="p2" class="panel">
-    <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:.4rem">Review Suggested Variables</h2>
-    <p style="color:var(--sl);font-size:.9rem;margin-bottom:1.5rem">We auto-suggest variables for each test. Fix any marked ✗ before continuing — <strong>all 7 must be ready</strong>.</p>
-    <div id="test-cards"></div>
-    <div class="alert alert-w" id="we"><p id="we-t"></p></div>
-    <div class="btn-row"><button class="btn btn-s" onclick="goStep(1)">← Back</button><button class="btn btn-p" id="btn3" onclick="goStep(3)" disabled style="flex:1">Continue → Generate Package</button></div>
-  </div>
-
-  <!-- STEP 3: GENERATE -->
-  <div id="p3" class="panel">
-    <div id="gen-precheck">
-      <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:.4rem">Generate Your Package</h2>
-      <p style="color:var(--sl);font-size:.9rem;margin-bottom:1.5rem">This costs <strong>12 credits</strong>, charged only after all 7 tests complete successfully.</p>
-      <div class="alert alert-e" id="ge"><p id="ge-t"></p></div>
-      <div class="pw" id="genpw"><div class="pt"><div class="pf" id="gen-fill"></div></div><p style="font-size:.8rem;color:var(--sl);margin-top:.5rem" id="gen-sub">Running 7 statistical tests…</p></div>
-      <div class="btn-row"><button class="btn btn-s" onclick="goStep(2)">← Back</button><button class="btn btn-p" id="btn-gen" onclick="generatePackage()" style="flex:1">⚡ Generate Package (12 credits)</button></div>
+    <div id="file-info" style="display:none" class="file-info">
+      <span style="font-size:1.5rem">📄</span>
+      <div><div class="fn" id="fn"></div><div class="fm" id="fm"></div></div>
+      <button class="close" onclick="resetUpload()">✕</button>
     </div>
-    <div id="gen-result" style="display:none"></div>
+    <div class="alert alert-error" id="upload-error"><span class="alert-ico">⚠</span><div class="al-body"><p id="upload-error-text"></p></div></div>
+    <div id="upload-progress" style="display:none;margin-top:1rem">
+      <div class="progress-bar-wrap"><div class="progress-bar" id="upload-bar" style="width:0%"></div></div>
+      <div class="progress-stats"><span>Uploading…</span><span id="upload-pct">0%</span></div>
+    </div>
   </div>
 
-</div>
+  <!-- STEP 2: SELECT TESTS -->
+  <div class="card" id="step-tests" style="display:none">
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:.35rem">🎯 Step 2: Select Your Analyses</div>
+    <p style="color:var(--sl);font-size:.9rem;margin-bottom:.5rem">Choose all the tests you need. <span style="color:var(--ok);font-weight:600">✅ Green = Statistically sound for your data</span> · <span style="color:var(--er);font-weight:600">❌ Red = May not be appropriate</span></p>
+    <div class="select-all-row">
+      <label><input type="checkbox" id="select-all" onchange="toggleAllTests()"> <span style="font-size:.85rem">Select All Sound Tests</span></label>
+      <span style="font-size:.78rem;color:var(--sl);margin-left:auto" id="total-credits-display">Total: 0 credits</span>
+    </div>
+    <div class="test-grid" id="test-grid"></div>
+    <div class="alert alert-warning" id="test-error"><span class="alert-ico">⚠</span><div class="al-body"><p id="test-error-text">Please select at least one test to run.</p></div></div>
+    <div class="alert alert-info" id="soundness-summary" style="display:none"><span class="alert-ico">📊</span><div class="al-body"><p id="soundness-summary-text"></p></div></div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goBack()">← Back</button>
+      <button class="btn btn-primary" id="btn-run-thesis" onclick="runThesis()" style="flex:1">🚀 Run Selected Tests</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: PROGRESS -->
+  <div class="card" id="step-progress" style="display:none">
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:.35rem">⚡ Running Your Analysis</div>
+    <p style="color:var(--sl);font-size:.9rem;margin-bottom:1rem" id="progress-status">Preparing…</p>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="run-bar" style="width:0%"></div></div>
+    <div class="progress-stats"><span id="progress-label">Initialising…</span><span id="progress-pct">0%</span></div>
+    <div id="progress-results" style="margin-top:1rem"></div>
+  </div>
+
+  <!-- STEP 4: RESULTS -->
+  <div class="card" id="step-results" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem">📊 Complete Research Report</div>
+        <div style="font-size:.8rem;color:var(--sl);margin-top:2px" id="results-meta">Thesis Package · Generated just now</div>
+      </div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <button class="btn btn-success btn-sm" onclick="exportThesis('word')" style="padding:.5rem 1rem;font-size:.8rem">⬇ Word Report</button>
+        <button class="btn btn-success btn-sm" onclick="exportThesis('pdf')" style="padding:.5rem 1rem;font-size:.8rem;background:linear-gradient(135deg,#DC2626,#991B1B)">⬇ PDF</button>
+        <button class="btn btn-success btn-sm" onclick="exportThesis('excel')" style="padding:.5rem 1rem;font-size:.8rem;background:linear-gradient(135deg,#16A34A,#15803D)">⬇ Excel</button>
+      </div>
+    </div>
+    <div class="result-summary" id="result-summary"></div>
+    <div id="result-items"></div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="resetAll()">← Start New Thesis</button>
+      <button class="btn btn-teal" onclick="window.location.href='/stats'" style="flex:1">📊 Run Individual Tests →</button>
+    </div>
+  </div>
+
 </div>
 
 <footer>
-  <p><strong style="color:rgba(255,255,255,.75)">Eduxellence Analytics</strong> — Free Statistical Analysis Platform</p>
-  <p style="margin-top:.4rem"><a href="/">Home</a> · <a href="/stats">Run Single Analysis</a> · <a href="https://eduxellence.org/#contact">Contact</a></p>
+  <p><strong>Eduxellence Analytics</strong> — Research-grade data tools, built free for the world.</p>
+  <p style="margin-top:.5rem"><a href="/">Home</a> · <a href="/stats">Statistical Analysis</a> · <a href="/upload">Data Cleaner</a> · <a href="https://eduxellence.org/#contact">Contact</a></p>
 </footer>
 
 <script>
-// ===== API BASE URL - FIXED =====
+// ===== API BASE =====
 const API_BASE = 'https://Eduxellence-eduxellence-api.hf.space';
 
-const S = { metaPath:null, filename:null, suggestions:null, config:{}, columns:[] };
-function getAuthToken(){ return localStorage.getItem('edux_auth_token') || null; }
+// ===== TEST DEFINITIONS =====
+const ALL_TESTS = [
+  { id: 'descriptive',   label: 'Descriptive Statistics', cost: 0,  icon: '📊', category: 'Free', alwaysValid: true },
+  { id: 'chi_square',    label: 'Chi-Square Test',        cost: 1,  icon: '🔲', category: '1 Credit', params: ['var1','var2'] },
+  { id: 't_test',        label: 'Independent T-Test',     cost: 1,  icon: '⚖️', category: '1 Credit', params: ['numeric_var','group_var'] },
+  { id: 'anova',         label: 'One-Way ANOVA',          cost: 2,  icon: '📈', category: '2 Credits', params: ['numeric_var','group_var'] },
+  { id: 'correlation',   label: 'Correlation Analysis',   cost: 1,  icon: '🔗', category: '1 Credit', params: ['columns','method'] },
+  { id: 'regression',    label: 'Linear Regression',      cost: 3,  icon: '📉', category: '3 Credits', params: ['dependent','predictors'] },
+  { id: 'logistic_regression', label: 'Logistic Regression', cost: 5, icon: '🔄', category: '5 Credits', params: ['dependent','predictors'] },
+  { id: 'pca',           label: 'PCA',                    cost: 5,  icon: '📐', category: '5 Credits', params: ['columns'] },
+  { id: 'factor_analysis', label: 'Factor Analysis',      cost: 6,  icon: '🧩', category: '6 Credits', params: ['columns'] },
+  { id: 'arima',         label: 'ARIMA',                  cost: 8,  icon: '📈', category: '8 Credits', params: ['time_var','value_var'] },
+  { id: 'mann_whitney',  label: 'Mann-Whitney U',         cost: 1,  icon: '🥊', category: '1 Credit', params: ['numeric_var','group_var'] },
+  { id: 'kruskal_wallis', label: 'Kruskal-Wallis',        cost: 2,  icon: '🏆', category: '2 Credits', params: ['numeric_var','group_var'] }
+];
 
-function goStep(n){
-  [1,2,3].forEach(i=>{
-    document.getElementById('p'+i).classList.toggle('active', i===n);
-    const c = document.getElementById('sc'+i), l = document.getElementById('sl'+i);
-    c.classList.remove('active','done'); l.classList.remove('active');
-    if(i<n){ c.classList.add('done'); }
-    if(i===n){ c.classList.add('active'); l.classList.add('active'); }
-  });
-  if(n===2) loadSuggestions();
-}
-
-const dz = document.getElementById('dz'), fi = document.getElementById('fi');
-dz.addEventListener('dragover', e=>{e.preventDefault(); dz.classList.add('drag');});
-dz.addEventListener('dragleave', ()=>dz.classList.remove('drag'));
-dz.addEventListener('drop', e=>{e.preventDefault(); dz.classList.remove('drag'); if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);});
-fi.addEventListener('change', e=>{ if(e.target.files[0]) handleFile(e.target.files[0]); });
-
-async function handleFile(file){
-  document.getElementById('ue').classList.remove('show');
-  document.getElementById('upw').classList.add('show');
-  const fd = new FormData(); fd.append('file', file);
-  try{
-    const r = await fetch(`${API_BASE}/api/upload`, {method:'POST', body:fd});
-    const d = await r.json();
-    document.getElementById('upw').classList.remove('show');
-    if(!r.ok || d.error){
-      document.getElementById('ue-t').textContent = d.error || 'Upload failed.';
-      document.getElementById('ue').classList.add('show');
-      return;
-    }
-    S.metaPath = d.meta_path; S.filename = file.name; S.columns = d.columns;
-    document.getElementById('btn2').disabled = false;
-  }catch(e){
-    document.getElementById('upw').classList.remove('show');
-    document.getElementById('ue-t').textContent = 'Network error: ' + e.message;
-    document.getElementById('ue').classList.add('show');
-  }
-}
-
-const TEST_ORDER = ['descriptive','chi_square','t_test','anova','correlation','regression','reliability'];
-const TEST_LABELS = {
-  descriptive:"Descriptive Statistics", chi_square:"Chi-Square Test", t_test:"Independent T-Test",
-  anova:"One-Way ANOVA", correlation:"Correlation Analysis", regression:"Linear Regression",
-  reliability:"Reliability (Cronbach's Alpha)"
+// ===== STATE =====
+let S = { 
+  metaPath: null, 
+  filename: null, 
+  selectedTests: [], 
+  results: null,
+  columns: [],
+  soundness: {},
+  packageId: null
 };
 
-async function loadSuggestions(){
-  document.getElementById('test-cards').innerHTML = '<p style="color:var(--sl);font-size:.85rem">Analysing your dataset…</p>';
-  try{
-    const r = await fetch(`${API_BASE}/api/package/suggest`, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({meta_path:S.metaPath})});
-    const d = await r.json();
-    if(!r.ok || d.error){ document.getElementById('test-cards').innerHTML = '<p style="color:var(--er)">'+(d.error||'Could not load suggestions.')+'</p>'; return; }
-    S.suggestions = d.suggestions;
-    S.config = {};
-    TEST_ORDER.forEach(k => S.config[k] = d.suggestions[k].params);
-    renderTestCards();
-    updateContinueButton();
-  }catch(e){
-    document.getElementById('test-cards').innerHTML = '<p style="color:var(--er)">Network error: '+e.message+'</p>';
-  }
-}
-
-function renderTestCards(){
-  const numCols = S.columns.filter(c=>c.dtype==='numeric').map(c=>c.name);
-  const catCols = S.columns.filter(c=>c.dtype==='categorical').map(c=>c.name);
-  const allCols = S.columns.map(c=>c.name);
-
-  document.getElementById('test-cards').innerHTML = TEST_ORDER.map(key=>{
-    const s = S.suggestions[key];
-    const ready = !!S.config[key];
-    const opts = c => c.map(n=>`<option value="${n}">${n}</option>`).join('');
-    let fixHtml = '';
-    if(key==='descriptive' || key==='correlation' || key==='reliability'){
-      fixHtml = `<select id="fix-${key}-cols" multiple size="4" style="min-width:200px">${opts(numCols.concat(catCols))}</select>
-        <button class="tc-fix-btn" onclick="applyFix('${key}')">Apply</button>`;
-    } else if(key==='chi_square'){
-      fixHtml = `<select id="fix-${key}-v1">${opts(catCols)}</select> × <select id="fix-${key}-v2">${opts(catCols)}</select>
-        <button class="tc-fix-btn" onclick="applyFix('${key}')">Apply</button>`;
-    } else if(key==='t_test' || key==='anova'){
-      fixHtml = `<select id="fix-${key}-nv">${opts(numCols)}</select> by <select id="fix-${key}-gv">${opts(catCols)}</select>
-        <button class="tc-fix-btn" onclick="applyFix('${key}')">Apply</button>`;
-    } else if(key==='regression'){
-      fixHtml = `<select id="fix-${key}-dep">${opts(numCols)}</select> ~ <select id="fix-${key}-preds" multiple size="3">${opts(numCols)}</select>
-        <button class="tc-fix-btn" onclick="applyFix('${key}')">Apply</button>`;
+// ===== RENDER TESTS WITH SOUNDNESS =====
+function renderTests() {
+  const grid = document.getElementById('test-grid');
+  
+  // If we have soundness data, show it
+  const hasSoundness = Object.keys(S.soundness).length > 0;
+  
+  grid.innerHTML = ALL_TESTS.map(t => {
+    const sound = S.soundness[t.id];
+    let soundnessHtml = '';
+    if (sound) {
+      const passed = sound.sound || sound.score >= 0.6;
+      const label = passed ? '✅ Sound' : '⚠️ Check assumptions';
+      const cls = passed ? 'pass' : 'fail';
+      soundnessHtml = `<span class="to-soundness ${cls}">${label}</span>`;
+    } else if (t.alwaysValid) {
+      soundnessHtml = `<span class="to-soundness pass">✅ Always valid</span>`;
+    } else if (S.columns.length > 0) {
+      soundnessHtml = `<span class="to-soundness unknown">⏳ Check assumptions</span>`;
     }
-
-    return `<div class="test-card ${ready?'ready':'broken'}" id="tc-${key}">
-      <div class="tc-header">
-        <span class="tc-title">${TEST_LABELS[key]}</span>
-        <span class="tc-status ${ready?'ready':'broken'}">${ready?'✓ Ready':'✗ Needs Fix'}</span>
-      </div>
-      <div class="tc-reason">${s.reason}</div>
-      ${!ready ? `<button class="tc-fix-btn" onclick="toggleFix('${key}')">Fix manually →</button><div class="tc-fix" id="fixbox-${key}">${fixHtml}</div>` : ''}
-    </div>`;
+    
+    return `
+      <label class="test-option" id="to-${t.id}" data-testid="${t.id}">
+        <input type="checkbox" value="${t.id}" onchange="updateTotal()">
+        <span class="to-name">${t.icon} ${t.label}</span>
+        ${soundnessHtml}
+        <span class="to-cost">${t.cost === 0 ? 'Free' : t.cost + ' cr'}</span>
+      </label>
+    `;
   }).join('');
 }
 
-function toggleFix(key){
-  document.getElementById('fixbox-'+key).classList.toggle('show');
+function updateTotal() {
+  const checked = document.querySelectorAll('#test-grid input:checked');
+  const total = Array.from(checked).reduce((sum, cb) => {
+    const test = ALL_TESTS.find(t => t.id === cb.value);
+    return sum + (test ? test.cost : 0);
+  }, 0);
+  document.getElementById('total-credits-display').textContent = `Total: ${total} credits`;
+  S.selectedTests = Array.from(checked).map(cb => cb.value);
+  document.getElementById('test-error').classList.remove('show');
 }
 
-function applyFix(key){
-  let params = null;
-  if(key==='descriptive' || key==='correlation' || key==='reliability'){
-    const sel = document.getElementById(`fix-${key}-cols`);
-    const cols = [...sel.selectedOptions].map(o=>o.value);
-    if(key==='correlation' && cols.length>=2) params = {columns:cols, method:'pearson'};
-    else if(key==='reliability' && cols.length>=2) params = {columns:cols};
-    else if(key==='descriptive' && cols.length>=1) params = {columns:cols};
-  } else if(key==='chi_square'){
-    const v1 = document.getElementById(`fix-${key}-v1`).value;
-    const v2 = document.getElementById(`fix-${key}-v2`).value;
-    if(v1 && v2 && v1!==v2) params = {var1:v1, var2:v2};
-  } else if(key==='t_test' || key==='anova'){
-    const nv = document.getElementById(`fix-${key}-nv`).value;
-    const gv = document.getElementById(`fix-${key}-gv`).value;
-    if(nv && gv) params = {numeric_var:nv, group_var:gv};
-  } else if(key==='regression'){
-    const dep = document.getElementById(`fix-${key}-dep`).value;
-    const preds = [...document.getElementById(`fix-${key}-preds`).selectedOptions].map(o=>o.value).filter(p=>p!==dep);
-    if(dep && preds.length) params = {dependent:dep, predictors:preds};
-  }
-
-  if(!params){ alert('Please complete the selection before applying.'); return; }
-  S.config[key] = params;
-  S.suggestions[key] = {params, reason: 'Manually configured.'};
-  renderTestCards();
-  updateContinueButton();
+function toggleAllTests() {
+  const checked = document.getElementById('select-all').checked;
+  document.querySelectorAll('#test-grid input').forEach(cb => {
+    const testId = cb.value;
+    const test = ALL_TESTS.find(t => t.id === testId);
+    // Only auto-select sound tests
+    if (checked) {
+      const sound = S.soundness[testId];
+      if (sound && sound.sound !== undefined) {
+        cb.checked = sound.sound || sound.score >= 0.6;
+      } else {
+        cb.checked = test && test.alwaysValid || false;
+      }
+    } else {
+      cb.checked = false;
+    }
+  });
+  updateTotal();
 }
 
-function updateContinueButton(){
-  const allReady = TEST_ORDER.every(k => !!S.config[k]);
-  document.getElementById('btn3').disabled = !allReady;
-  const we = document.getElementById('we'), wet = document.getElementById('we-t');
-  if(!allReady){
-    const missing = TEST_ORDER.filter(k=>!S.config[k]).map(k=>TEST_LABELS[k]);
-    wet.textContent = `${missing.length} test(s) still need fixing: ${missing.join(', ')}. All 7 must be ready before you can generate the package.`;
-    we.classList.add('show');
-  } else {
-    we.classList.remove('show');
-  }
-}
-
-async function generatePackage(){
-  const token = getAuthToken();
-  if(!token){ document.getElementById('ge-t').textContent = 'Please sign in to generate your package.'; document.getElementById('ge').classList.add('show'); return; }
-
-  document.getElementById('ge').classList.remove('show');
-  document.getElementById('btn-gen').disabled = true;
-  document.getElementById('genpw').classList.add('show');
-
-  let pct = 0;
-  const tm = setInterval(()=>{ pct = Math.min(92, pct+3); document.getElementById('gen-fill').style.width = pct+'%'; }, 300);
-
-  try{
-    const r = await fetch(`${API_BASE}/api/package/generate`, {
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-      body: JSON.stringify({meta_path:S.metaPath, config:S.config, dataset_name:S.filename})
+// ===== CHECK SOUNDNESS AFTER UPLOAD =====
+async function checkSoundness() {
+  if (!S.metaPath) return;
+  
+  try {
+    const r = await fetch(`${API_BASE}/api/assumptions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        meta_path: S.metaPath, 
+        analysis_type: 'thesis', 
+        params: {} 
+      })
     });
     const d = await r.json();
-    clearInterval(tm);
-    document.getElementById('genpw').classList.remove('show');
-    document.getElementById('btn-gen').disabled = false;
-
-    if(!r.ok || !d.ok){
-      document.getElementById('ge-t').textContent = d.error || 'Package generation failed.';
-      document.getElementById('ge').classList.add('show');
-      return;
+    
+    // Parse the soundness results
+    if (d.checks) {
+      // For each test, check if assumptions pass
+      for (const test of ALL_TESTS) {
+        if (test.alwaysValid) {
+          S.soundness[test.id] = { sound: true, score: 1.0 };
+          continue;
+        }
+        
+        // Get relevant checks for this test
+        const testChecks = d.checks.filter(c => 
+          c.name && c.name.toLowerCase().includes(test.id) || 
+          c.name && test.id.toLowerCase().includes('correlation') && c.name.includes('correlation')
+        );
+        
+        const passed = testChecks.filter(c => c.passed).length;
+        const total = testChecks.length;
+        const score = total > 0 ? passed / total : 0.5;
+        
+        S.soundness[test.id] = {
+          sound: score >= 0.6,
+          score: score,
+          checks: testChecks
+        };
+      }
+      
+      // Show soundness summary
+      const soundCount = Object.values(S.soundness).filter(s => s.sound).length;
+      const totalTests = ALL_TESTS.filter(t => !t.alwaysValid).length;
+      document.getElementById('soundness-summary-text').textContent = 
+        `${soundCount}/${totalTests} tests are statistically sound for your data. Unsound tests are marked in red.`;
+      document.getElementById('soundness-summary').style.display = 'flex';
     }
-
-    renderResult(d);
-  }catch(e){
-    clearInterval(tm);
-    document.getElementById('genpw').classList.remove('show');
-    document.getElementById('btn-gen').disabled = false;
-    document.getElementById('ge-t').textContent = 'Network error: ' + e.message;
-    document.getElementById('ge').classList.add('show');
+    
+    // Re-render tests with soundness data
+    renderTests();
+    
+    // Auto-select sound tests
+    document.getElementById('select-all').checked = true;
+    toggleAllTests();
+    
+  } catch(e) {
+    console.warn('Could not check soundness:', e);
+    renderTests();
   }
 }
 
-function renderResult(d){
-  document.getElementById('gen-precheck').style.display = 'none';
-  const summaryRows = Object.entries(d.summary).map(([k,s])=>
-    `<div class="rs-row"><span>${s.label}</span><span style="font-family:'JetBrains Mono',monospace">${s.p_display||'—'}</span></div>`).join('');
+// ===== UPLOAD =====
+const dz = document.getElementById('dz'), fi = document.getElementById('fi');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('drag');
+  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+fi.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
 
-  document.getElementById('gen-result').style.display = 'block';
-  document.getElementById('gen-result').innerHTML = `
-    <div class="result-card">
-      <div class="result-icon">🎉</div>
-      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem">Your Package Is Ready!</div>
-      <p style="color:var(--sl);font-size:.88rem;margin-top:.4rem">All ${d.completed_count} of ${d.total_count} tests completed successfully. ${d.credits_charged} credits charged — balance: ${d.credits_balance}.</p>
-      <div class="result-summary">${summaryRows}</div>
-      <div class="btn-row">
-        <button class="btn btn-p" onclick="downloadPackage('docx')" style="background:linear-gradient(135deg,#1E6BFF,#1452CC)">⬇ Download Word Report</button>
-      </div>
-      <div class="btn-row" style="margin-top:.6rem">
-        <button class="btn btn-p" onclick="downloadPackage('pdf')" style="background:linear-gradient(135deg,#DC2626,#991B1B)">⬇ Download PDF Report</button>
-      </div>
-      <div class="btn-row"><button class="btn btn-s" style="width:100%" onclick="location.reload()">Start a New Package</button></div>
-    </div>`;
-  window._packageId = d.package_id;
+async function handleFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (!['csv','xlsx','xls'].includes(ext)) {
+    showError('upload-error', 'upload-error-text', 'Unsupported type. Use .csv, .xlsx or .xls.');
+    return;
+  }
+  hideError('upload-error');
+  const fd = new FormData(); fd.append('file', file);
+  document.getElementById('upload-progress').style.display = 'block';
+  animateProgress('upload-bar', 'upload-pct', 3500);
+  try {
+    const r = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+    const d = await r.json();
+    document.getElementById('upload-progress').style.display = 'none';
+    if (!r.ok || d.error) { showError('upload-error', 'upload-error-text', d.error || 'Upload failed.'); return; }
+    S.metaPath = d.meta_path; S.filename = d.filename;
+    S.columns = d.columns || [];
+    
+    document.getElementById('fn').textContent = file.name;
+    document.getElementById('fm').textContent = `${d.rows} rows · ${d.cols} columns · ${(file.size/1024).toFixed(1)} KB`;
+    document.getElementById('file-info').style.display = 'flex';
+    document.getElementById('step-upload').style.display = 'none';
+    document.getElementById('step-tests').style.display = 'block';
+    
+    // Check soundness
+    await checkSoundness();
+    
+  } catch(e) {
+    document.getElementById('upload-progress').style.display = 'none';
+    showError('upload-error', 'upload-error-text', 'Network error: ' + e.message);
+  }
 }
 
-function downloadPackage(fmt){
-  if(!window._packageId) return;
-  window.location.href = `${API_BASE}/api/package/export/${window._packageId}?format=${fmt}`;
+function resetUpload() {
+  S.metaPath = null; S.filename = null; S.columns = []; S.soundness = {};
+  fi.value = '';
+  document.getElementById('file-info').style.display = 'none';
+  document.getElementById('step-tests').style.display = 'none';
+  document.getElementById('step-upload').style.display = 'block';
+  hideError('upload-error');
+  document.getElementById('soundness-summary').style.display = 'none';
+}
+
+// ===== BUILD PARAMS =====
+function buildParams(testId) {
+  const test = ALL_TESTS.find(t => t.id === testId);
+  if (!test) return {};
+  
+  // Get column names from the dataset
+  const numCols = S.columns.filter(c => c.dtype === 'numeric').map(c => c.name);
+  const catCols = S.columns.filter(c => c.dtype === 'categorical').map(c => c.name);
+  const allCols = S.columns.map(c => c.name);
+  
+  switch(testId) {
+    case 'descriptive':
+      return { columns: numCols.slice(0, 10) };
+      
+    case 'chi_square':
+      return { var1: catCols[0] || allCols[0], var2: catCols[1] || allCols[1] };
+      
+    case 't_test':
+      return { numeric_var: numCols[0] || allCols[0], group_var: catCols[0] || allCols[1] };
+      
+    case 'anova':
+      return { numeric_var: numCols[0] || allCols[0], group_var: catCols[0] || allCols[1] };
+      
+    case 'correlation':
+      return { columns: numCols.slice(0, 6), method: 'pearson' };
+      
+    case 'regression':
+      const dep = numCols[0] || allCols[0];
+      const preds = numCols.slice(1, 3);
+      return { dependent: dep, predictors: preds.length ? preds : [allCols[1]] };
+      
+    case 'logistic_regression':
+      return { dependent: catCols[0] || allCols[0], predictors: numCols.slice(0, 3) };
+      
+    case 'pca':
+      return { columns: numCols.slice(0, 8) };
+      
+    case 'factor_analysis':
+      return { columns: numCols.slice(0, 8), n_factors: 3, rotation: 'varimax' };
+      
+    case 'arima':
+      // Find date column
+      const dateCols = S.columns.filter(c => c.name.includes('date') || c.name.includes('Date') || c.name.includes('time') || c.name.includes('Time'));
+      return { time_var: dateCols[0]?.name || allCols[0], value_var: numCols[0] || allCols[1], forecast_periods: 12 };
+      
+    case 'mann_whitney':
+      return { numeric_var: numCols[0] || allCols[0], group_var: catCols[0] || allCols[1] };
+      
+    case 'kruskal_wallis':
+      return { numeric_var: numCols[0] || allCols[0], group_var: catCols[0] || allCols[1] };
+      
+    default:
+      return {};
+  }
+}
+
+// ===== RUN THESIS =====
+async function runThesis() {
+  const selected = S.selectedTests;
+  if (!selected.length) {
+    document.getElementById('test-error').classList.add('show');
+    document.getElementById('test-error-text').textContent = 'Please select at least one test to run.';
+    return;
+  }
+  
+  // Check credits
+  const totalCredits = selected.reduce((sum, id) => {
+    const test = ALL_TESTS.find(t => t.id === id);
+    return sum + (test ? test.cost : 0);
+  }, 0);
+  
+  // You could add credit check here
+  
+  document.getElementById('step-tests').style.display = 'none';
+  document.getElementById('step-progress').style.display = 'block';
+  document.getElementById('btn-run-thesis').disabled = true;
+
+  const progressEl = document.getElementById('progress-results');
+  progressEl.innerHTML = '';
+
+  let completed = 0;
+  const totalTests = selected.length;
+
+  const updateProgress = (testId, status, message) => {
+    const pct = Math.round((completed / totalTests) * 100);
+    document.getElementById('run-bar').style.width = pct + '%';
+    document.getElementById('progress-pct').textContent = pct + '%';
+    document.getElementById('progress-label').textContent = `Running ${testId}...`;
+    const item = document.getElementById(`pr-${testId}`);
+    if (item) {
+      const statusEl = item.querySelector('.ri-status');
+      statusEl.textContent = status;
+      statusEl.className = 'ri-status ' + (status === 'Done ✓' ? 'ok' : status === '⚠️ Skipped' ? 'skipped' : status === 'Error' ? 'err' : 'running');
+      const previewEl = item.querySelector('.ri-preview');
+      if (message) previewEl.textContent = message;
+    }
+  };
+
+  const completeTest = (testId, result, error) => {
+    completed++;
+    const pct = Math.round((completed / totalTests) * 100);
+    document.getElementById('run-bar').style.width = pct + '%';
+    document.getElementById('progress-pct').textContent = pct + '%';
+    const item = document.getElementById(`pr-${testId}`);
+    if (item) {
+      const statusEl = item.querySelector('.ri-status');
+      if (error) {
+        statusEl.textContent = 'Error';
+        statusEl.className = 'ri-status err';
+      } else {
+        statusEl.textContent = 'Done ✓';
+        statusEl.className = 'ri-status ok';
+      }
+      const previewEl = item.querySelector('.ri-preview');
+      if (result && result.interpretation) {
+        previewEl.textContent = result.interpretation.slice(0, 120) + '…';
+      } else if (error) {
+        previewEl.textContent = error;
+      } else {
+        previewEl.textContent = 'Complete';
+      }
+    }
+    if (completed === totalTests) {
+      document.getElementById('progress-label').textContent = '✅ All analyses complete!';
+      setTimeout(() => showResults(), 500);
+    }
+  };
+
+  // Show each test being run
+  selected.forEach(id => {
+    const test = ALL_TESTS.find(t => t.id === id);
+    progressEl.innerHTML += `
+      <div class="result-item" id="pr-${id}">
+        <div class="ri-header">
+          <span class="ri-name">${test.icon} ${test.label}</span>
+          <span class="ri-status running">⏳ Running…</span>
+        </div>
+        <div class="ri-preview">Initialising…</div>
+      </div>
+    `;
+  });
+
+  // Run each test sequentially
+  for (const testId of selected) {
+    const test = ALL_TESTS.find(t => t.id === testId);
+    document.getElementById('progress-label').textContent = `Running ${test.label}…`;
+    updateProgress(testId, 'Running…', 'Processing…');
+    
+    try {
+      const params = buildParams(testId);
+      const r = await fetch(`${API_BASE}/api/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          meta_path: S.metaPath, 
+          analysis_type: testId, 
+          params,
+          file_data: null // This would need to be handled differently
+        })
+      });
+      const d = await r.json();
+      
+      if (!r.ok || d.error) {
+        updateProgress(testId, 'Error', d.error || 'Failed');
+        completeTest(testId, null, d.error || 'Analysis failed');
+        continue;
+      }
+      
+      // Check if analysis returned an error
+      if (d.error) {
+        completeTest(testId, null, d.error);
+        continue;
+      }
+      
+      completeTest(testId, d, null);
+      S.results = S.results || {};
+      S.results[testId] = d;
+      
+    } catch(e) {
+      updateProgress(testId, 'Error', e.message);
+      completeTest(testId, null, e.message);
+    }
+  }
+}
+
+// ===== SHOW RESULTS =====
+function showResults() {
+  document.getElementById('step-progress').style.display = 'none';
+  document.getElementById('step-results').style.display = 'block';
+  document.getElementById('btn-run-thesis').disabled = false;
+
+  const results = S.results || {};
+  const keys = Object.keys(results);
+  const total = keys.length;
+
+  // Summary stats
+  document.getElementById('result-summary').innerHTML = `
+    <div class="result-stat"><div class="num">${total}</div><div class="lbl">Tests Run</div></div>
+    <div class="result-stat"><div class="num">${S.filename || 'Unknown'}</div><div class="lbl">Dataset</div></div>
+    <div class="result-stat"><div class="num">${new Date().toLocaleDateString()}</div><div class="lbl">Date</div></div>
+  `;
+
+  // Individual results
+  let html = '';
+  for (const [id, data] of Object.entries(results)) {
+    const test = ALL_TESTS.find(t => t.id === id);
+    const name = test ? test.label : id;
+    const icon = test ? test.icon : '📊';
+    const apa = data.apa_citation || 'No APA citation available.';
+    const interp = data.interpretation || 'No interpretation available.';
+    const sound = S.soundness[id];
+    const soundnessHtml = sound ? `
+      <div class="soundness-detail">
+        <span class="score">Statistical Soundness: ${(sound.score * 100).toFixed(0)}%</span>
+        ${sound.sound ? ' <span class="pass">✅ Passed</span>' : ' <span class="fail">⚠️ Assumptions may be violated</span>'}
+      </div>
+    ` : '';
+    
+    html += `
+      <div class="result-item">
+        <div class="ri-header">
+          <span class="ri-name">${icon} ${name}</span>
+          <span class="ri-status ok">✅ Complete</span>
+        </div>
+        ${soundnessHtml}
+        <div style="background:#F8F7FF;border:1.5px solid #C4B5FD;border-radius:var(--r8);padding:.7rem .9rem;margin:.5rem 0;font-size:.78rem;font-family:'JetBrains Mono',monospace;color:#1E1B4B">${apa}</div>
+        <div class="ri-preview" style="margin-top:.5rem;font-size:.85rem;color:var(--tx)">${interp.slice(0, 200)}${interp.length > 200 ? '…' : ''}</div>
+        <div style="margin-top:.5rem;display:flex;gap:.4rem;flex-wrap:wrap">
+          <span style="font-size:.72rem;color:var(--sl);background:var(--of);padding:2px 10px;border-radius:10px">${test ? test.cost + ' credits' : ''}</span>
+        </div>
+      </div>
+    `;
+  }
+  document.getElementById('result-items').innerHTML = html;
+  document.getElementById('results-meta').textContent = `Thesis Package · ${total} tests · ${new Date().toLocaleString()}`;
+}
+
+// ===== EXPORT FUNCTIONS =====
+async function exportThesis(format) {
+  if (!S.packageId) {
+    // Generate a package ID if not already set
+    S.packageId = 'pkg_' + Date.now();
+  }
+  
+  try {
+    const r = await fetch(`${API_BASE}/api/package/export/${S.packageId}?format=${format}`, {
+      method: 'GET'
+    });
+    
+    if (!r.ok) {
+      alert('Export failed. Please try again.');
+      return;
+    }
+    
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `thesis_package_${new Date().toISOString().slice(0,10)}.${format === 'pdf' ? 'pdf' : format === 'word' ? 'docx' : 'xlsx'}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+  } catch(e) {
+    alert('Export error: ' + e.message);
+  }
+}
+
+// ===== NAVIGATION =====
+function goBack() {
+  document.getElementById('step-tests').style.display = 'none';
+  document.getElementById('step-upload').style.display = 'block';
+}
+
+function resetAll() {
+  S = { metaPath: null, filename: null, selectedTests: [], results: null, columns: [], soundness: {}, packageId: null };
+  document.getElementById('step-results').style.display = 'none';
+  document.getElementById('step-progress').style.display = 'none';
+  document.getElementById('step-tests').style.display = 'none';
+  document.getElementById('step-upload').style.display = 'block';
+  resetUpload();
+}
+
+// ===== UTILITIES =====
+function showError(id, textId, msg) {
+  document.getElementById(textId).textContent = msg;
+  document.getElementById(id).classList.add('show');
+}
+function hideError(id) { document.getElementById(id).classList.remove('show'); }
+
+function animateProgress(barId, pctId, dur) {
+  let t = 0; const interval = 50;
+  const timer = setInterval(() => {
+    t += interval;
+    const p = Math.min(95, Math.round(95 * (1 - Math.pow(1 - t / dur, 2.5))));
+    document.getElementById(barId).style.width = p + '%';
+    document.getElementById(pctId).textContent = p + '%';
+    if (t >= dur) clearInterval(timer);
+  }, interval);
+}
+
+// ===== INIT =====
+// Check if ?package=thesis is in URL
+if (window.location.search.includes('package=thesis')) {
+  document.getElementById('step-upload').style.display = 'block';
 }
 </script>
 </body>
 </html>
-```
