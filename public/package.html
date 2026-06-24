@@ -257,6 +257,19 @@ function getAuthToken() {
          null;
 }
 
+// ===== GET STORED USER EMAIL =====
+function getStoredEmail() {
+  return localStorage.getItem('edux_user_email') || null;
+}
+
+// ===== ADMIN EMAIL =====
+const ADMIN_EMAIL = 'jesylvesterboy@gmail.com';
+
+// ===== CHECK IF USER IS ADMIN =====
+function isAdminUser(email) {
+  return email === ADMIN_EMAIL;
+}
+
 // ===== DEBUG LOG =====
 let debugLines = [];
 
@@ -327,7 +340,6 @@ function buildParamsForTest(testId) {
     case 'logistic_regression': return { dependent: catCols[0] || allCols[0], predictors: numCols.slice(0, 3) };
     case 'pca': return { columns: numCols.slice(0, 8) };
     case 'factor_analysis': return { columns: numCols.slice(0, 8), n_factors: 3, rotation: 'varimax' };
-    // ===== FIX: ARIMA parameter detection =====
     case 'arima': {
       // Try to find a real date column
       const dateCols = S.columns.filter(c => {
@@ -358,13 +370,11 @@ function buildParamsForTest(testId) {
         if (otherNumCols.length > 0) {
           valueVar = otherNumCols[0].name;
         } else {
-          // If no other numeric columns, use a different column as time
           const otherCols = S.columns.filter(c => c.name !== timeVar);
           if (otherCols.length > 0) {
-            // Use the first non-id column as time, keep valueVar as is
             const nonIdCols = otherCols.filter(c => !c.name.toLowerCase().includes('id'));
             if (nonIdCols.length > 0) {
-              // We have a non-id column we could use, but we'll just keep timeVar as is
+              // We have a non-id column we could use
             }
           }
         }
@@ -377,7 +387,6 @@ function buildParamsForTest(testId) {
       if (finalTimeVar === finalValueVar) {
         const otherCols = S.columns.filter(c => c.name !== finalTimeVar);
         if (otherCols.length > 0) {
-          // Use first other column as time
           finalTimeVar = otherCols[0].name;
         }
       }
@@ -395,6 +404,15 @@ function buildParamsForTest(testId) {
     case 'kruskal_wallis': return { numeric_var: numCols[0] || allCols[0], group_var: catCols[0] || allCols[1] };
     default: return {};
   }
+}
+
+// ===== CALCULATE TOTAL CREDITS =====
+function calculateTotalCredits() {
+  const selected = S.selectedTests;
+  return selected.reduce((sum, id) => {
+    const test = ALL_TESTS.find(t => t.id === id);
+    return sum + (test ? test.cost : 0);
+  }, 0);
 }
 
 // ===== RENDER TESTS =====
@@ -717,9 +735,31 @@ async function runThesis() {
   }
   debugLog(`📄 fileData length: ${S.fileData.length} characters`);
   
-  // ===== FIX: Get auth token =====
+  // ===== AUTH CHECK: Get user info =====
   const token = getAuthToken();
-  debugLog(`🔑 Auth token present: ${token ? '✅ Yes' : '❌ No'}`);
+  const userEmail = getStoredEmail();
+  const isAdmin = isAdminUser(userEmail);
+  const requiredCredits = calculateTotalCredits();
+  
+  debugLog(`🔑 Auth: token=${token ? '✅ Yes' : '❌ No'}, email=${userEmail || 'none'}, admin=${isAdmin}, credits_needed=${requiredCredits}`);
+  
+  // ===== FIX: Redirect non-admin users to pricing page =====
+  if (!isAdmin && !token) {
+    debugLog('🔑 No auth - redirecting to pricing page');
+    const pricingUrl = `/pricing?return=/thesis&required_credits=${requiredCredits}`;
+    window.location.href = pricingUrl;
+    return;
+  }
+  
+  // If not admin but has token, we can proceed (backend will handle credits)
+  if (!isAdmin && token) {
+    debugLog(`👤 Regular user: ${userEmail}, credits needed: ${requiredCredits}`);
+  }
+  
+  // Admin users skip all checks
+  if (isAdmin) {
+    debugLog('👑 Admin user - skipping credit checks');
+  }
   
   document.getElementById('step-tests').style.display = 'none';
   document.getElementById('step-progress').style.display = 'block';
@@ -778,7 +818,7 @@ async function runThesis() {
       }
     }
     if (completed + failedCount === totalTests) {
-      // ===== FIX 2: Generate package ID when all tests complete =====
+      // Generate package ID when all tests complete
       S.packageId = 'pkg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
       debugLog(`📦 Package ID generated: ${S.packageId}`);
       document.getElementById('progress-label').textContent = failedCount > 0 ? 
@@ -813,10 +853,10 @@ async function runThesis() {
       const params = buildParamsForTest(testId);
       debugLog(`📤 Sending request for ${testId} with params: ${JSON.stringify(params)}`);
       
-      // ===== FIX: Build headers with auth token =====
       const headers = { 'Content-Type': 'application/json' };
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      const authToken = getAuthToken();
+      if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`;
         debugLog(`🔑 Added Authorization header`);
       }
       
@@ -838,15 +878,11 @@ async function runThesis() {
       const d = await r.json();
       debugLog(`📄 Response data keys: ${Object.keys(d).join(', ')}`);
       
-      // ===== FIX 1: Don't redirect on 401 - show error instead =====
+      // If unauthorized, redirect to pricing
       if (r.status === 401) {
-        debugLog(`🔑 401 Unauthorized - Please sign in`);
-        showToast('🔑 Please sign in to run analyses');
-        // Show login prompt without redirecting
-        document.getElementById('step-progress').style.display = 'none';
-        document.getElementById('step-tests').style.display = 'block';
-        document.getElementById('btn-run-thesis').disabled = false;
-        showError('test-error', 'test-error-text', 'Please sign in to run analyses. <a href="/stats" style="color:var(--bl);font-weight:600">Sign in here</a>');
+        debugLog(`🔑 401 Unauthorized - redirecting to pricing`);
+        const pricingUrl = `/pricing?return=/thesis&required_credits=${requiredCredits}`;
+        window.location.href = pricingUrl;
         return;
       }
       
@@ -983,20 +1019,37 @@ async function downloadAllCode() {
 
 // ===== EXPORT =====
 async function exportThesis(format) {
+  // If no package ID, generate one
   if (!S.packageId) {
-    S.packageId = 'pkg_' + Date.now();
+    S.packageId = 'pkg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+    debugLog(`📦 Generated new package ID for export: ${S.packageId}`);
   }
   
   debugLog(`📤 Exporting as ${format}`);
   
+  // Map format names to backend expected values
+  const formatMap = {
+    'word': 'docx',
+    'pdf': 'pdf',
+    'excel': 'xlsx'
+  };
+  
+  const backendFormat = formatMap[format] || format;
+  
   try {
-    const r = await fetch(`${API_BASE}/api/package/export/${S.packageId}?format=${format}`, {
+    const r = await fetch(`${API_BASE}/api/package/export/${S.packageId}?format=${backendFormat}`, {
       method: 'GET'
     });
     
     if (!r.ok) {
       debugLog(`❌ Export failed: ${r.status} ${r.statusText}`);
-      alert('Export failed. Please try again.');
+      
+      // If 404, the backend route might not exist yet
+      if (r.status === 404) {
+        alert('Export feature is being configured. Please try again in a few minutes.\n\nIf this persists, contact support.');
+      } else {
+        alert('Export failed. Please try again.');
+      }
       return;
     }
     
@@ -1004,7 +1057,12 @@ async function exportThesis(format) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `thesis_package_${new Date().toISOString().slice(0,10)}.${format === 'pdf' ? 'pdf' : format === 'word' ? 'docx' : 'xlsx'}`;
+    const extMap = {
+      'word': 'docx',
+      'pdf': 'pdf',
+      'excel': 'xlsx'
+    };
+    a.download = `thesis_package_${new Date().toISOString().slice(0,10)}.${extMap[format] || format}`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
