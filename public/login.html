@@ -128,6 +128,19 @@
             border-radius: 4px;
             font-size: 12px;
         }
+        .referral-badge {
+            background: #E0F2FE;
+            color: #0369A1;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+            border-left: 4px solid #0EA5E9;
+        }
+        .referral-badge strong {
+            color: #0C4A6E;
+        }
     </style>
 </head>
 <body>
@@ -135,6 +148,11 @@
         <div class="logo">
             <h1>Eduxellence <span>Analytics</span></h1>
             <p>Statistical Analysis Platform</p>
+        </div>
+
+        <!-- ===== REFERRAL BADGE (shows when referral code is detected) ===== -->
+        <div id="referral-badge" class="referral-badge">
+            🎁 <strong>Referral detected!</strong> You'll both get <strong>5 free credits</strong> when you sign up and run your first analysis.
         </div>
 
         <div id="error" class="error"></div>
@@ -182,6 +200,38 @@
     </div>
 
     <script>
+        // ============================================================
+        // ===== FIX: CAPTURE REFERRAL CODE FROM URL =====
+        // ============================================================
+        const urlParams = new URLSearchParams(window.location.search);
+        const referralCode = urlParams.get('ref');
+        
+        if (referralCode) {
+            // Store the referral code in localStorage for use after signup
+            localStorage.setItem('edux_referral_code', referralCode);
+            console.log('📋 Referral code captured:', referralCode);
+            
+            // Show the referral badge
+            const badge = document.getElementById('referral-badge');
+            badge.style.display = 'block';
+            badge.innerHTML = `🎁 <strong>Referral from code: ${referralCode}</strong> — You'll both get <strong>5 free credits</strong> when you sign up and run your first analysis!`;
+        }
+
+        // ============================================================
+        // ===== API BASE (auto-detect environment) =====
+        // ============================================================
+        const API_BASE = (() => {
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                return 'http://localhost:7860';
+            }
+            return 'https://Eduxellence-eduxellence-api.hf.space';
+        })();
+
+        console.log(`🔗 API_BASE: ${API_BASE}`);
+
+        // ============================================================
+        // ===== MODE SWITCHING =====
+        // ============================================================
         let mode = 'login';
 
         function switchMode(newMode) {
@@ -219,7 +269,9 @@
             document.getElementById('error').style.display = 'none';
         }
 
-        // Login
+        // ============================================================
+        // ===== LOGIN =====
+        // ============================================================
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             hideMessages();
@@ -231,7 +283,7 @@
             const password = document.getElementById('password').value;
 
             try {
-                const res = await fetch('/api/auth/login', {
+                const res = await fetch(`${API_BASE}/api/auth/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
@@ -242,7 +294,34 @@
                     showSuccess('✅ Successfully signed in! Redirecting...');
                     // Store token
                     localStorage.setItem('supabase_token', data.token);
+                    localStorage.setItem('edux_user_email', email);
                     document.cookie = `supabase_token=${data.token}; path=/`;
+                    
+                    // ===== FIX: Check for referral code on login =====
+                    const savedRef = localStorage.getItem('edux_referral_code');
+                    if (savedRef && data.token) {
+                        try {
+                            console.log('📋 Recording referral on login...');
+                            const refRes = await fetch(`${API_BASE}/api/referrals/record`, {
+                                method: 'POST',
+                                headers: {
+                                    'Authorization': `Bearer ${data.token}`,
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ referral_code: savedRef })
+                            });
+                            if (refRes.ok) {
+                                console.log('✅ Referral recorded successfully on login');
+                                localStorage.removeItem('edux_referral_code');
+                            } else {
+                                const refData = await refRes.json();
+                                console.log('⚠️ Referral recording on login:', refData);
+                            }
+                        } catch(refErr) {
+                            console.log('⚠️ Error recording referral on login:', refErr.message);
+                        }
+                    }
+                    
                     setTimeout(() => {
                         window.location.href = '/stats';
                     }, 1500);
@@ -261,7 +340,9 @@
             }
         });
 
-        // Signup
+        // ============================================================
+        // ===== SIGNUP (with referral recording) =====
+        // ============================================================
         document.getElementById('signupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             hideMessages();
@@ -280,7 +361,7 @@
             }
 
             try {
-                const res = await fetch('/api/auth/signup', {
+                const res = await fetch(`${API_BASE}/api/auth/signup`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
@@ -289,13 +370,52 @@
 
                 if (res.ok) {
                     showSuccess('✅ Account created! Signing you in...');
-                    if (data.token) {
-                        localStorage.setItem('supabase_token', data.token);
-                        document.cookie = `supabase_token=${data.token}; path=/`;
+                    
+                    // Store token
+                    const token = data.token;
+                    if (token) {
+                        localStorage.setItem('supabase_token', token);
+                        localStorage.setItem('edux_user_email', email);
+                        document.cookie = `supabase_token=${token}; path=/`;
+                        
+                        // ============================================================
+                        // ===== FIX: RECORD REFERRAL AFTER SUCCESSFUL SIGNUP =====
+                        // ============================================================
+                        const savedRef = localStorage.getItem('edux_referral_code');
+                        if (savedRef) {
+                            try {
+                                console.log('📋 Recording referral after signup...');
+                                const refRes = await fetch(`${API_BASE}/api/referrals/record`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Authorization': `Bearer ${token}`,
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ referral_code: savedRef })
+                                });
+                                
+                                if (refRes.ok) {
+                                    const refData = await refRes.json();
+                                    console.log('✅ Referral recorded successfully!', refData);
+                                    // Show success message about free credits
+                                    showSuccess('✅ Account created and referral recorded! You both get 5 free credits!');
+                                    // Remove the stored referral code
+                                    localStorage.removeItem('edux_referral_code');
+                                } else {
+                                    const refData = await refRes.json();
+                                    console.log('⚠️ Referral recording failed:', refData);
+                                    // Don't block signup flow, just log it
+                                }
+                            } catch(refErr) {
+                                console.log('⚠️ Error recording referral:', refErr.message);
+                                // Don't block signup flow
+                            }
+                        }
                     }
+                    
                     setTimeout(() => {
                         window.location.href = '/stats';
-                    }, 1500);
+                    }, 2000);
                 } else {
                     showError('❌ ' + (data.error || 'Signup failed. Please try again.'));
                 }
@@ -304,6 +424,30 @@
             } finally {
                 btn.disabled = false;
                 btn.textContent = 'Create Account';
+            }
+        });
+
+        // ============================================================
+        // ===== INIT: Check for referral code on page load =====
+        // ============================================================
+        console.log('🔗 API_BASE:', API_BASE);
+        console.log('📋 Referral code from URL:', referralCode || 'none');
+        
+        // If there's a referral code, store it immediately (already done at top)
+        // Also show the badge if it exists
+        if (referralCode) {
+            document.getElementById('referral-badge').style.display = 'block';
+        }
+
+        // Handle Enter key for signup
+        document.getElementById('signupPassword').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('signupForm').dispatchEvent(new Event('submit'));
+            }
+        });
+        document.getElementById('password').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
             }
         });
     </script>
