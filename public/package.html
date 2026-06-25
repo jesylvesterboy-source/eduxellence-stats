@@ -444,7 +444,8 @@ let S = {
   packageId: null,
   testOverrides: {},
   testParams: {},
-  fileData: null
+  fileData: null,
+  config: {}  // Store config for export
 };
 
 // ===== BUILD PARAMS =====
@@ -817,7 +818,7 @@ async function handleFile(file) {
 }
 
 function resetUpload() {
-  S.metaPath = null; S.filename = null; S.columns = []; S.soundness = {}; S.testOverrides = {}; S.fileData = null;
+  S.metaPath = null; S.filename = null; S.columns = []; S.soundness = {}; S.testOverrides = {}; S.fileData = null; S.config = {};
   fi.value = '';
   document.getElementById('file-info').style.display = 'none';
   document.getElementById('step-tests').style.display = 'none';
@@ -929,7 +930,7 @@ async function runThesis() {
       }
     }
     if (completed + failedCount === totalTests) {
-      // ===== FIX: Save the package ID from the server response =====
+      // ===== FIX: Store the package ID from the server response =====
       // The server sets the package ID in the response
       // We need to store it for export
       if (!S.packageId) {
@@ -1039,6 +1040,11 @@ async function runThesis() {
       if (d.package_id) {
         S.packageId = d.package_id;
         debugLog(`📦 Server returned package ID: ${S.packageId}`);
+      }
+      
+      // ===== FIX: Build config for export =====
+      if (params) {
+        S.config[testId] = params;
       }
       
       debugLog(`✅ Test ${testId} completed with result keys: ${Object.keys(d).join(', ')}`);
@@ -1168,14 +1174,8 @@ async function downloadAllCode() {
   showToast('💡 Code for each test is available via the "🐍 Code" button next to each result.');
 }
 
-// ===== EXPORT - FIXED: Use correct API endpoint =====
+// ===== FIXED EXPORT - Uses POST endpoint with meta_path and config =====
 async function exportThesis(format) {
-  // If no package ID, generate one (fallback)
-  if (!S.packageId) {
-    S.packageId = 'pkg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
-    debugLog(`⚠️ Fallback package ID generated: ${S.packageId}`);
-  }
-  
   debugLog(`📤 Exporting as ${format}`);
   
   // Map format names to backend expected values
@@ -1186,19 +1186,48 @@ async function exportThesis(format) {
   };
   
   const backendFormat = formatMap[format] || format;
-  const exportUrl = `${API_BASE}/api/package/export/${S.packageId}?format=${backendFormat}`;
   
-  debugLog(`📤 Export URL: ${exportUrl}`);
+  // ===== FIX: Use the POST endpoint with meta_path and config =====
+  const exportUrl = `${API_BASE}/api/package/export`;
+  
+  // Build the complete config from all test params
+  const config = {};
+  for (const [testId, params] of Object.entries(S.config || {})) {
+    config[testId] = params;
+  }
+  
+  // If config is empty, try to build from selected tests
+  if (Object.keys(config).length === 0) {
+    for (const testId of S.selectedTests || []) {
+      config[testId] = buildParamsForTest(testId);
+    }
+  }
+  
+  debugLog(`📦 Export config: ${JSON.stringify(config).slice(0, 200)}...`);
   
   try {
     // Show loading state
     showToast(`⏳ Generating ${format} export...`);
     
+    const headers = { 'Content-Type': 'application/json' };
+    const authToken = getAuthToken();
+    if (authToken) {
+      headers['Authorization'] = `Bearer ${authToken}`;
+    }
+    
+    const requestBody = {
+      meta_path: S.metaPath,
+      config: config,
+      dataset_name: S.filename || 'Thesis Package',
+      format: backendFormat
+    };
+    
+    debugLog(`📤 POST to ${exportUrl}`);
+    
     const r = await fetch(exportUrl, {
-      method: 'GET',
-      headers: {
-        'Authorization': getAuthToken() ? `Bearer ${getAuthToken()}` : ''
-      }
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(requestBody)
     });
     
     if (!r.ok) {
@@ -1210,8 +1239,8 @@ async function exportThesis(format) {
       
       debugLog(`❌ Export failed: ${errorMsg}`);
       
-      if (r.status === 404) {
-        alert(`Export feature is being configured. Please try again in a few minutes.\n\nIf this persists, contact support.\n\nError: ${errorMsg}`);
+      if (r.status === 404 || r.status === 400) {
+        alert(`Export error: ${errorMsg}\n\nPlease try regenerating the thesis package.`);
       } else {
         alert(`Export failed: ${errorMsg}\n\nPlease try again.`);
       }
@@ -1249,7 +1278,7 @@ function goBack() {
 }
 
 function resetAll() {
-  S = { metaPath: null, filename: null, selectedTests: [], results: null, columns: [], soundness: {}, packageId: null, testOverrides: {}, testParams: {}, fileData: null };
+  S = { metaPath: null, filename: null, selectedTests: [], results: null, columns: [], soundness: {}, packageId: null, testOverrides: {}, testParams: {}, fileData: null, config: {} };
   document.getElementById('step-results').style.display = 'none';
   document.getElementById('step-progress').style.display = 'none';
   document.getElementById('step-tests').style.display = 'none';
