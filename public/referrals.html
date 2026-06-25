@@ -26,6 +26,9 @@ a{color:var(--bl);text-decoration:none}
 .main{max-width:900px;margin:-3rem auto 4rem;padding:0 1.25rem}
 .signin-card{background:var(--wh);border-radius:var(--r24);box-shadow:var(--shL);padding:3rem 2rem;text-align:center}
 .signin-icon{font-size:3rem;margin-bottom:1rem}
+.signin-card .sub-text{color:var(--sl);font-size:.9rem;margin-bottom:.5rem}
+.signin-card .how-text{font-size:.85rem;color:var(--sl);margin-top:.75rem;padding:.75rem;background:var(--of);border-radius:var(--r8)}
+.signin-card .how-text strong{color:var(--tx)}
 .code-card{background:var(--wh);border-radius:var(--r24);box-shadow:var(--shL);padding:2rem;margin-bottom:1.5rem;text-align:center}
 .code-label{font-size:.8rem;color:var(--sl);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
 .code-display{font-family:'JetBrains Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--ny);background:var(--of);border:2px dashed var(--bd);border-radius:var(--r12);padding:1rem 1.5rem;display:inline-block;margin-bottom:1rem;letter-spacing:.1em}
@@ -64,6 +67,8 @@ a{color:var(--bl);text-decoration:none}
 .status-pending{background:#FEF3C7;color:#92400E}
 .status-qualified{background:rgba(22,163,74,.1);color:var(--ok)}
 .empty-state{text-align:center;padding:2rem;color:var(--sl);font-size:.88rem}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--ny);color:#fff;padding:.7rem 1.5rem;border-radius:var(--r12);box-shadow:var(--shL);font-size:.85rem;z-index:1000;opacity:0;transition:opacity .3s ease;pointer-events:none}
+.toast.show{opacity:1}
 footer{background:var(--ny);color:rgba(255,255,255,.5);text-align:center;padding:2rem;font-size:.83rem;margin-top:2rem}
 footer a{color:var(--tl)}
 @media(max-width:640px){.stats-grid{grid-template-columns:1fr}.steps-grid{grid-template-columns:1fr}.nav-links{display:none}}
@@ -86,13 +91,21 @@ footer a{color:var(--tl)}
 </section>
 
 <div class="main" id="main-content">
-  <div class="signin-card">
+  <!-- Signin Card - Will be replaced by JS when logged in -->
+  <div class="signin-card" id="signin-card">
     <div class="signin-icon">🔒</div>
     <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:.5rem">Sign In to See Your Referral Link</div>
-    <p style="color:var(--sl);font-size:.9rem;margin-bottom:1.25rem">Create a free account to get your personal referral link and start earning credits.</p>
-    <a href="/login" style="display:inline-block;background:var(--bl);color:#fff;font-family:'Syne',sans-serif;font-weight:700;padding:.8rem 2rem;border-radius:10px">Sign In / Create Free Account</a>
+    <p class="sub-text">Create a free account to get your personal referral link and start earning credits.</p>
+    <div class="how-text">
+      <strong>How it works:</strong> Share your referral link. When friends sign up and run their first analysis, 
+      you both get <strong>5 free credits</strong>!
+    </div>
+    <a href="/login" style="display:inline-block;background:var(--bl);color:#fff;font-family:'Syne',sans-serif;font-weight:700;padding:.8rem 2rem;border-radius:10px;margin-top:1rem">Sign In / Create Free Account</a>
   </div>
 </div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
 
 <footer>
   <p><strong style="color:rgba(255,255,255,.75)">Eduxellence Analytics</strong> — Free Statistical Analysis Platform</p>
@@ -100,106 +113,272 @@ footer a{color:var(--tl)}
 </footer>
 
 <script>
-function getAuthToken(){ return localStorage.getItem('edux_auth_token') || null; }
+// ============================================================
+// ===== API BASE (auto-detect environment) =====
+// ============================================================
+const API_BASE = (() => {
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:7860';
+  }
+  return 'https://Eduxellence-eduxellence-api.hf.space';
+})();
 
+console.log(`🔗 API_BASE: ${API_BASE}`);
+
+// ============================================================
+// ===== AUTH HELPERS =====
+// ============================================================
+function getAuthToken() { 
+  return localStorage.getItem('edux_auth_token') || 
+         document.cookie.split('; ').find(row => row.startsWith('supabase_token='))?.split('=')[1] ||
+         null; 
+}
+
+function getUserEmail() {
+  return localStorage.getItem('edux_user_email') || null;
+}
+
+// ============================================================
+// ===== TOAST NOTIFICATION =====
+// ============================================================
+function showToast(message, duration = 3000) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.add('show');
+  clearTimeout(toast._timeout);
+  toast._timeout = setTimeout(() => {
+    toast.classList.remove('show');
+  }, duration);
+}
+
+// ============================================================
+// ===== MILESTONES DEFINITION =====
+// ============================================================
 const MILESTONES = [
   {threshold: 3,  label: '5 free credits',       pos: 30},
   {threshold: 10, label: '1 free Thesis Package', pos: 100},
 ];
 
-async function init(){
+// ============================================================
+// ===== MAIN INITIALIZATION =====
+// ============================================================
+async function init() {
   const token = getAuthToken();
-  if(!token) return;
+  console.log(`🔑 Auth token: ${token ? '✅ Present' : '❌ Missing'}`);
+  
+  if (!token) {
+    console.log('👤 No auth token - showing sign-in card');
+    return;
+  }
 
-  try{
+  try {
+    console.log('📡 Fetching referral data...');
     const [codeR, statsR] = await Promise.all([
-      fetch('/api/referrals/code', {headers:{'Authorization':'Bearer '+token}}),
-      fetch('/api/referrals/stats', {headers:{'Authorization':'Bearer '+token}}),
+      fetch(`${API_BASE}/api/referrals/code`, {
+        headers: { 'Authorization': 'Bearer ' + token }
+      }),
+      fetch(`${API_BASE}/api/referrals/stats`, {
+        headers: { 'Authorization': 'Bearer ' + token }
+      }),
     ]);
-    const codeD = await codeR.json();
-    const statsD = await statsR.json();
-    if(!codeR.ok || !statsR.ok){
-      document.getElementById('main-content').innerHTML = '<div class="signin-card"><p style="color:var(--sl)">Could not load referral data. Please try signing in again.</p></div>';
+
+    console.log(`📥 Code response: ${codeR.status}, Stats response: ${statsR.status}`);
+
+    if (!codeR.ok || !statsR.ok) {
+      const errorMsg = !codeR.ok ? `Code API error (${codeR.status})` : `Stats API error (${statsR.status})`;
+      console.error('❌ ' + errorMsg);
+      document.getElementById('main-content').innerHTML = 
+        '<div class="signin-card"><p style="color:var(--sl)">Could not load referral data. Please try signing in again.</p>' +
+        '<a href="/login" style="display:inline-block;background:var(--bl);color:#fff;font-family:\'Syne\',sans-serif;font-weight:700;padding:.8rem 2rem;border-radius:10px;margin-top:1rem">Sign In</a></div>';
       return;
     }
+
+    const codeD = await codeR.json();
+    const statsD = await statsR.json();
+    
+    console.log(`📊 Stats: ${statsD.total_referred || 0} referrals, ${statsD.qualified_count || 0} qualified`);
+    console.log(`📋 Referral code: ${codeD.code || 'N/A'}`);
+    
     render(codeD, statsD);
-  }catch(e){
-    document.getElementById('main-content').innerHTML = '<div class="signin-card"><p style="color:var(--sl)">Network error: ' + e.message + '</p></div>';
+  } catch (e) {
+    console.error('💥 Network error:', e.message);
+    document.getElementById('main-content').innerHTML = 
+      '<div class="signin-card"><p style="color:var(--sl)">Network error: ' + e.message + '</p>' +
+      '<a href="/login" style="display:inline-block;background:var(--bl);color:#fff;font-family:\'Syne\',sans-serif;font-weight:700;padding:.8rem 2rem;border-radius:10px;margin-top:1rem">Sign In</a></div>';
   }
 }
 
-function render(codeD, statsD){
-  const qualified = statsD.qualified_count || 0;
-  const fillPct = Math.min(100, (qualified / 10) * 100);
+// ============================================================
+// ===== RENDER DASHBOARD =====
+// ============================================================
+function render(codeD, statsD) {
+  console.log('🎨 Rendering dashboard...');
+  
+  // ===== FIX: Safely extract values with defaults =====
+  const totalReferred = statsD.total_referred || 0;
+  const qualifiedCount = statsD.qualified_count || 0;
+  const referralCode = codeD.code || 'Loading...';
+  const referralLink = codeD.referral_link || `https://eduxellence.org/signup?ref=${referralCode}`;
+  const milestonesReached = statsD.milestones_reached || [];
+  
+  // ===== FIX: Safely handle next milestone =====
+  let nextMilestoneHtml = '';
+  if (statsD.next_milestone) {
+    const remaining = statsD.next_milestone.remaining || 0;
+    const reward = statsD.next_milestone.reward || 'credits';
+    const threshold = statsD.next_milestone.threshold || 0;
+    const label = statsD.next_milestone.label || `${threshold} referrals`;
+    
+    if (remaining > 0) {
+      nextMilestoneHtml = `
+        <div class="next-reward-box">
+          <div style="font-weight:700;font-size:.95rem;margin-bottom:.25rem">
+            🎯 ${remaining} more referral${remaining === 1 ? '' : 's'} to unlock ${label}
+          </div>
+          <div style="font-size:.85rem;color:var(--txM)">${reward}</div>
+        </div>
+      `;
+    } else {
+      nextMilestoneHtml = `
+        <div class="next-reward-box complete">
+          <div style="font-weight:700;font-size:.95rem">🎉 You have unlocked every referral milestone!</div>
+          <div style="font-size:.85rem;color:var(--txM);margin-top:.25rem">
+            Keep referring — every qualified friend still helps grow the community.
+          </div>
+        </div>
+      `;
+    }
+  } else {
+    // Fallback if no next milestone
+    nextMilestoneHtml = `
+      <div class="next-reward-box">
+        <div style="font-weight:700;font-size:.95rem">🎯 Share your link to start earning!</div>
+        <div style="font-size:.85rem;color:var(--txM)">3 referrals = 5 free credits · 10 referrals = Free Thesis Package</div>
+      </div>
+    `;
+  }
 
-  const milestoneMarkers = MILESTONES.map(m=>{
-    const reached = qualified >= m.threshold;
+  // ===== MILESTONE MARKERS =====
+  const fillPct = Math.min(100, (qualifiedCount / 10) * 100);
+  
+  const milestoneMarkers = MILESTONES.map(m => {
+    const reached = qualifiedCount >= m.threshold;
     const isCurrent = !reached && statsD.next_milestone && statsD.next_milestone.threshold === m.threshold;
-    return '<div class="milestone-marker ' + (reached?'reached':isCurrent?'current':'') + '" style="left:' + m.pos + '%">' + (reached?'✓':m.threshold) + '</div>' +
+    return '<div class="milestone-marker ' + (reached ? 'reached' : isCurrent ? 'current' : '') + '" style="left:' + m.pos + '%">' + (reached ? '✓' : m.threshold) + '</div>' +
       '<div class="milestone-label" style="left:' + m.pos + '%">' + m.label + '</div>';
   }).join('');
 
-  const nextRewardHtml = statsD.next_milestone
-    ? '<div class="next-reward-box"><div style="font-weight:700;font-size:.95rem;margin-bottom:.25rem">🎯 ' + statsD.next_milestone.remaining + ' more referral' + (statsD.next_milestone.remaining===1?'':'s') + ' to unlock</div><div style="font-size:.85rem;color:var(--txM)">' + statsD.next_milestone.reward + '</div></div>'
-    : '<div class="next-reward-box complete"><div style="font-weight:700;font-size:.95rem">🎉 You have unlocked every referral milestone!</div><div style="font-size:.85rem;color:var(--txM);margin-top:.25rem">Keep referring — every qualified friend still helps grow the community.</div></div>';
-
+  // ===== REFERRALS LIST =====
   const referralsListHtml = statsD.referrals && statsD.referrals.length
-    ? statsD.referrals.map(r=>'<div class="ref-row"><span>Referred ' + new Date(r.created_at).toLocaleDateString() + '</span><span class="ref-status ' + (r.status==='pending'?'status-pending':'status-qualified') + '">' + (r.status==='pending'?'⏳ Pending first analysis':'✓ Qualified') + '</span></div>').join('')
+    ? statsD.referrals.map(r => {
+        const date = r.created_at ? new Date(r.created_at).toLocaleDateString() : 'Unknown date';
+        const status = r.status || 'pending';
+        const statusLabel = status === 'pending' ? '⏳ Pending first analysis' : '✓ Qualified';
+        const statusClass = status === 'pending' ? 'status-pending' : 'status-qualified';
+        return `<div class="ref-row"><span>Referred ${date}</span><span class="ref-status ${statusClass}">${statusLabel}</span></div>`;
+      }).join('')
     : '<div class="empty-state">No referrals yet — share your link to get started!</div>';
 
-  document.getElementById('main-content').innerHTML =
-    '<div class="code-card">' +
-      '<div class="code-label">Your Referral Code</div>' +
-      '<div class="code-display">' + codeD.code + '</div>' +
-      '<div class="link-row">' +
-        '<input class="link-input" id="ref-link-input" readonly value="' + codeD.referral_link + '">' +
-        '<button class="copy-btn" onclick="copyLink()">Copy Link</button>' +
-      '</div>' +
-      '<div class="share-row">' +
-        '<a class="share-btn" target="_blank" href="https://wa.me/?text=' + encodeURIComponent('Clean your data and run statistical analysis free — I use Eduxellence Analytics. Join with my link: ' + codeD.referral_link) + '">💬 WhatsApp</a>' +
-        '<a class="share-btn" target="_blank" href="https://twitter.com/intent/tweet?text=' + encodeURIComponent('Free statistical analysis tool for researchers and students:') + '&url=' + encodeURIComponent(codeD.referral_link) + '">🐦 X / Twitter</a>' +
-        '<a class="share-btn" target="_blank" href="mailto:?subject=' + encodeURIComponent('Free statistical analysis tool') + '&body=' + encodeURIComponent('I think you would find this useful: ' + codeD.referral_link) + '">✉️ Email</a>' +
-      '</div>' +
-    '</div>' +
-    '<div class="progress-section">' +
-      '<div class="progress-title">Your Referral Progress</div>' +
-      '<div class="milestone-track">' +
-        '<div class="milestone-bar"><div class="milestone-fill" style="width:' + fillPct + '%"></div></div>' +
-        milestoneMarkers +
-      '</div>' +
-      nextRewardHtml +
-      '<div class="stats-grid">' +
-        '<div class="stat-box"><div class="stat-num">' + statsD.total_referred + '</div><div class="stat-lbl">Total Invited</div></div>' +
-        '<div class="stat-box"><div class="stat-num">' + statsD.qualified_count + '</div><div class="stat-lbl">Qualified</div></div>' +
-        '<div class="stat-box"><div class="stat-num">' + statsD.milestones_reached.length + '</div><div class="stat-lbl">Rewards Earned</div></div>' +
-      '</div>' +
-    '</div>' +
-    '<div class="how-it-works">' +
-      '<div class="progress-title">How It Works</div>' +
-      '<div class="steps-grid">' +
-        '<div class="step-card"><div class="step-num-circle">1</div><div class="step-title">Share your link</div><div class="step-desc">Send your unique code to classmates, colleagues, or your research WhatsApp group.</div></div>' +
-        '<div class="step-card"><div class="step-num-circle">2</div><div class="step-title">They run an analysis</div><div class="step-desc">Once your friend signs up and completes any analysis — even a free one — they qualify.</div></div>' +
-        '<div class="step-card"><div class="step-num-circle">3</div><div class="step-title">You get rewarded</div><div class="step-desc">3 qualified friends = 5 free credits. 10 qualified friends = a free Thesis Package.</div></div>' +
-      '</div>' +
-    '</div>' +
-    '<div class="referrals-list">' +
-      '<div class="progress-title">Your Referrals</div>' +
-      referralsListHtml +
-    '</div>';
+  // ===== BUILD THE COMPLETE HTML =====
+  document.getElementById('main-content').innerHTML = `
+    <!-- Referral Code Card -->
+    <div class="code-card">
+      <div class="code-label">Your Referral Code</div>
+      <div class="code-display">${referralCode}</div>
+      <div class="link-row">
+        <input class="link-input" id="ref-link-input" readonly value="${referralLink}">
+        <button class="copy-btn" onclick="copyLink()">Copy Link</button>
+      </div>
+      <div class="share-row">
+        <a class="share-btn" target="_blank" href="https://wa.me/?text=${encodeURIComponent('Clean your data and run statistical analysis free — I use Eduxellence Analytics. Join with my link: ' + referralLink)}">💬 WhatsApp</a>
+        <a class="share-btn" target="_blank" href="https://twitter.com/intent/tweet?text=${encodeURIComponent('Free statistical analysis tool for researchers and students:')}&url=${encodeURIComponent(referralLink)}">🐦 X / Twitter</a>
+        <a class="share-btn" target="_blank" href="mailto:?subject=${encodeURIComponent('Free statistical analysis tool')}&body=${encodeURIComponent('I think you would find this useful: ' + referralLink)}">✉️ Email</a>
+      </div>
+    </div>
+
+    <!-- Progress Section -->
+    <div class="progress-section">
+      <div class="progress-title">Your Referral Progress</div>
+      <div class="milestone-track">
+        <div class="milestone-bar"><div class="milestone-fill" style="width:${fillPct}%"></div></div>
+        ${milestoneMarkers}
+      </div>
+      ${nextMilestoneHtml}
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-num">${totalReferred}</div><div class="stat-lbl">Total Invited</div></div>
+        <div class="stat-box"><div class="stat-num">${qualifiedCount}</div><div class="stat-lbl">Qualified</div></div>
+        <div class="stat-box"><div class="stat-num">${milestonesReached.length}</div><div class="stat-lbl">Rewards Earned</div></div>
+      </div>
+    </div>
+
+    <!-- How It Works -->
+    <div class="how-it-works">
+      <div class="progress-title">How It Works</div>
+      <div class="steps-grid">
+        <div class="step-card"><div class="step-num-circle">1</div><div class="step-title">Share your link</div><div class="step-desc">Send your unique code to classmates, colleagues, or your research WhatsApp group.</div></div>
+        <div class="step-card"><div class="step-num-circle">2</div><div class="step-title">They run an analysis</div><div class="step-desc">Once your friend signs up and completes any analysis — even a free one — they qualify.</div></div>
+        <div class="step-card"><div class="step-num-circle">3</div><div class="step-title">You get rewarded</div><div class="step-desc">3 qualified friends = 5 free credits. 10 qualified friends = a free Thesis Package.</div></div>
+      </div>
+    </div>
+
+    <!-- Referrals List -->
+    <div class="referrals-list">
+      <div class="progress-title">Your Referrals</div>
+      ${referralsListHtml}
+    </div>
+  `;
+  
+  console.log('✅ Dashboard rendered successfully');
 }
 
-function copyLink(){
+// ============================================================
+// ===== COPY LINK FUNCTION =====
+// ============================================================
+function copyLink() {
   const input = document.getElementById('ref-link-input');
+  if (!input) {
+    console.warn('⚠️ Link input not found');
+    return;
+  }
+  
   input.select();
-  navigator.clipboard?.writeText(input.value).then(()=>{
-    const btn = event.target;
-    const orig = btn.textContent;
-    btn.textContent = 'Copied!';
-    setTimeout(()=>btn.textContent = orig, 2000);
-  });
+  
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(input.value)
+      .then(() => {
+        showToast('✅ Link copied to clipboard!');
+        const btn = event.target;
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = orig, 2000);
+      })
+      .catch(() => {
+        // Fallback to document.execCommand
+        document.execCommand('copy');
+        showToast('✅ Link copied to clipboard!');
+      });
+  } else {
+    // Fallback for older browsers
+    document.execCommand('copy');
+    showToast('✅ Link copied to clipboard!');
+  }
 }
 
+// ============================================================
+// ===== INIT ON PAGE LOAD =====
+// ============================================================
+console.log('🚀 Referrals page loaded');
+console.log(`🔗 API_BASE: ${API_BASE}`);
+
+// Run initialization
 init();
+
+// ============================================================
+// ===== EXPOSE FUNCTIONS TO GLOBAL SCOPE =====
+// ============================================================
+window.copyLink = copyLink;
+window.getAuthToken = getAuthToken;
+window.showToast = showToast;
 </script>
 </body>
 </html>
