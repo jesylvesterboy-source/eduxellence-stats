@@ -2,7 +2,7 @@ name: Keep Supabase Alive
 
 on:
   schedule:
-    # Runs every day at 00:00 UTC (adjust time if needed)
+    # Runs every day at 00:00 UTC
     - cron: '0 0 * * *'
   workflow_dispatch:  # Allows manual trigger
 
@@ -13,12 +13,18 @@ jobs:
     steps:
       - name: Ping Supabase health endpoint
         run: |
+          echo "Pinging Supabase health endpoint..."
           curl -X GET "${{ secrets.SUPABASE_URL }}/auth/v1/health" \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -w "\nHTTP Status: %{http_code}\n" \
+            --fail-with-body
           
-      - name: Ping Supabase project URL
+      - name: Ping Supabase REST API
         run: |
+          echo "Pinging Supabase REST API..."
           curl -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/" \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -w "\nHTTP Status: %{http_code}\n" \
+            --fail-with-body
