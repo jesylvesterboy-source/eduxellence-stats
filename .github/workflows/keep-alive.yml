@@ -4,7 +4,7 @@ on:
   schedule:
     # Runs every day at 00:00 UTC
     - cron: '0 0 * * *'
-  workflow_dispatch:  # Allows manual trigger
+  workflow_dispatch:
 
 jobs:
   ping-supabase:
@@ -16,15 +16,11 @@ jobs:
           echo "Pinging Supabase health endpoint..."
           curl -X GET "${{ secrets.SUPABASE_URL }}/auth/v1/health" \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -w "\nHTTP Status: %{http_code}\n" \
-            --fail-with-body
+            -w "\nHTTP Status: %{http_code}\n"
           
-      - name: Ping Supabase REST API
+      - name: Ping Supabase Auth endpoint
         run: |
-          echo "Pinging Supabase REST API..."
-          curl -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/" \
+          echo "Pinging Supabase Auth endpoint..."
+          curl -X GET "${{ secrets.SUPABASE_URL }}/auth/v1/user" \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -w "\nHTTP Status: %{http_code}\n" \
-            --fail-with-body
+            -w "\nHTTP Status: %{http_code}\n"
