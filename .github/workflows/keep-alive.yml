@@ -2,25 +2,16 @@ name: Keep Supabase Alive
 
 on:
   schedule:
-    # Runs every day at 00:00 UTC
-    - cron: '0 0 * * *'
-  workflow_dispatch:
+    - cron: '0 */6 * * *'  # Runs every 6 hours (4 times a day)
+  workflow_dispatch:  # Allows manual trigger
 
 jobs:
-  ping-supabase:
+  keep-alive:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Ping Supabase health endpoint
+      - name: Ping the API to keep Supabase active
         run: |
-          echo "Pinging Supabase health endpoint..."
-          curl -X GET "${{ secrets.SUPABASE_URL }}/auth/v1/health" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -w "\nHTTP Status: %{http_code}\n"
-          
-      - name: Ping Supabase Auth endpoint
-        run: |
-          echo "Pinging Supabase Auth endpoint..."
-          curl -X GET "${{ secrets.SUPABASE_URL }}/auth/v1/user" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -w "\nHTTP Status: %{http_code}\n"
+          echo "Pinging Hugging Face API health endpoint..."
+          curl -X GET "https://Eduxellence-eduxellence-api.hf.space/health" \
+            -w "\nHTTP Status: %{http_code}\n" \
+            --fail-with-body
