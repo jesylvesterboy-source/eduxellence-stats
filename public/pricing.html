@@ -404,6 +404,44 @@ function subscribePlan(planKey){
   switchCurrency(detected);
   document.querySelector(`.cur-btn[data-cur="${currentCurrency}"]`)?.classList.add('active');
 })();
+
+// ===== NEW: AUTH FIX - Prevents redirect loop when user is logged in =====
+(async function checkAuthAndRedirect() {
+    try {
+        const token = localStorage.getItem('edux_auth_token');
+        const refreshToken = localStorage.getItem('edux_refresh_token');
+        
+        if (token && refreshToken) {
+            // Verify token with server
+            const r = await fetch('/api/credits/balance', {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+            
+            if (r.status === 200) {
+                // User is authenticated - stay on pricing page
+                console.log('✅ User authenticated - showing pricing');
+            } else if (r.status === 401) {
+                // Token expired, try to refresh
+                const refresh = await fetch('/api/auth/refresh', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({refresh_token: refreshToken})
+                });
+                const data = await refresh.json();
+                if (data.access_token) {
+                    localStorage.setItem('edux_auth_token', data.access_token);
+                    localStorage.setItem('edux_refresh_token', data.refresh_token);
+                    console.log('🔄 Token refreshed successfully');
+                }
+            }
+        }
+    } catch (e) {
+        // Silently fail - user stays on pricing page
+        console.log('Auth check completed (non-critical):', e.message);
+    }
+})();
 </script>
 </body>
 </html>
