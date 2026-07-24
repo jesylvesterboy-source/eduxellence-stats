@@ -332,14 +332,60 @@ function renderSubs(plans, currency){
     </div>`).join('');
 }
 
-// FIX: Updated buyPack with token refresh
+// ===== FIXED: buyPack with proper token verification and refresh =====
 async function buyPack(packId){
-  const token = await getValidToken();
+  // Try to get token from localStorage
+  let token = localStorage.getItem('edux_auth_token');
+  
+  // If no token, redirect to login
   if (!token) {
-    alert('Your session has expired. Please log in again.');
+    alert('Please log in to purchase credits.');
     window.location.href = '/login';
     return;
   }
+
+  // Verify token is still valid with the server
+  try {
+    const verify = await fetch('/api/credits/balance', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    
+    if (verify.status === 401) {
+      // Token expired, try to refresh
+      const refreshToken = localStorage.getItem('edux_refresh_token');
+      if (refreshToken) {
+        const refresh = await fetch('/api/auth/refresh', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({refresh_token: refreshToken})
+        });
+        const data = await refresh.json();
+        if (data.access_token) {
+          // Save new token and proceed
+          localStorage.setItem('edux_auth_token', data.access_token);
+          localStorage.setItem('edux_refresh_token', data.refresh_token);
+          localStorage.setItem('edux_token_expires_at', String(Date.now() + (data.expires_in || 3600) * 1000));
+          token = data.access_token;
+        } else {
+          // Refresh failed - redirect to login
+          alert('Your session has expired. Please log in again.');
+          window.location.href = '/login';
+          return;
+        }
+      } else {
+        // No refresh token - redirect to login
+        alert('Your session has expired. Please log in again.');
+        window.location.href = '/login';
+        return;
+      }
+    }
+  } catch (e) {
+    // Network error - allow user to retry
+    alert('Network error. Please check your connection and try again.');
+    return;
+  }
+
+  // Token is valid, proceed with purchase
   _pendingPackId = packId;
   openGatewayModal();
 }
@@ -405,35 +451,59 @@ function subscribePlan(planKey){
   document.querySelector(`.cur-btn[data-cur="${currentCurrency}"]`)?.classList.add('active');
 })();
 
-// ===== NEW: AUTH FIX - Prevents redirect loop when user is logged in =====
+// ===== FIXED: AUTH CHECK - Properly validates and refreshes token on page load =====
 (async function checkAuthAndRedirect() {
     try {
-        const token = localStorage.getItem('edux_auth_token');
+        let token = localStorage.getItem('edux_auth_token');
         const refreshToken = localStorage.getItem('edux_refresh_token');
         
-        if (token && refreshToken) {
+        if (!token && refreshToken) {
+            // Try to refresh if only refresh token exists
+            const refresh = await fetch('/api/auth/refresh', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({refresh_token: refreshToken})
+            });
+            const data = await refresh.json();
+            if (data.access_token) {
+                localStorage.setItem('edux_auth_token', data.access_token);
+                localStorage.setItem('edux_refresh_token', data.refresh_token);
+                localStorage.setItem('edux_token_expires_at', String(Date.now() + (data.expires_in || 3600) * 1000));
+                console.log('🔄 Token refreshed on page load');
+                token = data.access_token;
+            }
+        }
+        
+        if (token) {
             // Verify token with server
             const r = await fetch('/api/credits/balance', {
-                headers: {
-                    'Authorization': 'Bearer ' + token
-                }
+                headers: { 'Authorization': 'Bearer ' + token }
             });
             
             if (r.status === 200) {
-                // User is authenticated - stay on pricing page
                 console.log('✅ User authenticated - showing pricing');
             } else if (r.status === 401) {
-                // Token expired, try to refresh
-                const refresh = await fetch('/api/auth/refresh', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({refresh_token: refreshToken})
-                });
-                const data = await refresh.json();
-                if (data.access_token) {
-                    localStorage.setItem('edux_auth_token', data.access_token);
-                    localStorage.setItem('edux_refresh_token', data.refresh_token);
-                    console.log('🔄 Token refreshed successfully');
+                // Token invalid - try refresh once more
+                if (refreshToken) {
+                    const refresh = await fetch('/api/auth/refresh', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({refresh_token: refreshToken})
+                    });
+                    const data = await refresh.json();
+                    if (data.access_token) {
+                        localStorage.setItem('edux_auth_token', data.access_token);
+                        localStorage.setItem('edux_refresh_token', data.refresh_token);
+                        localStorage.setItem('edux_token_expires_at', String(Date.now() + (data.expires_in || 3600) * 1000));
+                        console.log('🔄 Token refreshed successfully');
+                    } else {
+                        // Refresh failed - clear tokens and redirect
+                        localStorage.removeItem('edux_auth_token');
+                        localStorage.removeItem('edux_refresh_token');
+                        localStorage.removeItem('edux_token_expires_at');
+                        console.log('🔴 Session invalid - redirecting to login');
+                        // Don't redirect here - let user stay on pricing page
+                    }
                 }
             }
         }
