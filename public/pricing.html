@@ -14,6 +14,16 @@
 body{font-family:'DM Sans',sans-serif;background:var(--of);color:var(--tx);line-height:1.6}
 a{color:var(--bl);text-decoration:none}
 
+/* NEW: Gateway Modal Styles */
+.gw-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(11,24,41,.6);z-index:1000;align-items:center;justify-content:center}
+.gw-modal-backdrop.show{display:flex}
+.gw-modal{background:var(--wh);border-radius:var(--r16);padding:1.75rem;max-width:340px;width:90%;box-shadow:var(--shL)}
+.gw-modal h3{font-family:'Syne',sans-serif;font-size:1.1rem;margin-bottom:1rem;color:var(--tx)}
+.gw-option{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1rem;border:1.5px solid var(--bd);border-radius:10px;margin-bottom:.75rem;cursor:pointer;transition:all .15s}
+.gw-option:hover{border-color:var(--bl);background:var(--of)}
+.gw-option-label{font-weight:600;font-size:.92rem}
+.gw-cancel{width:100%;padding:.6rem;border:none;background:transparent;color:var(--sl);font-size:.85rem;cursor:pointer;margin-top:.25rem}
+
 .nav{background:var(--ny);height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;position:sticky;top:0;z-index:100}
 .nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;color:#fff;text-decoration:none}
 .nav-logo span{color:var(--tl)}
@@ -162,6 +172,15 @@ footer a{color:var(--tl)}
 
 </div>
 
+<!-- NEW: Gateway Modal -->
+<div class="gw-modal-backdrop" id="gw-modal">
+  <div class="gw-modal">
+    <h3>Choose a payment method</h3>
+    <div id="gw-options"></div>
+    <button class="gw-cancel" onclick="closeGatewayModal()">Cancel</button>
+  </div>
+</div>
+
 <footer>
   <p><strong style="color:rgba(255,255,255,.75)">Eduxellence Analytics</strong> — Free Statistical Analysis Platform</p>
   <p style="margin-top:.4rem"><a href="/">Home</a> · <a href="/stats">Run Analysis</a> · <a href="https://eduxellence.org/#contact">Contact</a></p>
@@ -169,6 +188,8 @@ footer a{color:var(--tl)}
 
 <script>
 let currentCurrency = 'NGN';
+let _pendingPackId = null;
+let _availableGateways = [];
 
 async function detectDefaultCurrency(){
   // Server-side detection via Vercel's x-vercel-ip-country geo header —
@@ -196,6 +217,8 @@ async function loadPricing(){
   try{
     const r = await fetch(`/api/pricing?currency=${currentCurrency}`);
     const d = await r.json();
+    // FIX: Capture available gateways from the response
+    _availableGateways = d.gateways || [];
     renderPriceTable(d.tests);
     renderPacks(d.credit_packs, d.currency);
     renderSubs(d.subscriptions, d.currency);
@@ -271,6 +294,7 @@ function renderSubs(plans, currency){
     </div>`).join('');
 }
 
+// FIX: Updated buyPack with gateway modal
 function buyPack(packId){
   const token = localStorage.getItem('edux_auth_token');
   if(!token){
@@ -278,18 +302,46 @@ function buyPack(packId){
     window.location.href = '/login';
     return;
   }
+  _pendingPackId = packId;
+  openGatewayModal();
+}
+
+// FIX: New gateway modal functions
+function openGatewayModal(){
+  const gwLabels = {paystack:'Paystack', flutterwave:'Flutterwave'};
+  const optsHtml = _availableGateways.map(g => `
+    <div class="gw-option" onclick="chooseGateway('${g.id}')">
+      <span class="gw-option-label">${gwLabels[g.id] || g.label}</span>
+      <span style="color:var(--sl)">→</span>
+    </div>`).join('');
+  document.getElementById('gw-options').innerHTML = optsHtml || '<p style="color:var(--sl);font-size:.85rem">No payment gateways available.</p>';
+  document.getElementById('gw-modal').classList.add('show');
+}
+
+function closeGatewayModal(){
+  document.getElementById('gw-modal').classList.remove('show');
+  _pendingPackId = null;
+}
+
+function chooseGateway(gateway){
+  const token = localStorage.getItem('edux_auth_token');
+  const packId = _pendingPackId;
+  closeGatewayModal();
+  if(!packId) return;
+
   fetch('/api/payments/initiate',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-    body: JSON.stringify({pack_id: packId})
+    body: JSON.stringify({pack_id: packId, gateway: gateway})
   }).then(r=>r.json()).then(d=>{
     if(d.checkout_url) window.location.href = d.checkout_url;
     else alert(d.error || 'Could not start checkout.');
   }).catch(e=>alert('Error: '+e.message));
 }
 
+// FIX: Updated subscribePlan - removed Lemon Squeezy reference
 function subscribePlan(planKey){
-  alert(`Subscription checkout for "${planKey}" — connect this to your Lemon Squeezy subscription product.`);
+  alert(`Subscription plans are coming soon for "${planKey}". For now, please purchase a credit pack.`);
 }
 
 (async () => {
