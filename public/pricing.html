@@ -191,6 +191,44 @@ let currentCurrency = 'NGN';
 let _pendingPackId = null;
 let _availableGateways = [];
 
+// ===== TOKEN REFRESH HELPERS =====
+function saveSession(sessionData) {
+  localStorage.setItem('edux_auth_token', sessionData.access_token);
+  localStorage.setItem('edux_refresh_token', sessionData.refresh_token);
+  localStorage.setItem('edux_token_expires_at', String(Date.now() + (sessionData.expires_in || 3600) * 1000));
+}
+
+async function getValidToken() {
+  const expiresAt = parseInt(localStorage.getItem('edux_token_expires_at') || '0', 10);
+  const token = localStorage.getItem('edux_auth_token');
+  if (!token) return null;
+
+  // If token is still valid (more than 2 minutes from expiry)
+  if (Date.now() < expiresAt - 2 * 60 * 1000) {
+    return token;
+  }
+
+  // Token expired or about to expire — refresh it
+  const refreshToken = localStorage.getItem('edux_refresh_token');
+  if (!refreshToken) return null;
+
+  try {
+    const r = await fetch('/api/auth/refresh', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({refresh_token: refreshToken})
+    });
+    const d = await r.json();
+    if (d.access_token) {
+      saveSession(d);
+      return d.access_token;
+    }
+  } catch (e) {
+    console.error('Token refresh failed:', e);
+  }
+  return null; // Refresh failed — caller should redirect to /login
+}
+
 async function detectDefaultCurrency(){
   // Server-side detection via Vercel's x-vercel-ip-country geo header —
   // far more reliable than guessing from navigator.language, which only
@@ -294,11 +332,11 @@ function renderSubs(plans, currency){
     </div>`).join('');
 }
 
-// FIX: Updated buyPack with gateway modal
-function buyPack(packId){
-  const token = localStorage.getItem('edux_auth_token');
-  if(!token){
-    alert('Please sign in to purchase credits.');
+// FIX: Updated buyPack with token refresh
+async function buyPack(packId){
+  const token = await getValidToken();
+  if (!token) {
+    alert('Your session has expired. Please log in again.');
     window.location.href = '/login';
     return;
   }
@@ -323,20 +361,37 @@ function closeGatewayModal(){
   _pendingPackId = null;
 }
 
-function chooseGateway(gateway){
-  const token = localStorage.getItem('edux_auth_token');
+// FIX: Updated chooseGateway with token refresh
+async function chooseGateway(gateway) {
+  const token = await getValidToken();
   const packId = _pendingPackId;
   closeGatewayModal();
-  if(!packId) return;
+  
+  if (!token) {
+    alert('Your session has expired. Please log in again.');
+    window.location.href = '/login';
+    return;
+  }
+  if (!packId) return;
 
-  fetch('/api/payments/initiate',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-    body: JSON.stringify({pack_id: packId, gateway: gateway})
-  }).then(r=>r.json()).then(d=>{
-    if(d.checkout_url) window.location.href = d.checkout_url;
-    else alert(d.error || 'Could not start checkout.');
-  }).catch(e=>alert('Error: '+e.message));
+  try {
+    const r = await fetch('/api/payments/initiate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({pack_id: packId, gateway: gateway})
+    });
+    const d = await r.json();
+    if (d.checkout_url) {
+      window.location.href = d.checkout_url;
+    } else {
+      alert(d.error || 'Could not start checkout.');
+    }
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
 }
 
 // FIX: Updated subscribePlan - removed Lemon Squeezy reference
