@@ -1,393 +1,121 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Successful — Eduxellence Analytics</title>
-    <meta name="description" content="Your Eduxellence payment was successful. Credits have been added to your account.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        :root {
-            --ny: #0B1829;
-            --ny2: #112240;
-            --bl: #1E6BFF;
-            --tl: #0FC9A0;
-            --wh: #fff;
-            --of: #F7F9FC;
-            --sl: #64748B;
-            --bd: #E2E8F0;
-            --ok: #16A34A;
-            --tx: #0F172A;
-            --txM: #475569;
-            --r16: 16px;
-            --r24: 24px;
-            --shL: 0 12px 40px rgba(0,0,0,0.14);
-        }
-
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--of);
-            color: var(--tx);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            line-height: 1.6;
-        }
-
-        .card {
-            background: var(--wh);
-            border-radius: var(--r24);
-            box-shadow: var(--shL);
-            padding: 48px 40px;
-            max-width: 480px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .icon {
-            width: 80px;
-            height: 80px;
-            background: #E8F5E9;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-        }
-
-        .icon svg {
-            width: 48px;
-            height: 48px;
-            fill: none;
-            stroke: #16A34A;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        h1 {
-            font-family: 'Syne', sans-serif;
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--tx);
-            margin: 0 0 8px 0;
-        }
-
-        .subtitle {
-            color: var(--sl);
-            font-size: 16px;
-            margin: 0 0 24px 0;
-        }
-
-        .details {
-            background: var(--of);
-            border-radius: var(--r16);
-            padding: 16px 20px;
-            margin-bottom: 24px;
-            text-align: left;
-            font-size: 14px;
-        }
-
-        .details-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 0;
-            border-bottom: 1px solid var(--bd);
-        }
-
-        .details-row:last-child {
-            border-bottom: none;
-        }
-
-        .details-label {
-            color: var(--sl);
-            font-weight: 500;
-        }
-
-        .details-value {
-            color: var(--tx);
-            font-weight: 600;
-            font-family: 'Syne', sans-serif;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 14px 36px;
-            background: var(--bl);
-            color: var(--wh);
-            border: none;
-            border-radius: 12px;
-            font-family: 'Syne', sans-serif;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background 0.15s;
-            width: 100%;
-        }
-
-        .btn:hover {
-            background: #1557D9;
-        }
-
-        .btn-secondary {
-            display: inline-block;
-            padding: 12px 36px;
-            background: transparent;
-            color: var(--bl);
-            border: 2px solid var(--bl);
-            border-radius: 12px;
-            font-family: 'Syne', sans-serif;
-            font-weight: 700;
-            font-size: 15px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.15s;
-            width: 100%;
-            margin-top: 12px;
-        }
-
-        .btn-secondary:hover {
-            background: var(--bl);
-            color: var(--wh);
-        }
-
-        .note {
-            margin-top: 20px;
-            color: #94A3B8;
-            font-size: 13px;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .loader {
-            border: 4px solid var(--bd);
-            border-top: 4px solid var(--bl);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-
-        .status-badge.success {
-            background: rgba(22, 163, 74, 0.1);
-            color: var(--ok);
-        }
-
-        .status-badge.error {
-            background: rgba(220, 38, 38, 0.1);
-            color: #DC2626;
-        }
-
-        @media (max-width: 480px) {
-            .card {
-                padding: 32px 20px;
-            }
-            h1 {
-                font-size: 22px;
-            }
-        }
-    </style>
-</head>
+<html><head><meta charset="UTF-8"><title>Payment — Eduxellence</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F7F9FC;
+  display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1.5rem}
+.card{background:#fff;border-radius:16px;box-shadow:0 8px 30px rgba(11,24,41,.1);
+  padding:2.5rem 2rem;max-width:380px;width:100%;text-align:center}
+.icon{font-size:2.5rem;margin-bottom:1rem}
+h1{color:#0B1829;font-size:1.2rem;margin-bottom:.5rem}
+p{color:#64748B;font-size:.9rem;line-height:1.5}
+.balance{font-size:1.4rem;font-weight:700;color:#1E6BFF;margin:1rem 0}
+.spinner{width:28px;height:28px;border:3px solid #E2E8F0;border-top-color:#1E6BFF;
+  border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+a.btn{display:inline-block;margin-top:1.25rem;padding:.7rem 1.5rem;background:#1E6BFF;color:#fff;
+  border-radius:10px;text-decoration:none;font-weight:600;font-size:.9rem}
+</style></head>
 <body>
+<div class="card" id="card">
+  <div class="spinner"></div>
+  <h1>Confirming your payment…</h1>
+  <p>This only takes a moment.</p>
+</div>
 
-    <div class="card" id="payment-status">
-        <!-- Status will be dynamically shown -->
-        <div id="loading-state">
-            <div class="loader"></div>
-            <p style="color: var(--sl); margin-top: 12px;">Verifying your payment...</p>
-        </div>
+<script>
+// ============================================================
+// API_BASE — this page is served from Vercel (stats.eduxellence.org)
+// but the API lives on the Hugging Face Space. Every call must be
+// an absolute URL against the HF Space.
+// ============================================================
+const API_BASE = (() => {
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:7860';
+  }
+  return 'https://eduxellence-eduxellence-api.hf.space';
+})();
 
-        <div id="success-state" class="hidden">
-            <div class="icon">
-                <svg viewBox="0 0 24 24">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                    <polyline points="22 4 12 14.01 9 11.01"/>
-                </svg>
-            </div>
-            <h1>Payment Successful! 🎉</h1>
-            <p class="subtitle">Your credits have been added to your account.</p>
+function render(html) { document.getElementById('card').innerHTML = html; }
 
-            <div class="details" id="transaction-details">
-                <div class="details-row">
-                    <span class="details-label">Transaction Reference</span>
-                    <span class="details-value" id="tx-ref">—</span>
-                </div>
-                <div class="details-row">
-                    <span class="details-label">Status</span>
-                    <span class="details-value" style="color: var(--ok);">Completed</span>
-                </div>
-                <div class="details-row">
-                    <span class="details-label">Payment Method</span>
-                    <span class="details-value" id="payment-method">Flutterwave</span>
-                </div>
-            </div>
+async function getValidToken() {
+  const expiresAt = parseInt(localStorage.getItem('edux_token_expires_at') || '0', 10);
+  const token = localStorage.getItem('edux_auth_token');
+  if (!token) return null;
 
-            <a href="/stats" class="btn">Go to Statistical Analysis</a>
-            <a href="/pricing" class="btn-secondary">View Pricing</a>
+  if (Date.now() < expiresAt - 2 * 60 * 1000) {
+    return token;
+  }
 
-            <p class="note">
-                Your credits should appear in your account immediately.
-                <br>If you don't see them, please <a href="https://eduxellence.org/#contact" style="color: var(--bl);">contact support</a>.
-            </p>
-        </div>
+  const refreshToken = localStorage.getItem('edux_refresh_token');
+  if (!refreshToken) return token; // fall back to the (possibly stale) token; server will reject if truly expired
 
-        <div id="error-state" class="hidden">
-            <div class="icon" style="background: #FEE2E2;">
-                <svg viewBox="0 0 24 24" style="stroke: #DC2626;">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="8" x2="12" y2="12"/>
-                    <line x1="12" y1="16" x2="12.01" y2="16"/>
-                </svg>
-            </div>
-            <h1>Payment Verification Pending</h1>
-            <p class="subtitle">We're still confirming your payment. This usually takes a few moments.</p>
-            <a href="/stats" class="btn">Go to Analysis</a>
-            <p class="note">
-                If your credits don't appear within 5 minutes, please <a href="https://eduxellence.org/#contact" style="color: var(--bl);">contact support</a>
-                with your transaction reference.
-            </p>
-        </div>
-    </div>
+  try {
+    const r = await fetch(`${API_BASE}/api/auth/refresh`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({refresh_token: refreshToken})
+    });
+    const d = await r.json();
+    if (d.access_token) {
+      localStorage.setItem('edux_auth_token', d.access_token);
+      localStorage.setItem('edux_refresh_token', d.refresh_token);
+      localStorage.setItem('edux_token_expires_at', String(Date.now() + (d.expires_in || 3600) * 1000));
+      return d.access_token;
+    }
+  } catch (e) {
+    console.error('Token refresh failed:', e);
+  }
+  return token;
+}
 
-    <script>
-        (function() {
-            const params = new URLSearchParams(window.location.search);
-            const status = params.get('status');
-            const txRef = params.get('tx_ref');
-            const transactionId = params.get('transaction_id');
+async function confirmPayment() {
+  const token = await getValidToken();
+  if (!token) {
+    render(`<div class="icon">🔒</div><h1>Please sign in</h1><p>We couldn't find your session. Sign in to see your updated balance.</p><a class="btn" href="/login">Sign In</a>`);
+    return;
+  }
 
-            const loadingState = document.getElementById('loading-state');
-            const successState = document.getElementById('success-state');
-            const errorState = document.getElementById('error-state');
+  const params = new URLSearchParams(window.location.search);
+  let gateway, reference, transaction_id;
 
-            console.log('Payment success page loaded:', { status, txRef, transactionId });
+  if (params.get('trxref') || (params.get('reference') && !params.get('tx_ref'))) {
+    gateway = 'paystack';
+    reference = params.get('reference') || params.get('trxref');
+  } else if (params.get('tx_ref')) {
+    gateway = 'flutterwave';
+    reference = params.get('tx_ref');
+    transaction_id = params.get('transaction_id');
+  } else {
+    render(`<div class="icon">⚠️</div><h1>No payment details found</h1><p>If you just completed a purchase, check your balance below.</p><a class="btn" href="/pricing">Back to Pricing</a>`);
+    return;
+  }
 
-            // Update transaction reference
-            if (txRef) {
-                document.getElementById('tx-ref').textContent = txRef;
-            }
+  try {
+    const res = await fetch(`${API_BASE}/api/payments/verify-and-credit`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token},
+      body: JSON.stringify({gateway, reference, transaction_id})
+    });
+    const data = await res.json();
 
-            // Detect payment method from tx_ref prefix
-            const methodElement = document.getElementById('payment-method');
-            if (txRef) {
-                if (txRef.startsWith('edux_')) {
-                    // Could be either, check if it was Flutterwave or Paystack
-                    // For now, we'll try to detect from URL params
-                    if (transactionId) {
-                        methodElement.textContent = 'Flutterwave';
-                    } else {
-                        methodElement.textContent = 'Paystack';
-                    }
-                }
-            }
+    if (res.ok && data.ok) {
+      const balanceLine = data.balance !== undefined ? data.balance : data.new_balance;
+      render(`<div class="icon">✅</div><h1>Payment confirmed</h1>
+        <p>Your credits have been added.</p>
+        <div class="balance">💎 ${balanceLine} credits</div>
+        <a class="btn" href="/stats">Start Analyzing</a>`);
+    } else {
+      render(`<div class="icon">⚠️</div><h1>We couldn't confirm this automatically</h1>
+        <p>${data.error || 'Please contact support with your payment reference.'}</p>
+        <p style="margin-top:.5rem;font-size:.75rem;color:#94A3B8">Reference: ${reference}</p>
+        <a class="btn" href="/pricing">Back to Pricing</a>`);
+    }
+  } catch (e) {
+    render(`<div class="icon">⚠️</div><h1>Network error</h1><p>Please refresh this page.</p>`);
+  }
+}
 
-            // Handle status
-            if (status === 'successful' && txRef) {
-                // Hide loading, show success
-                loadingState.classList.add('hidden');
-                successState.classList.remove('hidden');
-
-                // Attempt to notify the server that payment was successful
-                // This is a fallback in case the webhook didn't fire
-                async function notifyServer() {
-                    try {
-                        const token = localStorage.getItem('edux_auth_token');
-                        if (!token) return;
-
-                        const response = await fetch('/api/payments/verify', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + token
-                            },
-                            body: JSON.stringify({
-                                tx_ref: txRef,
-                                transaction_id: transactionId,
-                                gateway: methodElement.textContent.toLowerCase()
-                            })
-                        });
-
-                        const data = await response.json();
-                        console.log('Verification response:', data);
-                    } catch (e) {
-                        console.error('Failed to notify server:', e);
-                    }
-                }
-
-                // Call the verification endpoint
-                notifyServer();
-
-            } else if (status === 'cancelled') {
-                loadingState.classList.add('hidden');
-                errorState.classList.remove('hidden');
-                document.querySelector('#error-state h1').textContent = 'Payment Cancelled';
-                document.querySelector('#error-state .subtitle').textContent =
-                    'You cancelled the payment. No charges were made to your account.';
-                document.querySelector('#error-state .btn').textContent = 'Return to Pricing';
-                document.querySelector('#error-state .btn').href = '/pricing';
-
-            } else if (status === 'failed') {
-                loadingState.classList.add('hidden');
-                errorState.classList.remove('hidden');
-                document.querySelector('#error-state h1').textContent = 'Payment Failed';
-                document.querySelector('#error-state .subtitle').textContent =
-                    'Your payment could not be processed. Please try again or use a different payment method.';
-                document.querySelector('#error-state .btn').textContent = 'Try Again';
-                document.querySelector('#error-state .btn').href = '/pricing';
-
-            } else {
-                // Default: show success if we have a reference
-                if (txRef) {
-                    loadingState.classList.add('hidden');
-                    successState.classList.remove('hidden');
-                } else {
-                    // No parameters - show generic success
-                    loadingState.classList.add('hidden');
-                    successState.classList.remove('hidden');
-                }
-            }
-
-            // Auto-redirect after 10 seconds if not interacted with
-            let redirectTimer = setTimeout(() => {
-                if (!successState.classList.contains('hidden')) {
-                    window.location.href = '/stats';
-                }
-            }, 10000);
-
-            // Cancel redirect on any click
-            document.addEventListener('click', () => {
-                clearTimeout(redirectTimer);
-            });
-
-        })();
-    </script>
-
-</body>
-</html>
+confirmPayment();
+</script>
+</body></html>
