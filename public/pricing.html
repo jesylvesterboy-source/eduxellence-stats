@@ -189,6 +189,7 @@ footer a{color:var(--tl)}
 <script>
 let currentCurrency = 'NGN';
 let _pendingPackId = null;
+let _pendingPlanKey = null;
 let _availableGateways = [];
 
 // ===== TOKEN REFRESH HELPERS =====
@@ -332,61 +333,16 @@ function renderSubs(plans, currency){
     </div>`).join('');
 }
 
-// ===== FIXED: buyPack with proper token verification and refresh =====
+// ===== FIXED: buyPack with proper token verification =====
 async function buyPack(packId){
-  // Try to get token from localStorage
-  let token = localStorage.getItem('edux_auth_token');
-  
-  // If no token, redirect to login
+  const token = await getValidToken();
   if (!token) {
-    alert('Please log in to purchase credits.');
+    alert('Please sign in to purchase credits.');
     window.location.href = '/login';
     return;
   }
-
-  // Verify token is still valid with the server
-  try {
-    const verify = await fetch('/api/credits/balance', {
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
-    
-    if (verify.status === 401) {
-      // Token expired, try to refresh
-      const refreshToken = localStorage.getItem('edux_refresh_token');
-      if (refreshToken) {
-        const refresh = await fetch('/api/auth/refresh', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({refresh_token: refreshToken})
-        });
-        const data = await refresh.json();
-        if (data.access_token) {
-          // Save new token and proceed
-          localStorage.setItem('edux_auth_token', data.access_token);
-          localStorage.setItem('edux_refresh_token', data.refresh_token);
-          localStorage.setItem('edux_token_expires_at', String(Date.now() + (data.expires_in || 3600) * 1000));
-          token = data.access_token;
-        } else {
-          // Refresh failed - redirect to login
-          alert('Your session has expired. Please log in again.');
-          window.location.href = '/login';
-          return;
-        }
-      } else {
-        // No refresh token - redirect to login
-        alert('Your session has expired. Please log in again.');
-        window.location.href = '/login';
-        return;
-      }
-    }
-  } catch (e) {
-    // Network error - allow user to retry
-    alert('Network error. Please check your connection and try again.');
-    return;
-  }
-
-  // Token is valid, proceed with purchase
   _pendingPackId = packId;
+  _pendingPlanKey = null;
   openGatewayModal();
 }
 
@@ -405,35 +361,54 @@ function openGatewayModal(){
 function closeGatewayModal(){
   document.getElementById('gw-modal').classList.remove('show');
   _pendingPackId = null;
+  _pendingPlanKey = null;
 }
 
-// ===== FIXED: chooseGateway with proper token verification and refresh =====
+// ===== FIXED: chooseGateway handles both packs and subscriptions =====
 async function chooseGateway(gateway) {
-  // Try to get token from localStorage
   let token = localStorage.getItem('edux_auth_token');
   const packId = _pendingPackId;
+  const planKey = _pendingPlanKey;
   closeGatewayModal();
-  
-  if (!packId) {
-    alert('No pack selected. Please try again.');
-    return;
-  }
 
-  // If no token, redirect to login
   if (!token) {
     alert('Please log in to complete your purchase.');
     window.location.href = '/login';
     return;
   }
 
-  // Verify token is still valid with the server
+  // ── Subscription branch ──
+  if (planKey) {
+    try {
+      const r = await fetch('/api/payments/subscribe', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token},
+        body: JSON.stringify({plan_key: planKey, gateway: gateway})
+      });
+      const d = await r.json();
+      if (d.checkout_url) {
+        window.location.href = d.checkout_url;
+      } else {
+        alert(d.error || 'Could not start subscription. Please try again.');
+      }
+    } catch (e) {
+      alert('Error: ' + e.message);
+    }
+    _pendingPlanKey = null;
+    return;
+  }
+
+  // ── Credit pack branch ──
+  if (!packId) {
+    alert('No pack selected. Please try again.');
+    return;
+  }
+
   try {
     const verify = await fetch('/api/credits/balance', {
       headers: { 'Authorization': 'Bearer ' + token }
     });
-    
     if (verify.status === 401) {
-      // Token expired, try to refresh
       const refreshToken = localStorage.getItem('edux_refresh_token');
       if (refreshToken) {
         const refresh = await fetch('/api/auth/refresh', {
@@ -443,38 +418,30 @@ async function chooseGateway(gateway) {
         });
         const data = await refresh.json();
         if (data.access_token) {
-          // Save new token and proceed
           localStorage.setItem('edux_auth_token', data.access_token);
           localStorage.setItem('edux_refresh_token', data.refresh_token);
           localStorage.setItem('edux_token_expires_at', String(Date.now() + (data.expires_in || 3600) * 1000));
           token = data.access_token;
         } else {
-          // Refresh failed - redirect to login
           alert('Your session has expired. Please log in again.');
           window.location.href = '/login';
           return;
         }
       } else {
-        // No refresh token - redirect to login
         alert('Your session has expired. Please log in again.');
         window.location.href = '/login';
         return;
       }
     }
   } catch (e) {
-    // Network error - allow user to retry
     alert('Network error. Please check your connection and try again.');
     return;
   }
 
-  // Token is valid, proceed with payment initiation
   try {
     const r = await fetch('/api/payments/initiate', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
-      },
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token},
       body: JSON.stringify({pack_id: packId, gateway: gateway})
     });
     const d = await r.json();
@@ -488,77 +455,60 @@ async function chooseGateway(gateway) {
   }
 }
 
-// FIX: Updated subscribePlan - removed Lemon Squeezy reference
-function subscribePlan(planKey){
-  alert(`Subscription plans are coming soon for "${planKey}". For now, please purchase a credit pack.`);
+// ===== FIXED: subscribePlan with proper flow =====
+let _pendingPlanKey = null;
+
+async function subscribePlan(planKey){
+  let token = localStorage.getItem('edux_auth_token');
+  if (!token) {
+    alert('Please log in to subscribe.');
+    window.location.href = '/login';
+    return;
+  }
+
+  try {
+    const verify = await fetch('/api/credits/balance', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (verify.status === 401) {
+      const refreshToken = localStorage.getItem('edux_refresh_token');
+      if (refreshToken) {
+        const refresh = await fetch('/api/auth/refresh', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({refresh_token: refreshToken})
+        });
+        const data = await refresh.json();
+        if (data.access_token) {
+          localStorage.setItem('edux_auth_token', data.access_token);
+          localStorage.setItem('edux_refresh_token', data.refresh_token);
+          localStorage.setItem('edux_token_expires_at', String(Date.now() + (data.expires_in || 3600) * 1000));
+          token = data.access_token;
+        } else {
+          alert('Your session has expired. Please log in again.');
+          window.location.href = '/login';
+          return;
+        }
+      } else {
+        alert('Your session has expired. Please log in again.');
+        window.location.href = '/login';
+        return;
+      }
+    }
+  } catch (e) {
+    alert('Network error. Please check your connection and try again.');
+    return;
+  }
+
+  _pendingPlanKey = planKey;
+  _pendingPackId = null;
+  openGatewayModal();
 }
 
 (async () => {
   const detected = await detectDefaultCurrency();
   switchCurrency(detected);
   document.querySelector(`.cur-btn[data-cur="${currentCurrency}"]`)?.classList.add('active');
-})();
-
-// ===== FIXED: AUTH CHECK - Properly validates and refreshes token on page load =====
-(async function checkAuthAndRedirect() {
-    try {
-        let token = localStorage.getItem('edux_auth_token');
-        const refreshToken = localStorage.getItem('edux_refresh_token');
-        
-        if (!token && refreshToken) {
-            // Try to refresh if only refresh token exists
-            const refresh = await fetch('/api/auth/refresh', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({refresh_token: refreshToken})
-            });
-            const data = await refresh.json();
-            if (data.access_token) {
-                localStorage.setItem('edux_auth_token', data.access_token);
-                localStorage.setItem('edux_refresh_token', data.refresh_token);
-                localStorage.setItem('edux_token_expires_at', String(Date.now() + (data.expires_in || 3600) * 1000));
-                console.log('🔄 Token refreshed on page load');
-                token = data.access_token;
-            }
-        }
-        
-        if (token) {
-            // Verify token with server
-            const r = await fetch('/api/credits/balance', {
-                headers: { 'Authorization': 'Bearer ' + token }
-            });
-            
-            if (r.status === 200) {
-                console.log('✅ User authenticated - showing pricing');
-            } else if (r.status === 401) {
-                // Token invalid - try refresh once more
-                if (refreshToken) {
-                    const refresh = await fetch('/api/auth/refresh', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({refresh_token: refreshToken})
-                    });
-                    const data = await refresh.json();
-                    if (data.access_token) {
-                        localStorage.setItem('edux_auth_token', data.access_token);
-                        localStorage.setItem('edux_refresh_token', data.refresh_token);
-                        localStorage.setItem('edux_token_expires_at', String(Date.now() + (data.expires_in || 3600) * 1000));
-                        console.log('🔄 Token refreshed successfully');
-                    } else {
-                        // Refresh failed - clear tokens and redirect
-                        localStorage.removeItem('edux_auth_token');
-                        localStorage.removeItem('edux_refresh_token');
-                        localStorage.removeItem('edux_token_expires_at');
-                        console.log('🔴 Session invalid - redirecting to login');
-                        // Don't redirect here - let user stay on pricing page
-                    }
-                }
-            }
-        }
-    } catch (e) {
-        // Silently fail - user stays on pricing page
-        console.log('Auth check completed (non-critical):', e.message);
-    }
 })();
 </script>
 </body>
