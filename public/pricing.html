@@ -14,7 +14,6 @@
 body{font-family:'DM Sans',sans-serif;background:var(--of);color:var(--tx);line-height:1.6}
 a{color:var(--bl);text-decoration:none}
 
-/* NEW: Gateway Modal Styles */
 .gw-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(11,24,41,.6);z-index:1000;align-items:center;justify-content:center}
 .gw-modal-backdrop.show{display:flex}
 .gw-modal{background:var(--wh);border-radius:var(--r16);padding:1.75rem;max-width:340px;width:90%;box-shadow:var(--shL)}
@@ -172,7 +171,6 @@ footer a{color:var(--tl)}
 
 </div>
 
-<!-- NEW: Gateway Modal -->
 <div class="gw-modal-backdrop" id="gw-modal">
   <div class="gw-modal">
     <h3>Choose a payment method</h3>
@@ -187,6 +185,18 @@ footer a{color:var(--tl)}
 </footer>
 
 <script>
+// ============================================================
+// API_BASE — frontend (Vercel: stats.eduxellence.org) and backend
+// (Hugging Face Space) are DIFFERENT domains. Every API call must
+// be absolute against the HF Space — never a bare relative path.
+// ============================================================
+const API_BASE = (() => {
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:7860';
+  }
+  return 'https://eduxellence-eduxellence-api.hf.space';
+})();
+
 let currentCurrency = 'NGN';
 let _pendingPackId = null;
 let _pendingPlanKey = null;
@@ -204,17 +214,15 @@ async function getValidToken() {
   const token = localStorage.getItem('edux_auth_token');
   if (!token) return null;
 
-  // If token is still valid (more than 2 minutes from expiry)
   if (Date.now() < expiresAt - 2 * 60 * 1000) {
     return token;
   }
 
-  // Token expired or about to expire — refresh it
   const refreshToken = localStorage.getItem('edux_refresh_token');
   if (!refreshToken) return null;
 
   try {
-    const r = await fetch('/api/auth/refresh', {
+    const r = await fetch(`${API_BASE}/api/auth/refresh`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({refresh_token: refreshToken})
@@ -227,19 +235,15 @@ async function getValidToken() {
   } catch (e) {
     console.error('Token refresh failed:', e);
   }
-  return null; // Refresh failed — caller should redirect to /login
+  return null;
 }
 
 async function detectDefaultCurrency(){
-  // Server-side detection via Vercel's x-vercel-ip-country geo header —
-  // far more reliable than guessing from navigator.language, which only
-  // reflects browser/OS language settings, not actual visitor location.
   try{
-    const r = await fetch('/api/geo');
+    const r = await fetch(`${API_BASE}/api/geo`);
     const d = await r.json();
     return d.currency || 'USD';
   }catch(e){
-    // Network failure fallback — still better than nothing
     const lang = navigator.language || '';
     if(lang.includes('en-GB')) return 'GBP';
     return 'USD';
@@ -254,9 +258,8 @@ function switchCurrency(cur){
 
 async function loadPricing(){
   try{
-    const r = await fetch(`/api/pricing?currency=${currentCurrency}`);
+    const r = await fetch(`${API_BASE}/api/pricing?currency=${currentCurrency}`);
     const d = await r.json();
-    // FIX: Capture available gateways from the response
     _availableGateways = d.gateways || [];
     renderPriceTable(d.tests);
     renderPacks(d.credit_packs, d.currency);
@@ -267,7 +270,6 @@ async function loadPricing(){
 }
 
 function renderPriceTable(tests){
-  // Define the order for the price table
   const order = [
     "cleaning", "descriptive",
     "chi_square", "correlation", "t_test", "mann_whitney",
@@ -279,11 +281,10 @@ function renderPriceTable(tests){
     "thesis_package",
     "ai_interpretation", "export_docx", "export_pdf", "export_xlsx"
   ];
-  
-  // Create a map for quick lookup
+
   const testMap = {};
   tests.forEach(t => testMap[t.key] = t);
-  
+
   let html = '';
   order.forEach(key => {
     const t = testMap[key];
@@ -294,8 +295,7 @@ function renderPriceTable(tests){
       </div>`;
     }
   });
-  
-  // Add any tests not in the order list
+
   tests.forEach(t => {
     if (!order.includes(t.key)) {
       html += `<div class="price-row">
@@ -304,7 +304,7 @@ function renderPriceTable(tests){
       </div>`;
     }
   });
-  
+
   document.getElementById('price-table').innerHTML = html;
 }
 
@@ -333,7 +333,7 @@ function renderSubs(plans, currency){
     </div>`).join('');
 }
 
-// ===== FIXED: buyPack with proper token verification =====
+// ===== buyPack =====
 async function buyPack(packId){
   const token = await getValidToken();
   if (!token) {
@@ -346,7 +346,6 @@ async function buyPack(packId){
   openGatewayModal();
 }
 
-// FIX: New gateway modal functions
 function openGatewayModal(){
   const gwLabels = {paystack:'Paystack', flutterwave:'Flutterwave'};
   const optsHtml = _availableGateways.map(g => `
@@ -364,9 +363,9 @@ function closeGatewayModal(){
   _pendingPlanKey = null;
 }
 
-// ===== FIXED: chooseGateway handles both packs and subscriptions =====
+// ===== chooseGateway — handles both packs and subscriptions =====
 async function chooseGateway(gateway) {
-  let token = localStorage.getItem('edux_auth_token');
+  let token = await getValidToken();
   const packId = _pendingPackId;
   const planKey = _pendingPlanKey;
   closeGatewayModal();
@@ -380,7 +379,7 @@ async function chooseGateway(gateway) {
   // ── Subscription branch ──
   if (planKey) {
     try {
-      const r = await fetch('/api/payments/subscribe', {
+      const r = await fetch(`${API_BASE}/api/payments/subscribe`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token},
         body: JSON.stringify({plan_key: planKey, gateway: gateway})
@@ -394,7 +393,6 @@ async function chooseGateway(gateway) {
     } catch (e) {
       alert('Error: ' + e.message);
     }
-    _pendingPlanKey = null;
     return;
   }
 
@@ -405,41 +403,7 @@ async function chooseGateway(gateway) {
   }
 
   try {
-    const verify = await fetch('/api/credits/balance', {
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
-    if (verify.status === 401) {
-      const refreshToken = localStorage.getItem('edux_refresh_token');
-      if (refreshToken) {
-        const refresh = await fetch('/api/auth/refresh', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({refresh_token: refreshToken})
-        });
-        const data = await refresh.json();
-        if (data.access_token) {
-          localStorage.setItem('edux_auth_token', data.access_token);
-          localStorage.setItem('edux_refresh_token', data.refresh_token);
-          localStorage.setItem('edux_token_expires_at', String(Date.now() + (data.expires_in || 3600) * 1000));
-          token = data.access_token;
-        } else {
-          alert('Your session has expired. Please log in again.');
-          window.location.href = '/login';
-          return;
-        }
-      } else {
-        alert('Your session has expired. Please log in again.');
-        window.location.href = '/login';
-        return;
-      }
-    }
-  } catch (e) {
-    alert('Network error. Please check your connection and try again.');
-    return;
-  }
-
-  try {
-    const r = await fetch('/api/payments/initiate', {
+    const r = await fetch(`${API_BASE}/api/payments/initiate`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token},
       body: JSON.stringify({pack_id: packId, gateway: gateway})
@@ -455,51 +419,14 @@ async function chooseGateway(gateway) {
   }
 }
 
-// ===== FIXED: subscribePlan with proper flow =====
-let _pendingPlanKey = null;
-
+// ===== subscribePlan =====
 async function subscribePlan(planKey){
-  let token = localStorage.getItem('edux_auth_token');
+  const token = await getValidToken();
   if (!token) {
     alert('Please log in to subscribe.');
     window.location.href = '/login';
     return;
   }
-
-  try {
-    const verify = await fetch('/api/credits/balance', {
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
-    if (verify.status === 401) {
-      const refreshToken = localStorage.getItem('edux_refresh_token');
-      if (refreshToken) {
-        const refresh = await fetch('/api/auth/refresh', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({refresh_token: refreshToken})
-        });
-        const data = await refresh.json();
-        if (data.access_token) {
-          localStorage.setItem('edux_auth_token', data.access_token);
-          localStorage.setItem('edux_refresh_token', data.refresh_token);
-          localStorage.setItem('edux_token_expires_at', String(Date.now() + (data.expires_in || 3600) * 1000));
-          token = data.access_token;
-        } else {
-          alert('Your session has expired. Please log in again.');
-          window.location.href = '/login';
-          return;
-        }
-      } else {
-        alert('Your session has expired. Please log in again.');
-        window.location.href = '/login';
-        return;
-      }
-    }
-  } catch (e) {
-    alert('Network error. Please check your connection and try again.');
-    return;
-  }
-
   _pendingPlanKey = planKey;
   _pendingPackId = null;
   openGatewayModal();
