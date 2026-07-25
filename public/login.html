@@ -1,455 +1,341 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sign In - Eduxellence Analytics</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #F7F9FC;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .container {
-            background: white;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(11, 24, 41, 0.1);
-            width: 400px;
-            max-width: 90%;
-        }
-        .logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .logo h1 {
-            color: #0B1829;
-            font-size: 24px;
-            font-weight: 700;
-        }
-        .logo span {
-            color: #1E6BFF;
-        }
-        .logo p {
-            color: #64748B;
-            font-size: 14px;
-            margin-top: 4px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            color: #0F172A;
-            margin-bottom: 6px;
-            font-size: 14px;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #E2E8F0;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.2s;
-        }
-        .form-group input:focus {
-            outline: none;
-            border-color: #1E6BFF;
-        }
-        .btn {
-            width: 100%;
-            padding: 14px;
-            background: #1E6BFF;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn:hover {
-            background: #0047CC;
-        }
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        .switch {
-            text-align: center;
-            margin-top: 16px;
-            color: #64748B;
-            font-size: 14px;
-        }
-        .switch a {
-            color: #1E6BFF;
-            text-decoration: none;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .switch a:hover {
-            text-decoration: underline;
-        }
-        .error {
-            background: #FEE2E2;
-            color: #DC2626;
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-bottom: 16px;
-            display: none;
-        }
-        .success {
-            background: #D1FAE5;
-            color: #065F46;
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-bottom: 16px;
-            display: none;
-        }
-        .note {
-            background: #FEF3C7;
-            color: #92400E;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-top: 16px;
-            border-left: 4px solid #D97706;
-        }
-        .note code {
-            background: #FFFBEB;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-        .referral-badge {
-            background: #E0F2FE;
-            color: #0369A1;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-bottom: 16px;
-            display: none;
-            border-left: 4px solid #0EA5E9;
-        }
-        .referral-badge strong {
-            color: #0C4A6E;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — Eduxellence Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--ny:#0B1829;--ny2:#112240;--bl:#1E6BFF;--tl:#0FC9A0;--wh:#fff;--of:#F7F9FC;
+  --sl:#64748B;--bd:#E2E8F0;--ok:#16A34A;--err:#DC2626;--tx:#0F172A;
+  --r12:12px;--r16:16px;--r24:24px;--shL:0 12px 40px rgba(0,0,0,.14)}
+body{font-family:'DM Sans',sans-serif;background:linear-gradient(160deg,var(--ny) 0%,var(--ny2) 42%,var(--of) 42%);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem}
+
+.wrap{width:100%;max-width:400px}
+.brand{text-align:center;margin-bottom:1.75rem}
+.brand a{text-decoration:none}
+.brand h1{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;color:#fff;letter-spacing:-.5px}
+.brand h1 span{color:var(--tl)}
+.brand p{color:rgba(255,255,255,.55);font-size:.85rem;margin-top:.25rem}
+
+.card{background:var(--wh);border-radius:var(--r24);box-shadow:var(--shL);padding:2.25rem 2rem}
+.card h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;color:var(--tx);margin-bottom:.25rem}
+.card .sub{color:var(--sl);font-size:.85rem;margin-bottom:1.5rem}
+
+.referral-badge{background:#E0F2FE;color:#0369A1;padding:.65rem .9rem;border-radius:10px;
+  font-size:.82rem;margin-bottom:1.25rem;border-left:3px solid #0EA5E9;display:none}
+.referral-badge strong{color:#0C4A6E}
+
+.alert{padding:.7rem .9rem;border-radius:10px;font-size:.85rem;margin-bottom:1rem;display:none}
+.alert.error{background:#FEF2F2;color:var(--err);border-left:3px solid var(--err)}
+.alert.success{background:#F0FDF4;color:#166534;border-left:3px solid var(--ok)}
+
+.field{margin-bottom:1.1rem}
+.field label{display:block;font-weight:600;color:var(--tx);margin-bottom:.4rem;font-size:.82rem}
+.field-input-wrap{position:relative}
+.field input{width:100%;padding:.75rem .95rem;border:1.5px solid var(--bd);border-radius:10px;
+  font-size:.9rem;font-family:inherit;transition:border-color .15s;background:var(--of)}
+.field input:focus{outline:none;border-color:var(--bl);background:var(--wh)}
+.pw-toggle{position:absolute;right:.85rem;top:50%;transform:translateY(-50%);background:none;border:none;
+  color:var(--sl);font-size:.75rem;font-weight:600;cursor:pointer;padding:0}
+.pw-toggle:hover{color:var(--bl)}
+
+.row-between{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem}
+.row-between a{color:var(--bl);font-size:.8rem;font-weight:600;text-decoration:none;cursor:pointer}
+.row-between a:hover{text-decoration:underline}
+
+.btn{width:100%;padding:.85rem;background:var(--bl);color:#fff;border:none;border-radius:10px;
+  font-family:'Syne',sans-serif;font-size:.92rem;font-weight:700;cursor:pointer;transition:background .15s;
+  display:flex;align-items:center;justify-content:center;gap:.5rem}
+.btn:hover:not(:disabled){background:#0047CC}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;
+  border-radius:50%;animation:spin .6s linear infinite;display:none}
+.btn.loading .spinner{display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.switch{text-align:center;margin-top:1.5rem;color:var(--sl);font-size:.85rem}
+.switch a{color:var(--bl);font-weight:600;text-decoration:none;cursor:pointer}
+.switch a:hover{text-decoration:underline}
+
+.foot-links{text-align:center;margin-top:1.5rem;font-size:.78rem}
+.foot-links a{color:rgba(255,255,255,.55);text-decoration:none}
+.foot-links a:hover{color:#fff}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">
-            <h1>Eduxellence <span>Analytics</span></h1>
-            <p>Statistical Analysis Platform</p>
+
+<div class="wrap">
+  <div class="brand">
+    <a href="/"><h1>Eduxellence<span>.</span></h1></a>
+    <p>Statistical Analysis Platform</p>
+  </div>
+
+  <div class="card">
+    <div id="referral-badge" class="referral-badge"></div>
+    <div id="alert-error" class="alert error"></div>
+    <div id="alert-success" class="alert success"></div>
+
+    <!-- LOGIN -->
+    <div id="view-login">
+      <h2>Welcome back</h2>
+      <p class="sub">Sign in to continue your analysis.</p>
+      <form id="loginForm">
+        <div class="field">
+          <label for="email">Email address</label>
+          <input type="email" id="email" placeholder="you@institution.edu" required autocomplete="email">
         </div>
-
-        <!-- ===== REFERRAL BADGE (shows when referral code is detected) ===== -->
-        <div id="referral-badge" class="referral-badge">
-            🎁 <strong>Referral detected!</strong> You'll both get <strong>5 free credits</strong> when you sign up and run your first analysis.
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="field-input-wrap">
+            <input type="password" id="password" placeholder="••••••••" required minlength="6" autocomplete="current-password">
+            <button type="button" class="pw-toggle" data-target="password">Show</button>
+          </div>
         </div>
-
-        <div id="error" class="error"></div>
-        <div id="success" class="success"></div>
-
-        <!-- Login Form -->
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" placeholder="you@example.com" required />
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="••••••••" required minlength="6" />
-            </div>
-            <button type="submit" class="btn" id="loginBtn">Sign In</button>
-        </form>
-
-        <div class="switch">
-            Don't have an account? <a onclick="switchMode('signup')">Create one</a>
+        <div class="row-between">
+          <span></span>
+          <a onclick="switchMode('forgot')">Forgot password?</a>
         </div>
-
-        <!-- Signup Form (hidden) -->
-        <form id="signupForm" style="display:none;">
-            <div class="form-group">
-                <label for="signupEmail">Email Address</label>
-                <input type="email" id="signupEmail" placeholder="you@example.com" required />
-            </div>
-            <div class="form-group">
-                <label for="signupPassword">Password (min 6 characters)</label>
-                <input type="password" id="signupPassword" placeholder="••••••••" required minlength="6" />
-            </div>
-            <button type="submit" class="btn" id="signupBtn">Create Account</button>
-        </form>
-
-        <div id="signupSwitch" class="switch" style="display:none;">
-            Already have an account? <a onclick="switchMode('login')">Sign in</a>
-        </div>
-
-        <div class="note">
-            🔧 <strong>Dev Mode:</strong> Use any email/password. 
-            <br />No email confirmation required. 
-            <br />After signing in, return to <a href="/stats" style="color:#1E6BFF;">Stats Tool</a>
-        </div>
+        <button type="submit" class="btn" id="loginBtn">
+          <span class="spinner"></span><span class="btn-text">Sign In</span>
+        </button>
+      </form>
+      <div class="switch">Don't have an account? <a onclick="switchMode('signup')">Create one</a></div>
     </div>
 
-    <script>
-        // ============================================================
-        // ===== FIX: CAPTURE REFERRAL CODE FROM URL =====
-        // ============================================================
-        const urlParams = new URLSearchParams(window.location.search);
-        const referralCode = urlParams.get('ref');
-        
-        if (referralCode) {
-            // Store the referral code in localStorage for use after signup
-            localStorage.setItem('edux_referral_code', referralCode);
-            console.log('📋 Referral code captured:', referralCode);
-            
-            // Show the referral badge
-            const badge = document.getElementById('referral-badge');
-            badge.style.display = 'block';
-            badge.innerHTML = `🎁 <strong>Referral from code: ${referralCode}</strong> — You'll both get <strong>5 free credits</strong> when you sign up and run your first analysis!`;
-        }
+    <!-- SIGNUP -->
+    <div id="view-signup" style="display:none">
+      <h2>Create your account</h2>
+      <p class="sub">Start free — no card required.</p>
+      <form id="signupForm">
+        <div class="field">
+          <label for="signupEmail">Email address</label>
+          <input type="email" id="signupEmail" placeholder="you@institution.edu" required autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="signupPassword">Password</label>
+          <div class="field-input-wrap">
+            <input type="password" id="signupPassword" placeholder="Min. 6 characters" required minlength="6" autocomplete="new-password">
+            <button type="button" class="pw-toggle" data-target="signupPassword">Show</button>
+          </div>
+        </div>
+        <button type="submit" class="btn" id="signupBtn">
+          <span class="spinner"></span><span class="btn-text">Create Account</span>
+        </button>
+      </form>
+      <div class="switch">Already have an account? <a onclick="switchMode('login')">Sign in</a></div>
+    </div>
 
-        // ============================================================
-        // ===== API BASE (auto-detect environment) =====
-        // ============================================================
-        const API_BASE = (() => {
-            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                return 'http://localhost:7860';
-            }
-            return 'https://Eduxellence-eduxellence-api.hf.space';
-        })();
+    <!-- FORGOT PASSWORD -->
+    <div id="view-forgot" style="display:none">
+      <h2>Reset your password</h2>
+      <p class="sub">We'll email you a link to reset it.</p>
+      <form id="forgotForm">
+        <div class="field">
+          <label for="forgotEmail">Email address</label>
+          <input type="email" id="forgotEmail" placeholder="you@institution.edu" required autocomplete="email">
+        </div>
+        <button type="submit" class="btn" id="forgotBtn">
+          <span class="spinner"></span><span class="btn-text">Send Reset Link</span>
+        </button>
+      </form>
+      <div class="switch"><a onclick="switchMode('login')">Back to sign in</a></div>
+    </div>
+  </div>
 
-        console.log(`🔗 API_BASE: ${API_BASE}`);
+  <div class="foot-links">
+    <a href="/stats">Statistical Analysis</a> &nbsp;·&nbsp; <a href="/upload">Data Cleaner</a> &nbsp;·&nbsp; <a href="https://eduxellence.org/#contact">Contact</a>
+  </div>
+</div>
 
-        // ============================================================
-        // ===== MODE SWITCHING =====
-        // ============================================================
-        let mode = 'login';
+<script>
+// ============================================================
+// API_BASE — the frontend (Vercel: stats.eduxellence.org) and the
+// backend (Hugging Face Space) are on DIFFERENT domains. Every API
+// call must be an absolute URL against the HF Space, never a bare
+// relative path like fetch('/api/...') — that would try to hit
+// Vercel itself and 404.
+// ============================================================
+const API_BASE = (() => {
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:7860';
+  }
+  return 'https://eduxellence-eduxellence-api.hf.space';
+})();
 
-        function switchMode(newMode) {
-            mode = newMode;
-            if (newMode === 'login') {
-                document.getElementById('loginForm').style.display = 'block';
-                document.getElementById('signupForm').style.display = 'none';
-                document.querySelector('.switch').style.display = 'block';
-                document.getElementById('signupSwitch').style.display = 'none';
-            } else {
-                document.getElementById('loginForm').style.display = 'none';
-                document.getElementById('signupForm').style.display = 'block';
-                document.querySelector('.switch').style.display = 'none';
-                document.getElementById('signupSwitch').style.display = 'block';
-            }
-            hideMessages();
-        }
+// ── Referral capture ──────────────────────────────────────────────
+const urlParams = new URLSearchParams(window.location.search);
+const referralCode = urlParams.get('ref');
+if (referralCode) {
+  localStorage.setItem('edux_referral_code', referralCode);
+  const badge = document.getElementById('referral-badge');
+  badge.innerHTML = `🎁 <strong>Referral applied</strong> — you'll both get 5 free credits after your first analysis.`;
+  badge.style.display = 'block';
+}
 
-        function hideMessages() {
-            document.getElementById('error').style.display = 'none';
-            document.getElementById('success').style.display = 'none';
-        }
+// ── View switching ────────────────────────────────────────────────
+function switchMode(mode) {
+  ['login','signup','forgot'].forEach(m => {
+    document.getElementById('view-' + m).style.display = (m === mode ? 'block' : 'none');
+  });
+  hideAlerts();
+}
 
-        function showError(msg) {
-            const el = document.getElementById('error');
-            el.textContent = msg;
-            el.style.display = 'block';
-            document.getElementById('success').style.display = 'none';
-        }
+function hideAlerts() {
+  document.getElementById('alert-error').style.display = 'none';
+  document.getElementById('alert-success').style.display = 'none';
+}
+function showError(msg) {
+  hideAlerts();
+  const el = document.getElementById('alert-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function showSuccess(msg) {
+  hideAlerts();
+  const el = document.getElementById('alert-success');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function setLoading(btn, isLoading, idleText) {
+  btn.disabled = isLoading;
+  btn.classList.toggle('loading', isLoading);
+  btn.querySelector('.btn-text').textContent = isLoading ? 'Please wait…' : idleText;
+}
 
-        function showSuccess(msg) {
-            const el = document.getElementById('success');
-            el.textContent = msg;
-            el.style.display = 'block';
-            document.getElementById('error').style.display = 'none';
-        }
+// Password visibility toggles
+document.querySelectorAll('.pw-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const input = document.getElementById(btn.dataset.target);
+    const showing = input.type === 'text';
+    input.type = showing ? 'password' : 'text';
+    btn.textContent = showing ? 'Show' : 'Hide';
+  });
+});
 
-        // ============================================================
-        // ===== LOGIN =====
-        // ============================================================
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            hideMessages();
-            const btn = document.getElementById('loginBtn');
-            btn.disabled = true;
-            btn.textContent = 'Signing in...';
+// ── Session storage (consistent keys used across the whole app) ────
+// NOTE: no cookie is set here anymore. A cookie set from Vercel would
+// never be sent to the HF Space domain (different hosts), so the
+// Authorization header is the ONLY mechanism that matters now.
+function saveSession(data, email) {
+  localStorage.setItem('edux_auth_token', data.token);
+  if (data.refresh_token) localStorage.setItem('edux_refresh_token', data.refresh_token);
+  if (data.expires_in) localStorage.setItem('edux_token_expires_at', String(Date.now() + data.expires_in * 1000));
+  localStorage.setItem('edux_user_email', email);
+}
 
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+async function recordReferralIfPresent(token) {
+  const savedRef = localStorage.getItem('edux_referral_code');
+  if (!savedRef) return;
+  try {
+    const r = await fetch(`${API_BASE}/api/referrals/record`, {
+      method: 'POST',
+      headers: {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'},
+      body: JSON.stringify({referral_code: savedRef})
+    });
+    if (r.ok) localStorage.removeItem('edux_referral_code');
+  } catch (e) { /* non-blocking */ }
+}
 
-            try {
-                const res = await fetch(`${API_BASE}/api/auth/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-                const data = await res.json();
+// ── Login ────────────────────────────────────────────────────────
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  hideAlerts();
+  const btn = document.getElementById('loginBtn');
+  setLoading(btn, true, 'Sign In');
 
-                if (res.ok) {
-                    showSuccess('✅ Successfully signed in! Redirecting...');
-                    // Store token
-                    localStorage.setItem('supabase_token', data.token);
-                    localStorage.setItem('edux_user_email', email);
-                    document.cookie = `supabase_token=${data.token}; path=/`;
-                    
-                    // ===== FIX: Check for referral code on login =====
-                    const savedRef = localStorage.getItem('edux_referral_code');
-                    if (savedRef && data.token) {
-                        try {
-                            console.log('📋 Recording referral on login...');
-                            const refRes = await fetch(`${API_BASE}/api/referrals/record`, {
-                                method: 'POST',
-                                headers: {
-                                    'Authorization': `Bearer ${data.token}`,
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ referral_code: savedRef })
-                            });
-                            if (refRes.ok) {
-                                console.log('✅ Referral recorded successfully on login');
-                                localStorage.removeItem('edux_referral_code');
-                            } else {
-                                const refData = await refRes.json();
-                                console.log('⚠️ Referral recording on login:', refData);
-                            }
-                        } catch(refErr) {
-                            console.log('⚠️ Error recording referral on login:', refErr.message);
-                        }
-                    }
-                    
-                    setTimeout(() => {
-                        window.location.href = '/stats';
-                    }, 1500);
-                } else {
-                    if (data.error === 'Invalid email or password' || data.error === 'Invalid login credentials') {
-                        showError('❌ Invalid email or password. Please try again.');
-                    } else {
-                        showError('❌ ' + (data.error || 'Login failed. Please try again.'));
-                    }
-                }
-            } catch (err) {
-                showError('❌ Network error. Please check your connection.');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Sign In';
-            }
-        });
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
 
-        // ============================================================
-        // ===== SIGNUP (with referral recording) =====
-        // ============================================================
-        document.getElementById('signupForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            hideMessages();
-            const btn = document.getElementById('signupBtn');
-            btn.disabled = true;
-            btn.textContent = 'Creating account...';
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/login`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({email, password})
+    });
+    const data = await res.json();
 
-            const email = document.getElementById('signupEmail').value;
-            const password = document.getElementById('signupPassword').value;
+    if (res.ok) {
+      saveSession(data, email);
+      await recordReferralIfPresent(data.token);
+      showSuccess('Signed in — redirecting…');
+      setTimeout(() => { window.location.href = '/stats'; }, 900);
+    } else {
+      showError(data.error === 'Invalid login credentials' || data.error === 'Invalid email or password'
+        ? 'Incorrect email or password.'
+        : (data.error || 'Sign-in failed. Please try again.'));
+      setLoading(btn, false, 'Sign In');
+    }
+  } catch (err) {
+    showError('Network error — please check your connection.');
+    setLoading(btn, false, 'Sign In');
+  }
+});
 
-            if (password.length < 6) {
-                showError('❌ Password must be at least 6 characters.');
-                btn.disabled = false;
-                btn.textContent = 'Create Account';
-                return;
-            }
+// ── Signup ───────────────────────────────────────────────────────
+document.getElementById('signupForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  hideAlerts();
+  const btn = document.getElementById('signupBtn');
+  const email = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
 
-            try {
-                const res = await fetch(`${API_BASE}/api/auth/signup`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-                const data = await res.json();
+  if (password.length < 6) {
+    showError('Password must be at least 6 characters.');
+    return;
+  }
+  setLoading(btn, true, 'Create Account');
 
-                if (res.ok) {
-                    showSuccess('✅ Account created! Signing you in...');
-                    
-                    // Store token
-                    const token = data.token;
-                    if (token) {
-                        localStorage.setItem('supabase_token', token);
-                        localStorage.setItem('edux_user_email', email);
-                        document.cookie = `supabase_token=${token}; path=/`;
-                        
-                        // ============================================================
-                        // ===== FIX: RECORD REFERRAL AFTER SUCCESSFUL SIGNUP =====
-                        // ============================================================
-                        const savedRef = localStorage.getItem('edux_referral_code');
-                        if (savedRef) {
-                            try {
-                                console.log('📋 Recording referral after signup...');
-                                const refRes = await fetch(`${API_BASE}/api/referrals/record`, {
-                                    method: 'POST',
-                                    headers: {
-                                        'Authorization': `Bearer ${token}`,
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify({ referral_code: savedRef })
-                                });
-                                
-                                if (refRes.ok) {
-                                    const refData = await refRes.json();
-                                    console.log('✅ Referral recorded successfully!', refData);
-                                    // Show success message about free credits
-                                    showSuccess('✅ Account created and referral recorded! You both get 5 free credits!');
-                                    // Remove the stored referral code
-                                    localStorage.removeItem('edux_referral_code');
-                                } else {
-                                    const refData = await refRes.json();
-                                    console.log('⚠️ Referral recording failed:', refData);
-                                    // Don't block signup flow, just log it
-                                }
-                            } catch(refErr) {
-                                console.log('⚠️ Error recording referral:', refErr.message);
-                                // Don't block signup flow
-                            }
-                        }
-                    }
-                    
-                    setTimeout(() => {
-                        window.location.href = '/stats';
-                    }, 2000);
-                } else {
-                    showError('❌ ' + (data.error || 'Signup failed. Please try again.'));
-                }
-            } catch (err) {
-                showError('❌ Network error. Please check your connection.');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Create Account';
-            }
-        });
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/signup`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({email, password})
+    });
+    const data = await res.json();
 
-        // ============================================================
-        // ===== INIT: Check for referral code on page load =====
-        // ============================================================
-        console.log('🔗 API_BASE:', API_BASE);
-        console.log('📋 Referral code from URL:', referralCode || 'none');
-        
-        // If there's a referral code, store it immediately (already done at top)
-        // Also show the badge if it exists
-        if (referralCode) {
-            document.getElementById('referral-badge').style.display = 'block';
-        }
+    if (res.ok) {
+      if (data.token) {
+        saveSession(data, email);
+        await recordReferralIfPresent(data.token);
+      }
+      showSuccess('Account created — redirecting…');
+      setTimeout(() => { window.location.href = '/stats'; }, 1200);
+    } else {
+      showError(data.error || 'Sign-up failed. Please try again.');
+      setLoading(btn, false, 'Create Account');
+    }
+  } catch (err) {
+    showError('Network error — please check your connection.');
+    setLoading(btn, false, 'Create Account');
+  }
+});
 
-        // Handle Enter key for signup
-        document.getElementById('signupPassword').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('signupForm').dispatchEvent(new Event('submit'));
-            }
-        });
-        document.getElementById('password').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
-            }
-        });
-    </script>
+// ── Forgot password ──────────────────────────────────────────────
+document.getElementById('forgotForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  hideAlerts();
+  const btn = document.getElementById('forgotBtn');
+  const email = document.getElementById('forgotEmail').value.trim();
+  setLoading(btn, true, 'Send Reset Link');
+
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/forgot-password`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({email})
+    });
+    const data = await res.json();
+    showSuccess(data.message || 'If an account exists for that email, a reset link has been sent.');
+    setLoading(btn, false, 'Send Reset Link');
+  } catch (err) {
+    showError('Network error — please check your connection.');
+    setLoading(btn, false, 'Send Reset Link');
+  }
+});
+</script>
 </body>
 </html>
