@@ -17,6 +17,7 @@
     { "src": "/package", "dest": "public/package.html" },
     { "src": "/referrals", "dest": "public/referrals.html" },
     { "src": "/lecturer", "dest": "public/lecturer.html" },
+    { "src": "/admin", "dest": "public/admin.html" },
     { "src": "/payment/success", "dest": "public/payment_success.html" },
     { "src": "/r/(.*)", "dest": "public/shared.html" },
     { "src": "/(.*)", "dest": "public/$1" }
