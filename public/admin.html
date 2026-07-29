@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Super Admin — Eduxellence Stats</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--ny:#0B1829;--ny2:#112240;--bl:#1E6BFF;--tl:#0FC9A0;--wh:#fff;--of:#F7F9FC;
+  --sl:#64748B;--bd:#E2E8F0;--ok:#16A34A;--err:#DC2626;--warn:#D97706;--tx:#0F172A;
+  --r10:10px;--r16:16px;--r20:20px;--shM:0 4px 16px rgba(0,0,0,.08);--shL:0 10px 34px rgba(0,0,0,.12)}
+body{font-family:'DM Sans',sans-serif;background:var(--of);color:var(--tx)}
+a{color:var(--bl);text-decoration:none}
+
+.nav{background:var(--ny);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;position:sticky;top:0;z-index:50}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;color:#fff;font-size:1rem}
+.nav-logo span{color:var(--tl)}
+.nav-badge{background:rgba(255,255,255,.1);color:#fff;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;margin-left:.6rem}
+.nav-right{color:rgba(255,255,255,.5);font-size:.8rem}
+
+.wrap{max-width:1200px;margin:0 auto;padding:1.75rem 1.25rem 4rem}
+
+.tabs{display:flex;gap:.4rem;margin-bottom:1.5rem;border-bottom:1px solid var(--bd)}
+.tab{padding:.7rem 1.1rem;font-weight:700;font-family:'Syne',sans-serif;font-size:.85rem;color:var(--sl);cursor:pointer;border-bottom:2px solid transparent}
+.tab.active{color:var(--bl);border-color:var(--bl)}
+.view{display:none}
+.view.active{display:block}
+
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem}
+.stat-card{background:var(--wh);border-radius:var(--r16);box-shadow:var(--shM);padding:1.25rem}
+.stat-label{font-size:.75rem;color:var(--sl);font-weight:600;text-transform:uppercase;letter-spacing:.03em;margin-bottom:.4rem}
+.stat-value{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:var(--tx)}
+.stat-value.money{color:var(--ok)}
+
+.panel{background:var(--wh);border-radius:var(--r20);box-shadow:var(--shL);overflow:hidden}
+.panel-head{padding:1.1rem 1.4rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.panel-head h2{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800}
+.search-input{padding:.5rem .85rem;border:1.5px solid var(--bd);border-radius:8px;font-size:.85rem;width:220px}
+
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.03em;color:var(--sl);padding:.7rem 1.4rem;border-bottom:1px solid var(--bd)}
+td{padding:.75rem 1.4rem;font-size:.85rem;border-bottom:1px solid var(--bd)}
+tr:last-child td{border-bottom:none}
+tr.clickable{cursor:pointer}
+tr.clickable:hover{background:var(--of)}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.72rem;font-weight:700}
+.badge.active{background:rgba(22,163,74,.1);color:var(--ok)}
+.badge.suspended{background:rgba(220,38,38,.1);color:var(--err)}
+.badge.gateway-paystack{background:rgba(30,107,255,.1);color:var(--bl)}
+.badge.gateway-flutterwave{background:rgba(245,158,11,.12);color:var(--warn)}
+
+.pagination{display:flex;gap:.5rem;padding:1rem 1.4rem;justify-content:flex-end}
+.pg-btn{padding:.4rem .8rem;border:1.5px solid var(--bd);border-radius:8px;background:var(--wh);font-size:.8rem;cursor:pointer;font-weight:600}
+.pg-btn:disabled{opacity:.4;cursor:not-allowed}
+
+.loading,.empty{text-align:center;padding:3rem;color:var(--sl);font-size:.9rem}
+
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(11,24,41,.6);z-index:200;align-items:center;justify-content:center;padding:1.5rem}
+.modal-backdrop.show{display:flex}
+.modal{background:var(--wh);border-radius:var(--r16);padding:1.75rem;max-width:480px;width:100%;max-height:85vh;overflow-y:auto}
+.modal h3{font-family:'Syne',sans-serif;font-size:1.1rem;margin-bottom:1rem}
+.modal-close{float:right;background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--sl)}
+.detail-row{display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--of);font-size:.85rem}
+.detail-row span:first-child{color:var(--sl)}
+.detail-row span:last-child{font-weight:600}
+.action-row{display:flex;gap:.6rem;margin-top:1.25rem}
+.btn{flex:1;padding:.6rem;border-radius:9px;border:none;font-weight:700;font-size:.8rem;cursor:pointer;font-family:'Syne',sans-serif}
+.btn.primary{background:var(--bl);color:#fff}
+.btn.danger{background:#FEF2F2;color:var(--err)}
+.btn.ok{background:#F0FDF4;color:var(--ok)}
+.credit-form{display:flex;gap:.5rem;margin-top:1rem}
+.credit-form input{flex:1;padding:.55rem;border:1.5px solid var(--bd);border-radius:8px;font-size:.85rem}
+.txn-list{margin-top:1rem;max-height:180px;overflow-y:auto}
+.txn-row{display:flex;justify-content:space-between;font-size:.78rem;padding:.4rem 0;border-bottom:1px solid var(--of)}
+.txn-row .pos{color:var(--ok)}
+.txn-row .neg{color:var(--err)}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div><span class="nav-logo">Eduxellence<span>.</span></span><span class="nav-badge">SUPER ADMIN</span></div>
+  <div class="nav-right" id="admin-email"></div>
+</nav>
+
+<div class="wrap">
+  <div class="tabs">
+    <div class="tab active" data-view="dashboard">Dashboard</div>
+    <div class="tab" data-view="subscribers">Subscribers</div>
+    <div class="tab" data-view="payments">Payment Centre</div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="view active" id="view-dashboard">
+    <div class="stat-grid" id="stat-grid"><div class="loading">Loading stats…</div></div>
+  </div>
+
+  <!-- SUBSCRIBERS -->
+  <div class="view" id="view-subscribers">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Subscribers</h2>
+        <input class="search-input" id="user-search" placeholder="Search by email…">
+      </div>
+      <table>
+        <thead><tr><th>Email</th><th>Joined</th><th>Balance</th><th>Status</th></tr></thead>
+        <tbody id="users-tbody"><tr><td colspan="4" class="loading">Loading…</td></tr></tbody>
+      </table>
+      <div class="pagination">
+        <button class="pg-btn" id="pg-prev">← Prev</button>
+        <button class="pg-btn" id="pg-next">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAYMENTS -->
+  <div class="view" id="view-payments">
+    <div class="panel">
+      <div class="panel-head"><h2>Recent Payments</h2></div>
+      <table>
+        <thead><tr><th>Date</th><th>Gateway</th><th>Type</th><th>Amount</th><th>Reference</th></tr></thead>
+        <tbody id="payments-tbody"><tr><td colspan="5" class="loading">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- USER DETAIL MODAL -->
+<div class="modal-backdrop" id="user-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3 id="modal-email">—</h3>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const API_BASE = (() => {
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return 'http://localhost:7860';
+  return 'https://eduxellence-eduxellence-api.hf.space';
+})();
+
+async function getValidToken() {
+  const expiresAt = parseInt(localStorage.getItem('edux_token_expires_at') || '0', 10);
+  const token = localStorage.getItem('edux_auth_token');
+  if (!token) return null;
+  if (Date.now() < expiresAt - 2 * 60 * 1000) return token;
+  const refreshToken = localStorage.getItem('edux_refresh_token');
+  if (!refreshToken) return token;
+  try {
+    const r = await fetch(`${API_BASE}/api/auth/refresh`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({refresh_token: refreshToken})
+    });
+    const d = await r.json();
+    if (d.access_token) {
+      localStorage.setItem('edux_auth_token', d.access_token);
+      localStorage.setItem('edux_refresh_token', d.refresh_token);
+      localStorage.setItem('edux_token_expires_at', String(Date.now() + (d.expires_in || 3600) * 1000));
+      return d.access_token;
+    }
+  } catch (e) {}
+  return token;
+}
+
+async function authedFetch(path, opts = {}) {
+  const token = await getValidToken();
+  if (!token) { window.location.href = '/login'; return null; }
+  const headers = Object.assign({'Authorization': 'Bearer ' + token}, opts.headers || {});
+  const res = await fetch(`${API_BASE}${path}`, Object.assign({}, opts, {headers}));
+  if (res.status === 403) {
+    document.body.innerHTML = '<div style="padding:4rem;text-align:center;font-family:sans-serif;color:#DC2626">Admin access required.</div>';
+    throw new Error('forbidden');
+  }
+  return res.json();
+}
+
+// ── Tabs ──
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('view-' + tab.dataset.view).classList.add('active');
+    if (tab.dataset.view === 'subscribers') loadUsers();
+    if (tab.dataset.view === 'payments') loadPayments();
+  });
+});
+
+document.getElementById('admin-email').textContent = localStorage.getItem('edux_user_email') || '';
+
+// ── Dashboard ──
+async function loadDashboard() {
+  try {
+    const d = await authedFetch('/api/admin/dashboard-stats');
+    const s = d.stats;
+    const cards = [
+      ['Total Users', s.total_users],
+      ['Active Today', s.active_today],
+      ['Credits Sold', s.credits_sold],
+      ['Credits Consumed', s.credits_consumed],
+      ['Revenue (USD)', s.revenue_usd != null ? '$' + s.revenue_usd : '—', true],
+      ['Active Subscriptions', s.active_subscriptions],
+    ];
+    document.getElementById('stat-grid').innerHTML = cards.map(([label, val, money]) => `
+      <div class="stat-card">
+        <div class="stat-label">${label}</div>
+        <div class="stat-value ${money ? 'money' : ''}">${val === null || val === undefined ? '—' : val}</div>
+      </div>`).join('');
+  } catch (e) {
+    if (e.message !== 'forbidden') document.getElementById('stat-grid').innerHTML = '<div class="empty">Could not load stats.</div>';
+  }
+}
+
+// ── Subscribers ──
+let currentPage = 1;
+async function loadUsers() {
+  const search = document.getElementById('user-search').value.trim();
+  document.getElementById('users-tbody').innerHTML = '<tr><td colspan="4" class="loading">Loading…</td></tr>';
+  try {
+    const d = await authedFetch(`/api/admin/users?page=${currentPage}&limit=25&search=${encodeURIComponent(search)}`);
+    const users = d.users || [];
+    if (!users.length) {
+      document.getElementById('users-tbody').innerHTML = '<tr><td colspan="4" class="empty">No users found.</td></tr>';
+      return;
+    }
+    document.getElementById('users-tbody').innerHTML = users.map(u => `
+      <tr class="clickable" onclick="openUser('${u.id}')">
+        <td>${u.email || '—'}</td>
+        <td>${u.created_at ? new Date(u.created_at).toLocaleDateString() : '—'}</td>
+        <td>💎 ${u.balance ?? '—'}</td>
+        <td><span class="badge ${u.is_active === false ? 'suspended' : 'active'}">${u.is_active === false ? 'Suspended' : 'Active'}</span></td>
+      </tr>`).join('');
+    document.getElementById('pg-prev').disabled = currentPage <= 1;
+    document.getElementById('pg-next').disabled = users.length < 25;
+  } catch (e) {
+    if (e.message !== 'forbidden') document.getElementById('users-tbody').innerHTML = '<tr><td colspan="4" class="empty">Could not load users.</td></tr>';
+  }
+}
+document.getElementById('user-search').addEventListener('input', () => { currentPage = 1; loadUsers(); });
+document.getElementById('pg-prev').addEventListener('click', () => { if (currentPage > 1) { currentPage--; loadUsers(); } });
+document.getElementById('pg-next').addEventListener('click', () => { currentPage++; loadUsers(); });
+
+// ── User detail modal ──
+let openUserId = null;
+async function openUser(userId) {
+  openUserId = userId;
+  document.getElementById('user-modal').classList.add('show');
+  document.getElementById('modal-email').textContent = 'Loading…';
+  document.getElementById('modal-body').innerHTML = '';
+  try {
+    const d = await authedFetch(`/api/admin/users/${userId}`);
+    const p = d.profile;
+    document.getElementById('modal-email').textContent = p.email;
+    const suspended = p.is_active === false;
+    document.getElementById('modal-body').innerHTML = `
+      <div class="detail-row"><span>Balance</span><span>💎 ${d.balance}</span></div>
+      <div class="detail-row"><span>Joined</span><span>${new Date(p.created_at).toLocaleDateString()}</span></div>
+      <div class="detail-row"><span>Status</span><span><span class="badge ${suspended ? 'suspended' : 'active'}">${suspended ? 'Suspended' : 'Active'}</span></span></div>
+      <div class="detail-row"><span>Subscription</span><span>${d.subscription ? d.subscription.plan_key + ' (' + d.subscription.status + ')' : 'None'}</span></div>
+      <div class="credit-form">
+        <input type="number" id="credit-amount" placeholder="+10 or -5">
+        <button class="btn primary" onclick="adjustCredits()">Adjust</button>
+      </div>
+      <div class="action-row">
+        <button class="btn ${suspended ? 'ok' : 'danger'}" onclick="toggleSuspend(${!suspended})">${suspended ? 'Reactivate' : 'Suspend'}</button>
+      </div>
+      <div class="txn-list">
+        ${(d.transactions || []).slice(0, 15).map(t => `
+          <div class="txn-row">
+            <span>${t.reason} · ${new Date(t.created_at).toLocaleDateString()}</span>
+            <span class="${t.delta > 0 ? 'pos' : 'neg'}">${t.delta > 0 ? '+' : ''}${t.delta}</span>
+          </div>`).join('') || '<div class="empty" style="padding:1rem 0">No transactions.</div>'}
+      </div>
+    `;
+  } catch (e) {
+    if (e.message !== 'forbidden') document.getElementById('modal-body').innerHTML = '<div class="empty">Could not load user.</div>';
+  }
+}
+function closeModal() { document.getElementById('user-modal').classList.remove('show'); }
+
+async function adjustCredits() {
+  const amount = parseFloat(document.getElementById('credit-amount').value);
+  if (!amount) return alert('Enter a non-zero amount.');
+  try {
+    const d = await authedFetch(`/api/admin/users/${openUserId}/adjust-credits`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({amount, reason: 'admin_manual_adjust'})
+    });
+    if (d.ok) { openUser(openUserId); loadUsers(); } else alert(d.error || 'Adjustment failed.');
+  } catch (e) {}
+}
+
+async function toggleSuspend(suspend) {
+  try {
+    const d = await authedFetch(`/api/admin/users/${openUserId}/suspend`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({suspended: suspend})
+    });
+    if (d.ok) { openUser(openUserId); loadUsers(); } else alert(d.error || 'Action failed.');
+  } catch (e) {}
+}
+
+// ── Payments ──
+async function loadPayments() {
+  document.getElementById('payments-tbody').innerHTML = '<tr><td colspan="5" class="loading">Loading…</td></tr>';
+  try {
+    const d = await authedFetch('/api/admin/payments?limit=50');
+    const rows = d.payments || [];
+    if (!rows.length) {
+      document.getElementById('payments-tbody').innerHTML = '<tr><td colspan="5" class="empty">No payments yet.</td></tr>';
+      return;
+    }
+    document.getElementById('payments-tbody').innerHTML = rows.map(p => `
+      <tr>
+        <td>${new Date(p.created_at).toLocaleString()}</td>
+        <td><span class="badge gateway-${p.gateway}">${p.gateway}</span></td>
+        <td>${p.reason === 'subscription_grant' ? 'Subscription' : 'Credit Pack'}</td>
+        <td>$${p.amount_usd ?? '—'}</td>
+        <td style="font-family:monospace;font-size:.75rem">${p.reference || '—'}</td>
+      </tr>`).join('');
+  } catch (e) {
+    if (e.message !== 'forbidden') document.getElementById('payments-tbody').innerHTML = '<tr><td colspan="5" class="empty">Could not load payments.</td></tr>';
+  }
+}
+
+loadDashboard();
+</script>
+</body>
+</html>
