@@ -225,6 +225,12 @@ code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:#f1f5f9;p
 .share-url-box .copy-btn:hover{background:#1452CC}
 .spinner{width:32px;height:32px;border:3px solid var(--bd);border-top-color:var(--bl);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
+/* PASSWORD VISIBILITY TOGGLE */
+.pw-wrap{position:relative}
+.pw-wrap input{padding-right:2.4rem!important}
+.pw-toggle{position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;padding:2px;cursor:pointer;color:var(--sl);display:flex;align-items:center;transition:color .15s}
+.pw-toggle:hover{color:var(--bl)}
+.pw-toggle svg{width:18px;height:18px;display:block}
 /* REFERRAL MODAL STYLES */
 #referral-modal{display:none;position:fixed;inset:0;background:rgba(11,24,41,.8);z-index:800;align-items:center;justify-content:center;padding:1rem}
 #referral-modal.show{display:flex}
@@ -463,10 +469,20 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
 
     <div style="text-align:left;margin-bottom:.5rem">
       <label style="font-size:.8rem;font-weight:600;color:var(--tx);display:block;margin-bottom:.25rem">New Password</label>
-      <input id="reset-password-input" type="password" placeholder="Min 6 characters" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--bd);border-radius:8px;font-size:.9rem;font-family:'DM Sans',sans-serif;margin-bottom:.75rem;">
+      <div class="pw-wrap" style="margin-bottom:.75rem">
+        <input id="reset-password-input" type="password" placeholder="Min 6 characters" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--bd);border-radius:8px;font-size:.9rem;font-family:'DM Sans',sans-serif;">
+        <button type="button" class="pw-toggle" onclick="togglePwVisibility('reset-password-input', this)" aria-label="Show password" title="Show password">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
 
       <label style="font-size:.8rem;font-weight:600;color:var(--tx);display:block;margin-bottom:.25rem">Confirm New Password</label>
-      <input id="reset-password-confirm" type="password" placeholder="Re-enter password" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--bd);border-radius:8px;font-size:.9rem;font-family:'DM Sans',sans-serif;margin-bottom:.5rem;">
+      <div class="pw-wrap" style="margin-bottom:.5rem">
+        <input id="reset-password-confirm" type="password" placeholder="Re-enter password" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--bd);border-radius:8px;font-size:.9rem;font-family:'DM Sans',sans-serif;">
+        <button type="button" class="pw-toggle" onclick="togglePwVisibility('reset-password-confirm', this)" aria-label="Show password" title="Show password">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
     </div>
 
     <button class="btn btn-p" id="resetPasswordBtn" onclick="handleSetNewPassword()" style="width:100%">Set New Password</button>
@@ -491,7 +507,12 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
       <input id="login-email" type="email" placeholder="you@example.com" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--bd);border-radius:8px;font-size:.9rem;font-family:'DM Sans',sans-serif;margin-bottom:.75rem;">
       
       <label style="font-size:.8rem;font-weight:600;color:var(--tx);display:block;margin-bottom:.25rem">Password</label>
-      <input id="login-password" type="password" placeholder="Your password (min 6 characters)" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--bd);border-radius:8px;font-size:.9rem;font-family:'DM Sans',sans-serif;margin-bottom:.5rem;">
+      <div class="pw-wrap">
+        <input id="login-password" type="password" placeholder="Your password (min 6 characters)" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--bd);border-radius:8px;font-size:.9rem;font-family:'DM Sans',sans-serif;margin-bottom:.5rem;">
+        <button type="button" class="pw-toggle" id="login-password-toggle" onclick="togglePwVisibility('login-password', this)" aria-label="Show password" title="Show password">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
       <div style="text-align:right;margin-bottom:.75rem">
         <a href="#" onclick="handleForgotPassword();return false;" style="font-size:.78rem;color:var(--bl);font-weight:500;">Forgot password?</a>
       </div>
@@ -1318,6 +1339,22 @@ function showDevMode(){
   errorEl.textContent = '🔧 DEV MODE: Use any email and password (min 6 chars). Sign up will work automatically.';
   errorEl.style.color = 'var(--wn)';
   errorEl.style.display = 'block';
+}
+
+// NEW: password show/hide toggle — lets someone catch a typo before
+// submitting, rather than finding out from a failed login or a mismatched
+// "confirm password" error after the fact.
+const EYE_OPEN  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_CLOSED = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+
+function togglePwVisibility(inputId, btnEl){
+  const input = document.getElementById(inputId);
+  if(!input) return;
+  const nowVisible = input.type === 'password';
+  input.type = nowVisible ? 'text' : 'password';
+  btnEl.innerHTML = nowVisible ? EYE_CLOSED : EYE_OPEN;
+  btnEl.setAttribute('aria-label', nowVisible ? 'Hide password' : 'Show password');
+  btnEl.setAttribute('title', nowVisible ? 'Hide password' : 'Show password');
 }
 
 // NEW: Forgot password — was completely absent from the UI even though
