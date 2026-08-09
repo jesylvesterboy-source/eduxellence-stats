@@ -468,6 +468,9 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
       
       <label style="font-size:.8rem;font-weight:600;color:var(--tx);display:block;margin-bottom:.25rem">Password</label>
       <input id="login-password" type="password" placeholder="Your password (min 6 characters)" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--bd);border-radius:8px;font-size:.9rem;font-family:'DM Sans',sans-serif;margin-bottom:.5rem;">
+      <div style="text-align:right;margin-bottom:.75rem">
+        <a href="#" onclick="handleForgotPassword();return false;" style="font-size:.78rem;color:var(--bl);font-weight:500;">Forgot password?</a>
+      </div>
     </div>
     
     <button class="btn btn-p" id="loginSubmitBtn" onclick="handleLoginSubmit()" style="width:100%;margin-bottom:.5rem">Sign In / Create Account</button>
@@ -541,10 +544,25 @@ function fileToBase64(file) {
 }
 
 // ===== Helper: Get auth token =====
-function getAuthToken() {
-  return localStorage.getItem('edux_auth_token') || 
-         document.cookie.split('; ').find(row => row.startsWith('supabase_token='))?.split('=')[1] ||
-         null;
+// FIX (root cause of "signed in but says sign in"): this used to read a
+// static localStorage copy written ONCE at login time. Supabase's JS SDK
+// auto-refreshes the session internally by default (autoRefreshToken:true)
+// and stores the refreshed token in its OWN internal storage key — but
+// that refresh was never synced back into 'edux_auth_token'. So after the
+// token's ~1hr lifetime, the nav bar kept showing "signed in" (it just
+// reads a separate localStorage flag) while every actual API call sent a
+// stale, now-invalid token and got 401'd. Fix: always pull the CURRENT
+// session directly from the SDK, which returns an auto-refreshed token
+// transparently. This is now async — every caller must await it.
+async function getAuthToken() {
+  try {
+    const { data, error } = await supabaseClient.auth.getSession();
+    if (error || !data?.session) return null;
+    return data.session.access_token;
+  } catch (e) {
+    console.error('getAuthToken error:', e);
+    return null;
+  }
 }
 
 // ===== Helper: Get user email =====
@@ -563,7 +581,7 @@ function getUserEmail() {
 
 /* ═══════════ PHASE 9: CREDIT BALANCE PILL ═══════════ */
 async function loadBalance(){
-  const token = getAuthToken();
+  const token = await getAuthToken();
   const pill = document.getElementById('balance-pill');
   if(!token){ pill.style.display='none'; return; }
 
@@ -616,7 +634,6 @@ const TESTS=[
   {id:"kruskal_wallis",ico:"🏆",name:"Kruskal-Wallis",bdg:"np",bl:"Non-Parametric",
    desc:"Non-parametric ANOVA. Use for skewed data or ordinal outcomes.",
    hint:"Need: 1 numeric + 1 grouping column (3+ groups)."},
-  // ===== NEW TESTS ADDED =====
   {id:"logistic_regression",ico:"📋",name:"Logistic Regression",bdg:"adv",bl:"Advanced",
    desc:"Predict binary outcomes. Odds ratios, confusion matrix, ROC AUC, VIF.",
    hint:"Need: 1 binary categorical dependent + 1+ numeric predictors."},
@@ -647,7 +664,7 @@ function gs(n){
   if(n===4){ checkAssumptions(); renderCostPreview(); }
 }
 
-function renderCostPreview(){
+async function renderCostPreview(){
   const box = document.getElementById('cost-preview');
   if(!box || !S.test) return;
   const cost = (S.creditCosts && S.creditCosts[S.test] !== undefined) ? S.creditCosts[S.test] : null;
@@ -658,7 +675,7 @@ function renderCostPreview(){
     return;
   }
 
-  const token = getAuthToken();
+  const token = await getAuthToken();
   box.style.display = 'block';
 
   if(!token){
@@ -769,7 +786,6 @@ function renderVars(){
   else if(["anova","kruskal_wallis"].includes(id)) h=`<div class="vs"><div class="vs-lbl">Numeric (dependent) variable</div><div class="vs-hint">The measurement to compare</div><select class="vs-sel" id="nv">${opts(numC())}</select></div><div class="vs"><div class="vs-lbl">Grouping variable</div><div class="vs-hint">Must have 3+ categories</div><select class="vs-sel" id="gv">${opts(catC())}</select></div>`;
   else if(id==="correlation") h=`<div class="vs"><div class="vs-lbl">Select numeric columns (minimum 2)</div>${mchk(numC(),"cc")}</div><div class="vs"><div class="vs-lbl">Method</div><div class="mr"><label><input type="radio" name="cm" value="pearson" checked> Pearson (parametric)</label><label><input type="radio" name="cm" value="spearman"> Spearman (non-parametric)</label></div></div>`;
   else if(id==="regression") h=`<div class="vs"><div class="vs-lbl">Dependent (outcome) variable</div><div class="vs-hint">The variable to predict</div><select class="vs-sel" id="dv">${opts(numC())}</select></div><div class="vs"><div class="vs-lbl">Predictor(s)</div><div class="vs-hint">Select one or more numeric predictors</div>${mchk(numC(),"pc")}</div>`;
-  // ===== NEW TESTS =====
   else if(id==="logistic_regression") h=`<div class="vs"><div class="vs-lbl">Dependent (binary outcome) variable</div><div class="vs-hint">Must have exactly 2 categories (e.g. Pass/Fail, Yes/No)</div><select class="vs-sel" id="dv">${opts(catC())}</select></div><div class="vs"><div class="vs-lbl">Predictor(s)</div><div class="vs-hint">Select one or more numeric predictors</div>${mchk(numC(),"pc")}</div>`;
   else if(id==="pca") h=`<div class="vs"><div class="vs-lbl">Select numeric columns for PCA (minimum 2)</div><div class="vs-hint">Variables should be measured on comparable scales</div>${mchk(numC(),"cc")}</div><div class="vs"><div class="vs-lbl">Number of components (optional)</div><div class="vs-hint">Leave blank for auto-selection based on Kaiser criterion</div><input type="number" id="n_components" min="2" max="10" placeholder="e.g. 3" style="width:100%;padding:.65rem .9rem;border:1.5px solid var(--bd);border-radius:var(--r8);font-size:.9rem;font-family:'DM Sans',sans-serif;"></div>`;
   else if(id==="factor_analysis") h=`<div class="vs"><div class="vs-lbl">Select numeric columns for Factor Analysis (minimum 3)</div><div class="vs-hint">Variables should be correlated and conceptually related</div>${mchk(numC(),"cc")}</div><div class="vs"><div class="vs-lbl">Number of factors (optional)</div><div class="vs-hint">Leave blank for auto-selection (max 3 factors)</div><input type="number" id="n_factors" min="2" max="5" placeholder="e.g. 2" style="width:100%;padding:.65rem .9rem;border:1.5px solid var(--bd);border-radius:var(--r8);font-size:.9rem;font-family:'DM Sans',sans-serif;"></div>`;
@@ -784,7 +800,6 @@ function buildParams(){
   if(["t_test","anova","mann_whitney","kruskal_wallis"].includes(id)){const n=document.getElementById("nv")?.value,g=document.getElementById("gv")?.value;if(!n||!g)return{err:"Select both variables."};if(n===g)return{err:"Variables must be different."};return{ok:1,p:{numeric_var:n,group_var:g}};}
   if(id==="correlation"){const c=[...document.querySelectorAll('[name="cc"]:checked')].map(e=>e.value);if(c.length<2)return{err:"Select at least 2 columns."};const m=document.querySelector('[name="cm"]:checked')?.value||"pearson";return{ok:1,p:{columns:c,method:m}};}
   if(id==="regression"){const d=document.getElementById("dv")?.value,pr=[...document.querySelectorAll('[name="pc"]:checked')].map(e=>e.value);if(!d)return{err:"Select dependent variable."};if(!pr.length)return{err:"Select at least 1 predictor."};if(pr.includes(d))return{err:"Dependent cannot also be a predictor."};return{ok:1,p:{dependent:d,predictors:pr}};}
-  // ===== NEW TESTS =====
   if(id==="logistic_regression"){const d=document.getElementById("dv")?.value,pr=[...document.querySelectorAll('[name="pc"]:checked')].map(e=>e.value);if(!d)return{err:"Select dependent variable."};if(!pr.length)return{err:"Select at least 1 predictor."};return{ok:1,p:{dependent:d,predictors:pr}};}
   if(id==="pca"){const c=[...document.querySelectorAll('[name="cc"]:checked')].map(e=>e.value);if(c.length<2)return{err:"Select at least 2 columns."};const nc=document.getElementById("n_components")?.value;return{ok:1,p:{columns:c,n_components:nc?parseInt(nc):null}};}
   if(id==="factor_analysis"){const c=[...document.querySelectorAll('[name="cc"]:checked')].map(e=>e.value);if(c.length<3)return{err:"Select at least 3 columns."};const nf=document.getElementById("n_factors")?.value;return{ok:1,p:{columns:c,n_factors:nf?parseInt(nf):null}};}
@@ -820,7 +835,7 @@ async function runAnalysis(){
   showP("anpw"); const stages=["Loading data…","Parsing columns…","Running test…","Computing effect sizes…","Generating charts…","Building interpretation…","Finalising…"];
   let t=0; const tm=setInterval(()=>{t+=100;const pct=Math.min(92,Math.round(92*(1-Math.pow(1-t/9000,2))));document.getElementById("an-fill").style.width=pct+"%";document.getElementById("an-pct").textContent=pct+"%";document.getElementById("an-sub").textContent=stages[Math.min(Math.floor(pct/(92/stages.length)),stages.length-1)];if(t>=9000)clearInterval(tm);},100);
   try{
-    const token = getAuthToken();
+    const token = await getAuthToken();
     const headers = {"Content-Type":"application/json"};
     if(token) {headers["Authorization"]=`Bearer ${token}`; console.log("🔑 Auth token included in request");}
     else {console.log("ℹ️ No auth token found - request will be anonymous");}
@@ -920,7 +935,6 @@ function renderResults(d){
 
   if(d.charts?.length) h+=`<div class="rs"><div class="rs-title">📊 Charts & Visualisations</div><div class="cg">${d.charts.map((c,i)=>`<div class="cc-card"><div class="cc-title"><span>${c.title}</span><span class="dl-img" onclick="dlImg(${i},'${c.title}')">⬇ PNG</span></div><img class="cc-img" id="chart-${i}" src="${c.img}" alt="${c.title}" loading="lazy"></div>`).join("")}</div></div>`;
 
-  // Tables - expanded for new tests
   const tableKeys = [
     ["numeric_summary","Descriptive Statistics"],
     ["summary_table","Group Summary"],
@@ -954,7 +968,6 @@ function buildChips(d){
   if(d.eta_squared!=null) c.push({val:d.eta_squared,lbl:"η²",cls:""});
   if(d.effect_size&&d.effect_size!=="—") c.push({val:d.effect_size,lbl:"Effect Size",cls:""});
   if(d.n!=null) c.push({val:d.n,lbl:"Sample (N)",cls:""});
-  // New test chips
   if(d.auc!=null) c.push({val:d.auc,lbl:"ROC AUC",cls:d.auc>.7?"sig":""});
   if(d.accuracy!=null) c.push({val:d.accuracy,lbl:"Accuracy",cls:d.accuracy>.7?"sig":""});
   if(d.kmo_overall!=null) c.push({val:d.kmo_overall,lbl:"KMO",cls:d.kmo_overall>.7?"sig":""});
@@ -1206,11 +1219,10 @@ async function handleLoginSubmit(){
         }
         
         if (signupData.session) {
-          localStorage.setItem('edux_auth_token', signupData.session.access_token);
-          if(signupData.user){
-            localStorage.setItem('edux_user', JSON.stringify(signupData.user));
-          }
-          updateNavUI(signupData.user);
+          // FIX: storage + nav sync now handled by the onAuthStateChange
+          // listener (fires automatically on this SIGNED_IN event) — no
+          // longer duplicated here, which used to create two sources of
+          // truth that could silently drift apart over time.
           successEl.textContent = '✅ Account created and signed in!';
           successEl.style.display = 'block';
           btn.disabled = false;
@@ -1228,11 +1240,8 @@ async function handleLoginSubmit(){
     }
     
     if (data.session) {
-      localStorage.setItem('edux_auth_token', data.session.access_token);
-      if(data.user){
-        localStorage.setItem('edux_user', JSON.stringify(data.user));
-      }
-      updateNavUI(data.user);
+      // FIX: storage + nav sync now handled by the onAuthStateChange
+      // listener, not duplicated here (see fix note above).
       successEl.textContent = '✅ Signed in successfully!';
       successEl.style.display = 'block';
       btn.disabled = false;
@@ -1269,7 +1278,11 @@ function updateNavUI(user){
   }
 }
 
-function logoutUser(){
+async function logoutUser(){
+  // FIX: previously only cleared our own localStorage copy — the Supabase
+  // SDK's internal session (separate storage key) was never invalidated,
+  // so getSession() could still return a "valid" session after "logout".
+  try { await supabaseClient.auth.signOut(); } catch(e) { console.error('signOut error:', e); }
   localStorage.removeItem('edux_auth_token');
   localStorage.removeItem('edux_user');
   updateNavUI(null);
@@ -1283,16 +1296,60 @@ function showDevMode(){
   errorEl.style.display = 'block';
 }
 
-document.addEventListener('DOMContentLoaded', function(){
-  const token = localStorage.getItem('edux_auth_token');
-  const userStr = localStorage.getItem('edux_user');
-  if(token && userStr){
-    try {
-      const user = JSON.parse(userStr);
-      updateNavUI(user);
-    } catch(e) {
-      console.error('Error parsing user data:', e);
+// NEW: Forgot password — was completely absent from the UI even though
+// the backend already has a working /api/auth/forgot-password route.
+// Uses the Supabase SDK directly (same pattern as sign-in/sign-up above)
+// rather than the backend route, since Supabase needs to own the reset
+// token + redirect flow end-to-end for its email link to work correctly.
+//
+// IMPORTANT: the redirect URL below must be added to your Supabase
+// project's Authentication > URL Configuration > Redirect URLs allowlist,
+// or the reset link in the email will fail to complete.
+async function handleForgotPassword(){
+  const email = document.getElementById('login-email').value.trim();
+  const errorEl = document.getElementById('login-error');
+  const successEl = document.getElementById('login-success');
+  errorEl.style.display = 'none';
+  successEl.style.display = 'none';
+
+  if(!email){
+    errorEl.textContent = 'Enter your email above first, then click "Forgot password?".';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  try {
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname
+    });
+    if (error) {
+      errorEl.textContent = error.message || 'Could not send reset email.';
+      errorEl.style.display = 'block';
+      return;
     }
+    successEl.textContent = '✅ If an account exists for that email, a password reset link has been sent.';
+    successEl.style.display = 'block';
+  } catch(e) {
+    errorEl.textContent = 'Network error: ' + e.message;
+    errorEl.style.display = 'block';
+  }
+}
+
+// FIX: replaced a one-time DOMContentLoaded localStorage read with a live
+// listener on the SDK's own auth state. This is what keeps 'edux_auth_token'
+// / 'edux_user' / the nav bar honest going forward — every time the SDK
+// silently refreshes the token, signs in, or signs out, this fires and
+// re-syncs our copies and the UI automatically. Also does the initial
+// paint on page load via getSession() instead of trusting old localStorage.
+supabaseClient.auth.onAuthStateChange((event, session) => {
+  if (session) {
+    localStorage.setItem('edux_auth_token', session.access_token);
+    if (session.user) localStorage.setItem('edux_user', JSON.stringify(session.user));
+    updateNavUI(session.user);
+  } else {
+    localStorage.removeItem('edux_auth_token');
+    localStorage.removeItem('edux_user');
+    updateNavUI(null);
   }
 });
 
@@ -1383,8 +1440,8 @@ function copyShareUrl(){
 }
 
 /* ═══════════ REFERRAL FUNCTIONS ═══════════ */
-function openReferralModal() {
-  const token = getAuthToken();
+async function openReferralModal() {
+  const token = await getAuthToken();
   if (!token) {
     alert('Please sign in to access referrals.');
     openLoginModal();
@@ -1399,7 +1456,7 @@ function closeReferralModal() {
 }
 
 async function renderReferralModal() {
-  const token = getAuthToken();
+  const token = await getAuthToken();
   const body = document.getElementById('referral-modal-body');
   
   if (!token) {
