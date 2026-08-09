@@ -449,6 +449,30 @@ footer a{color:var(--tl)}footer strong{color:rgba(255,255,255,.75)}
   </div>
 </div>
 
+<!-- SET NEW PASSWORD MODAL (shown only after clicking a password-reset email link) -->
+<div id="reset-password-modal" style="display:none;position:fixed;inset:0;background:rgba(11,24,41,.85);z-index:750;align-items:center;justify-content:center;padding:1rem">
+  <div style="background:var(--wh);border-radius:var(--r24);padding:2.5rem;max-width:420px;width:100%;box-shadow:var(--shL);position:relative">
+    <div style="text-align:center;margin-bottom:1.5rem">
+      <div style="font-size:2.5rem;margin-bottom:.5rem">🔒</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--tx)">Set a New Password</div>
+      <p style="color:var(--sl);font-size:.88rem;margin-top:.25rem">You clicked a password reset link. Choose a new password below.</p>
+    </div>
+
+    <div id="reset-error" style="color:var(--er);font-size:.82rem;padding:.6rem;background:rgba(220,38,38,.06);border-radius:8px;display:none;margin-bottom:.75rem"></div>
+    <div id="reset-success" style="color:var(--ok);font-size:.82rem;padding:.6rem;background:rgba(22,163,74,.06);border-radius:8px;display:none;margin-bottom:.75rem"></div>
+
+    <div style="text-align:left;margin-bottom:.5rem">
+      <label style="font-size:.8rem;font-weight:600;color:var(--tx);display:block;margin-bottom:.25rem">New Password</label>
+      <input id="reset-password-input" type="password" placeholder="Min 6 characters" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--bd);border-radius:8px;font-size:.9rem;font-family:'DM Sans',sans-serif;margin-bottom:.75rem;">
+
+      <label style="font-size:.8rem;font-weight:600;color:var(--tx);display:block;margin-bottom:.25rem">Confirm New Password</label>
+      <input id="reset-password-confirm" type="password" placeholder="Re-enter password" style="width:100%;padding:.65rem .8rem;border:1.5px solid var(--bd);border-radius:8px;font-size:.9rem;font-family:'DM Sans',sans-serif;margin-bottom:.5rem;">
+    </div>
+
+    <button class="btn btn-p" id="resetPasswordBtn" onclick="handleSetNewPassword()" style="width:100%">Set New Password</button>
+  </div>
+</div>
+
 <!-- LOGIN MODAL -->
 <div id="login-modal" style="display:none;position:fixed;inset:0;background:rgba(11,24,41,.8);z-index:700;align-items:center;justify-content:center;padding:1rem">
   <div style="background:var(--wh);border-radius:var(--r24);padding:2.5rem;max-width:420px;width:100%;box-shadow:var(--shL);position:relative">
@@ -1342,6 +1366,19 @@ async function handleForgotPassword(){
 // re-syncs our copies and the UI automatically. Also does the initial
 // paint on page load via getSession() instead of trusting old localStorage.
 supabaseClient.auth.onAuthStateChange((event, session) => {
+  // FIX: PASSWORD_RECOVERY is a DISTINCT event from a normal sign-in.
+  // Clicking a password-reset email link makes the SDK auto-detect the
+  // recovery token in the URL and create a session from it — but that
+  // session exists only so the user can set a new password, not to drop
+  // them straight into the app. Previously this branch treated it exactly
+  // like SIGNED_IN (sync storage, flip nav to "signed in", done) — so the
+  // user just silently landed on the normal front page with no prompt to
+  // actually reset anything. Now it shows a dedicated form instead.
+  if (event === 'PASSWORD_RECOVERY') {
+    document.getElementById('reset-password-modal').style.display = 'flex';
+    return;
+  }
+
   if (session) {
     localStorage.setItem('edux_auth_token', session.access_token);
     if (session.user) localStorage.setItem('edux_user', JSON.stringify(session.user));
@@ -1352,6 +1389,54 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
     updateNavUI(null);
   }
 });
+
+async function handleSetNewPassword(){
+  const pw = document.getElementById('reset-password-input').value;
+  const pwConfirm = document.getElementById('reset-password-confirm').value;
+  const errorEl = document.getElementById('reset-error');
+  const successEl = document.getElementById('reset-success');
+  errorEl.style.display = 'none';
+  successEl.style.display = 'none';
+
+  if(!pw || pw.length < 6){
+    errorEl.textContent = 'Password must be at least 6 characters.';
+    errorEl.style.display = 'block';
+    return;
+  }
+  if(pw !== pwConfirm){
+    errorEl.textContent = 'Passwords do not match.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('resetPasswordBtn');
+  btn.disabled = true; btn.textContent = 'Updating…';
+
+  try {
+    // This works because the recovery-flow session (from the emailed link)
+    // is already active in the SDK at this point — updateUser() applies to
+    // whichever session is currently live.
+    const { error } = await supabaseClient.auth.updateUser({ password: pw });
+    if (error) {
+      errorEl.textContent = error.message || 'Could not update password.';
+      errorEl.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'Set New Password';
+      return;
+    }
+    successEl.textContent = '✅ Password updated! You are now signed in.';
+    successEl.style.display = 'block';
+    setTimeout(() => {
+      document.getElementById('reset-password-modal').style.display = 'none';
+      // Clean the recovery token out of the URL so a page refresh doesn't
+      // re-trigger this flow.
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }, 1800);
+  } catch(e) {
+    errorEl.textContent = 'Network error: ' + e.message;
+    errorEl.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Set New Password';
+  }
+}
 
 /* ═══════════ SHARE FUNCTIONS ═══════════ */
 function openShareModal(){
