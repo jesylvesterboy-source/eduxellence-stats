@@ -151,14 +151,25 @@ body{font-family:'DM Sans',sans-serif;background:linear-gradient(160deg,var(--ny
   </div>
 </div>
 
+<!-- ===== SUPABASE JS SDK =====
+     CRITICAL FIX: login.html previously signed in via the Flask backend
+     (/api/auth/login), which never touches the browser-side Supabase SDK.
+     stats.html and admin.html both rely on the SDK's own session
+     (getSession() / onAuthStateChange) to know whether someone is logged
+     in. That mismatch is exactly why a successful login here still showed
+     "Sign In" on /stats and could bounce /admin back to /login — the SDK
+     genuinely had no session, even though a raw token existed under a
+     different, backend-only storage scheme. Signing in through the SDK
+     directly (same as stats.html's embedded login modal does) makes this
+     one single, consistent source of truth across every page. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-// ============================================================
-// API_BASE — the frontend (Vercel: stats.eduxellence.org) and the
-// backend (Hugging Face Space) are on DIFFERENT domains. Every API
-// call must be an absolute URL against the HF Space, never a bare
-// relative path like fetch('/api/...') — that would try to hit
-// Vercel itself and 404.
-// ============================================================
+// Must match stats.html and admin.html exactly — same Supabase project.
+const SUPABASE_URL = 'https://uvmmottlccuxvfmwckuf.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2bW1vdHRsY2N1eHZmbXdja3VmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3ODQxMzIsImV4cCI6MjA5NzM2MDEzMn0.e4789311KYwC-YXOuPheW9AXIIYRzT-te6YfNnnNdnk';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 const API_BASE = (() => {
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     return 'http://localhost:7860';
@@ -166,8 +177,13 @@ const API_BASE = (() => {
   return 'https://eduxellence-eduxellence-api.hf.space';
 })();
 
-// ── Referral capture ──────────────────────────────────────────────
+// ── FIX: honor a ?redirect= param instead of always going to /stats.
+// This is what makes /admin -> (not logged in) -> /login -> sign in
+// correctly return you to /admin instead of dumping you on /stats. ──
 const urlParams = new URLSearchParams(window.location.search);
+const redirectTarget = urlParams.get('redirect') || '/stats';
+
+// ── Referral capture ──────────────────────────────────────────────
 const referralCode = urlParams.get('ref');
 if (referralCode) {
   localStorage.setItem('edux_referral_code', referralCode);
@@ -216,17 +232,6 @@ document.querySelectorAll('.pw-toggle').forEach(btn => {
   });
 });
 
-// ── Session storage (consistent keys used across the whole app) ────
-// NOTE: no cookie is set here anymore. A cookie set from Vercel would
-// never be sent to the HF Space domain (different hosts), so the
-// Authorization header is the ONLY mechanism that matters now.
-function saveSession(data, email) {
-  localStorage.setItem('edux_auth_token', data.token);
-  if (data.refresh_token) localStorage.setItem('edux_refresh_token', data.refresh_token);
-  if (data.expires_in) localStorage.setItem('edux_token_expires_at', String(Date.now() + data.expires_in * 1000));
-  localStorage.setItem('edux_user_email', email);
-}
-
 async function recordReferralIfPresent(token) {
   const savedRef = localStorage.getItem('edux_referral_code');
   if (!savedRef) return;
@@ -240,7 +245,7 @@ async function recordReferralIfPresent(token) {
   } catch (e) { /* non-blocking */ }
 }
 
-// ── Login ────────────────────────────────────────────────────────
+// ── Login — now via the Supabase SDK directly, same as stats.html ──
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   hideAlerts();
@@ -251,22 +256,23 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   const password = document.getElementById('password').value;
 
   try {
-    const res = await fetch(`${API_BASE}/api/auth/login`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({email, password})
-    });
-    const data = await res.json();
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
-    if (res.ok) {
-      saveSession(data, email);
-      await recordReferralIfPresent(data.token);
-      showSuccess('Signed in — redirecting…');
-      setTimeout(() => { window.location.href = '/stats'; }, 900);
-    } else {
-      showError(data.error === 'Invalid login credentials' || data.error === 'Invalid email or password'
+    if (error) {
+      showError(error.message.includes('Invalid login credentials')
         ? 'Incorrect email or password.'
-        : (data.error || 'Sign-in failed. Please try again.'));
+        : (error.message || 'Sign-in failed. Please try again.'));
+      setLoading(btn, false, 'Sign In');
+      return;
+    }
+
+    if (data.session) {
+      if (data.session.user) localStorage.setItem('edux_user', JSON.stringify(data.session.user));
+      await recordReferralIfPresent(data.session.access_token);
+      showSuccess('Signed in — redirecting…');
+      setTimeout(() => { window.location.href = redirectTarget; }, 900);
+    } else {
+      showError('Sign-in failed. No session returned.');
       setLoading(btn, false, 'Sign In');
     }
   } catch (err) {
@@ -275,7 +281,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   }
 });
 
-// ── Signup ───────────────────────────────────────────────────────
+// ── Signup — via the Supabase SDK directly ──────────────────────────
 document.getElementById('signupForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   hideAlerts();
@@ -290,23 +296,26 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
   setLoading(btn, true, 'Create Account');
 
   try {
-    const res = await fetch(`${API_BASE}/api/auth/signup`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({email, password})
-    });
-    const data = await res.json();
+    const { data, error } = await supabaseClient.auth.signUp({ email, password });
 
-    if (res.ok) {
-      if (data.token) {
-        saveSession(data, email);
-        await recordReferralIfPresent(data.token);
-      }
-      showSuccess('Account created — redirecting…');
-      setTimeout(() => { window.location.href = '/stats'; }, 1200);
-    } else {
-      showError(data.error || 'Sign-up failed. Please try again.');
+    if (error) {
+      showError(error.message || 'Sign-up failed. Please try again.');
       setLoading(btn, false, 'Create Account');
+      return;
+    }
+
+    if (data.user && !data.session) {
+      showSuccess('Account created! Please check your email to confirm, then sign in.');
+      setLoading(btn, false, 'Create Account');
+      switchMode('login');
+      return;
+    }
+
+    if (data.session) {
+      if (data.session.user) localStorage.setItem('edux_user', JSON.stringify(data.session.user));
+      await recordReferralIfPresent(data.session.access_token);
+      showSuccess('Account created — redirecting…');
+      setTimeout(() => { window.location.href = redirectTarget; }, 1200);
     }
   } catch (err) {
     showError('Network error — please check your connection.');
@@ -314,7 +323,7 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
   }
 });
 
-// ── Forgot password ──────────────────────────────────────────────
+// ── Forgot password — via the Supabase SDK, matching stats.html ────
 document.getElementById('forgotForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   hideAlerts();
@@ -323,17 +332,27 @@ document.getElementById('forgotForm').addEventListener('submit', async (e) => {
   setLoading(btn, true, 'Send Reset Link');
 
   try {
-    const res = await fetch(`${API_BASE}/api/auth/forgot-password`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({email})
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/stats'
     });
-    const data = await res.json();
-    showSuccess(data.message || 'If an account exists for that email, a reset link has been sent.');
+    if (error) {
+      showError(error.message || 'Could not send reset email.');
+      setLoading(btn, false, 'Send Reset Link');
+      return;
+    }
+    showSuccess('If an account exists for that email, a reset link has been sent.');
     setLoading(btn, false, 'Send Reset Link');
   } catch (err) {
     showError('Network error — please check your connection.');
     setLoading(btn, false, 'Send Reset Link');
+  }
+});
+
+// If already signed in and someone lands on /login anyway, skip straight
+// to their destination instead of making them log in again.
+supabaseClient.auth.getSession().then(({ data }) => {
+  if (data?.session) {
+    window.location.href = redirectTarget;
   }
 });
 </script>
