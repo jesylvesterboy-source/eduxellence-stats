@@ -135,38 +135,34 @@ tr.clickable:hover{background:var(--of)}
   </div>
 </div>
 
+<!-- ===== SUPABASE JS SDK =====
+     CRITICAL FIX: admin.html previously used its own custom token/refresh
+     scheme (edux_auth_token / edux_refresh_token / edux_token_expires_at)
+     that only login.html wrote to — and never loaded the Supabase SDK at
+     all. Now unified with stats.html's approach: always ask the SDK for
+     the current session directly, so login state is consistent no matter
+     which page someone signed in from. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
+const SUPABASE_URL = 'https://uvmmottlccuxvfmwckuf.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2bW1vdHRsY2N1eHZmbXdja3VmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3ODQxMzIsImV4cCI6MjA5NzM2MDEzMn0.e4789311KYwC-YXOuPheW9AXIIYRzT-te6YfNnnNdnk';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 const API_BASE = (() => {
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return 'http://localhost:7860';
   return 'https://eduxellence-eduxellence-api.hf.space';
 })();
 
-async function getValidToken() {
-  const expiresAt = parseInt(localStorage.getItem('edux_token_expires_at') || '0', 10);
-  const token = localStorage.getItem('edux_auth_token');
-  if (!token) return null;
-  if (Date.now() < expiresAt - 2 * 60 * 1000) return token;
-  const refreshToken = localStorage.getItem('edux_refresh_token');
-  if (!refreshToken) return token;
-  try {
-    const r = await fetch(`${API_BASE}/api/auth/refresh`, {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({refresh_token: refreshToken})
-    });
-    const d = await r.json();
-    if (d.access_token) {
-      localStorage.setItem('edux_auth_token', d.access_token);
-      localStorage.setItem('edux_refresh_token', d.refresh_token);
-      localStorage.setItem('edux_token_expires_at', String(Date.now() + (d.expires_in || 3600) * 1000));
-      return d.access_token;
-    }
-  } catch (e) {}
-  return token;
+async function getSupabaseToken() {
+  const { data, error } = await supabaseClient.auth.getSession();
+  if (error || !data?.session) return null;
+  return data.session.access_token;
 }
 
 async function authedFetch(path, opts = {}) {
-  const token = await getValidToken();
-  if (!token) { window.location.href = '/login'; return null; }
+  const token = await getSupabaseToken();
+  if (!token) { window.location.href = '/login?redirect=/admin'; return null; }
   const headers = Object.assign({'Authorization': 'Bearer ' + token}, opts.headers || {});
   const res = await fetch(`${API_BASE}${path}`, Object.assign({}, opts, {headers}));
   if (res.status === 403) {
@@ -188,12 +184,15 @@ document.querySelectorAll('.tab').forEach(tab => {
   });
 });
 
-document.getElementById('admin-email').textContent = localStorage.getItem('edux_user_email') || '';
+supabaseClient.auth.getSession().then(({ data }) => {
+  document.getElementById('admin-email').textContent = data?.session?.user?.email || '';
+});
 
 // ── Dashboard ──
 async function loadDashboard() {
   try {
     const d = await authedFetch('/api/admin/dashboard-stats');
+    if (!d) return;
     const s = d.stats;
     const cards = [
       ['Total Users', s.total_users],
@@ -220,6 +219,7 @@ async function loadUsers() {
   document.getElementById('users-tbody').innerHTML = '<tr><td colspan="4" class="loading">Loading…</td></tr>';
   try {
     const d = await authedFetch(`/api/admin/users?page=${currentPage}&limit=25&search=${encodeURIComponent(search)}`);
+    if (!d) return;
     const users = d.users || [];
     if (!users.length) {
       document.getElementById('users-tbody').innerHTML = '<tr><td colspan="4" class="empty">No users found.</td></tr>';
@@ -251,6 +251,7 @@ async function openUser(userId) {
   document.getElementById('modal-body').innerHTML = '';
   try {
     const d = await authedFetch(`/api/admin/users/${userId}`);
+    if (!d) return;
     const p = d.profile;
     document.getElementById('modal-email').textContent = p.email;
     const suspended = p.is_active === false;
@@ -288,7 +289,7 @@ async function adjustCredits() {
       method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({amount, reason: 'admin_manual_adjust'})
     });
-    if (d.ok) { openUser(openUserId); loadUsers(); } else alert(d.error || 'Adjustment failed.');
+    if (d?.ok) { openUser(openUserId); loadUsers(); } else alert(d?.error || 'Adjustment failed.');
   } catch (e) {}
 }
 
@@ -298,7 +299,7 @@ async function toggleSuspend(suspend) {
       method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({suspended: suspend})
     });
-    if (d.ok) { openUser(openUserId); loadUsers(); } else alert(d.error || 'Action failed.');
+    if (d?.ok) { openUser(openUserId); loadUsers(); } else alert(d?.error || 'Action failed.');
   } catch (e) {}
 }
 
@@ -307,6 +308,7 @@ async function loadPayments() {
   document.getElementById('payments-tbody').innerHTML = '<tr><td colspan="5" class="loading">Loading…</td></tr>';
   try {
     const d = await authedFetch('/api/admin/payments?limit=50');
+    if (!d) return;
     const rows = d.payments || [];
     if (!rows.length) {
       document.getElementById('payments-tbody').innerHTML = '<tr><td colspan="5" class="empty">No payments yet.</td></tr>';
