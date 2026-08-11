@@ -79,9 +79,13 @@ tr.clickable:hover{background:var(--of)}
 </head>
 <body>
 
+<!-- ===== UPDATED NAV WITH LOGOUT BUTTON ===== -->
 <nav class="nav">
   <div><span class="nav-logo">Eduxellence<span>.</span></span><span class="nav-badge">SUPER ADMIN</span></div>
-  <div class="nav-right" id="admin-email"></div>
+  <div style="display:flex;align-items:center;gap:.75rem">
+    <span class="nav-right" id="admin-email"></span>
+    <button onclick="adminLogout()" style="background:rgba(220,38,38,.15);color:#ef4444;padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:500;border:1px solid rgba(220,38,38,.2);cursor:pointer;font-family:'DM Sans',sans-serif">Sign Out</button>
+  </div>
 </nav>
 
 <div class="wrap">
@@ -175,6 +179,12 @@ async function getSupabaseToken() {
   const { data, error } = await supabaseClient.auth.getSession();
   if (error || !data?.session) return null;
   return data.session.access_token;
+}
+
+// ===== ADDED: Logout function =====
+async function adminLogout() {
+  try { await supabaseClient.auth.signOut(); } catch (e) {}
+  window.location.href = '/login';
 }
 
 async function authedFetch(path, opts = {}) {
