@@ -101,7 +101,24 @@ tr.clickable:hover{background:var(--of)}
     <div class="panel">
       <div class="panel-head">
         <h2>Subscribers</h2>
-        <input class="search-input" id="user-search" placeholder="Search by email…">
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
+          <input class="search-input" id="user-search" placeholder="Search by email…">
+          <select class="search-input" id="filter-status" style="width:130px">
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="suspended">Suspended</option>
+          </select>
+          <select class="search-input" id="filter-plan" style="width:150px">
+            <option value="all">All Plans</option>
+            <option value="none">No Subscription</option>
+            <option value="student">Student</option>
+            <option value="researcher">Researcher</option>
+            <option value="professional">Professional</option>
+          </select>
+          <input class="search-input" type="date" id="filter-date-from" style="width:140px" title="Joined after">
+          <input class="search-input" type="date" id="filter-date-to" style="width:140px" title="Joined before">
+          <button class="pg-btn" onclick="clearFilters()">Clear</button>
+        </div>
       </div>
       <table>
         <thead><tr><th>Email</th><th>Joined</th><th>Balance</th><th>Status</th></tr></thead>
@@ -216,9 +233,19 @@ async function loadDashboard() {
 let currentPage = 1;
 async function loadUsers() {
   const search = document.getElementById('user-search').value.trim();
+  const status = document.getElementById('filter-status').value;
+  const plan = document.getElementById('filter-plan').value;
+  const dateFrom = document.getElementById('filter-date-from').value;
+  const dateTo = document.getElementById('filter-date-to').value;
+
   document.getElementById('users-tbody').innerHTML = '<tr><td colspan="4" class="loading">Loading…</td></tr>';
   try {
-    const d = await authedFetch(`/api/admin/users?page=${currentPage}&limit=25&search=${encodeURIComponent(search)}`);
+    const params = new URLSearchParams({
+      page: currentPage, limit: 25, search,
+      status, plan,
+      date_from: dateFrom, date_to: dateTo
+    });
+    const d = await authedFetch(`/api/admin/users?${params.toString()}`);
     if (!d) return;
     const users = d.users || [];
     if (!users.length) {
@@ -238,6 +265,22 @@ async function loadUsers() {
     if (e.message !== 'forbidden') document.getElementById('users-tbody').innerHTML = '<tr><td colspan="4" class="empty">Could not load users.</td></tr>';
   }
 }
+
+function clearFilters() {
+  document.getElementById('user-search').value = '';
+  document.getElementById('filter-status').value = 'all';
+  document.getElementById('filter-plan').value = 'all';
+  document.getElementById('filter-date-from').value = '';
+  document.getElementById('filter-date-to').value = '';
+  currentPage = 1;
+  loadUsers();
+}
+
+// ── Wire filter controls ──
+['filter-status', 'filter-plan', 'filter-date-from', 'filter-date-to'].forEach(id => {
+  document.getElementById(id).addEventListener('change', () => { currentPage = 1; loadUsers(); });
+});
+
 document.getElementById('user-search').addEventListener('input', () => { currentPage = 1; loadUsers(); });
 document.getElementById('pg-prev').addEventListener('click', () => { if (currentPage > 1) { currentPage--; loadUsers(); } });
 document.getElementById('pg-next').addEventListener('click', () => { currentPage++; loadUsers(); });
@@ -260,6 +303,23 @@ async function openUser(userId) {
       <div class="detail-row"><span>Joined</span><span>${new Date(p.created_at).toLocaleDateString()}</span></div>
       <div class="detail-row"><span>Status</span><span><span class="badge ${suspended ? 'suspended' : 'active'}">${suspended ? 'Suspended' : 'Active'}</span></span></div>
       <div class="detail-row"><span>Subscription</span><span>${d.subscription ? d.subscription.plan_key + ' (' + d.subscription.status + ')' : 'None'}</span></div>
+      <div class="detail-row"><span>Last Login</span><span>${d.activity?.last_sign_in_at ? new Date(d.activity.last_sign_in_at).toLocaleString() : '—'}</span></div>
+      <div class="detail-row"><span>Last Activity</span><span>${d.activity?.last_activity_action ? d.activity.last_activity_action + ' · ' + new Date(d.activity.last_activity_at).toLocaleDateString() : '—'}</span></div>
+      <div class="detail-row"><span>Tests Saved</span><span>${d.activity?.tests_performed_count ?? 0}</span></div>
+      <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--of)">
+        <div style="font-weight:700;font-size:.82rem;margin-bottom:.5rem;font-family:'Syne',sans-serif">Subscription Management</div>
+        <select id="sub-action" class="search-input" style="width:100%;margin-bottom:.5rem">
+          <option value="activate">Activate</option>
+          <option value="cancel">Cancel</option>
+          <option value="extend">Extend (+days)</option>
+          <option value="change_plan">Change Plan</option>
+          <option value="grant_complimentary">Grant Complimentary</option>
+          <option value="revoke_complimentary">Revoke Complimentary</option>
+        </select>
+        <div id="sub-action-extra" style="margin-bottom:.5rem"></div>
+        <input type="text" id="sub-reason" placeholder="Reason (required)" style="width:100%;padding:.55rem;border:1.5px solid var(--bd);border-radius:8px;font-size:.85rem;margin-bottom:.5rem">
+        <button class="btn primary" style="width:100%" onclick="manageSubscription()">Apply</button>
+      </div>
       <div class="credit-form">
         <input type="number" id="credit-amount" placeholder="+10 or -5">
         <button class="btn primary" onclick="adjustCredits()">Adjust</button>
@@ -280,6 +340,59 @@ async function openUser(userId) {
   }
 }
 function closeModal() { document.getElementById('user-modal').classList.remove('show'); }
+
+// ── Subscription management ──
+document.addEventListener('change', (e) => {
+  if (e.target.id !== 'sub-action') return;
+  const extra = document.getElementById('sub-action-extra');
+  const action = e.target.value;
+  if (action === 'extend') {
+    extra.innerHTML = `<input type="number" id="sub-days" placeholder="Days to extend" style="width:100%;padding:.55rem;border:1.5px solid var(--bd);border-radius:8px;font-size:.85rem">`;
+  } else if (action === 'change_plan' || action === 'grant_complimentary') {
+    extra.innerHTML = `
+      <select id="sub-plan" class="search-input" style="width:100%">
+        <option value="student">Student</option>
+        <option value="researcher">Researcher</option>
+        <option value="professional">Professional</option>
+      </select>
+      ${action === 'grant_complimentary' ? `<input type="number" id="sub-days" placeholder="Days (default 30)" style="width:100%;padding:.55rem;border:1.5px solid var(--bd);border-radius:8px;font-size:.85rem;margin-top:.4rem">` : ''}
+    `;
+  } else {
+    extra.innerHTML = '';
+  }
+});
+
+async function manageSubscription() {
+  const action = document.getElementById('sub-action').value;
+  const reason = document.getElementById('sub-reason').value.trim();
+  if (!reason) return alert('A reason is required.');
+
+  const dangerous = ['cancel', 'revoke_complimentary'];
+  if (dangerous.includes(action) && !confirm(`Are you sure you want to ${action.replace('_',' ')} this subscription? This cannot be undone automatically.`)) {
+    return;
+  }
+
+  const body = { action, reason };
+  const daysEl = document.getElementById('sub-days');
+  const planEl = document.getElementById('sub-plan');
+  if (daysEl && daysEl.value) body.days = parseInt(daysEl.value, 10);
+  if (planEl) body.plan_key = planEl.value;
+  if (action === 'grant_complimentary' && !body.days) body.days = 30;
+
+  try {
+    const d = await authedFetch(`/api/admin/users/${openUserId}/subscription`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body)
+    });
+    if (d?.ok) {
+      alert('Subscription updated.');
+      openUser(openUserId);
+      loadUsers();
+    } else {
+      alert(d?.error || 'Action failed.');
+    }
+  } catch (e) {}
+}
 
 async function adjustCredits() {
   const amount = parseFloat(document.getElementById('credit-amount').value);
