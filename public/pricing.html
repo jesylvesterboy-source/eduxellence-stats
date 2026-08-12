@@ -184,11 +184,23 @@ footer a{color:var(--tl)}
   <p style="margin-top:.4rem"><a href="/">Home</a> · <a href="/stats">Run Analysis</a> · <a href="https://eduxellence.org/#contact">Contact</a></p>
 </footer>
 
+<!-- ===== SUPABASE JS SDK =====
+     CRITICAL FIX: pricing.html previously used the old custom token scheme
+     (edux_auth_token / edux_refresh_token / edux_token_expires_at) with
+     /api/auth/refresh calls. This caused 400 errors and login loops.
+     Now using the Supabase SDK directly - same as login.html and admin.html -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
 // ============================================================
-// API_BASE — frontend (Vercel: stats.eduxellence.org) and backend
-// (Hugging Face Space) are DIFFERENT domains. Every API call must
-// be absolute against the HF Space — never a bare relative path.
+// SUPABASE CLIENT - Must match login.html and admin.html
+// ============================================================
+const SUPABASE_URL = 'https://uvmmottlccuxvfmwckuf.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2bW1vdHRsY2N1eHZmbXdja3VmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3ODQxMzIsImV4cCI6MjA5NzM2MDEzMn0.e4789311KYwC-YXOuPheW9AXIIYRzT-te6YfNnnNdnk';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============================================================
+// API_BASE - Backend (Hugging Face Space)
 // ============================================================
 const API_BASE = (() => {
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
@@ -202,40 +214,36 @@ let _pendingPackId = null;
 let _pendingPlanKey = null;
 let _availableGateways = [];
 
-// ===== TOKEN REFRESH HELPERS =====
-function saveSession(sessionData) {
-  localStorage.setItem('edux_auth_token', sessionData.access_token);
-  localStorage.setItem('edux_refresh_token', sessionData.refresh_token);
-  localStorage.setItem('edux_token_expires_at', String(Date.now() + (sessionData.expires_in || 3600) * 1000));
+// ============================================================
+// ✅ FIXED: Get session using Supabase SDK (no custom tokens!)
+// ============================================================
+async function getValidToken() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  
+  if (!session) {
+    return null;
+  }
+  
+  // Check if session is expired
+  const expiresAt = session.expires_at || 0;
+  if (expiresAt && Date.now() >= expiresAt * 1000) {
+    // Try to refresh
+    const { data: refreshData, error: refreshError } = await supabaseClient.auth.refreshSession();
+    if (refreshError || !refreshData.session) {
+      return null;
+    }
+    return refreshData.session.access_token;
+  }
+  
+  return session.access_token;
 }
 
-async function getValidToken() {
-  const expiresAt = parseInt(localStorage.getItem('edux_token_expires_at') || '0', 10);
-  const token = localStorage.getItem('edux_auth_token');
-  if (!token) return null;
-
-  if (Date.now() < expiresAt - 2 * 60 * 1000) {
-    return token;
-  }
-
-  const refreshToken = localStorage.getItem('edux_refresh_token');
-  if (!refreshToken) return null;
-
-  try {
-    const r = await fetch(`${API_BASE}/api/auth/refresh`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({refresh_token: refreshToken})
-    });
-    const d = await r.json();
-    if (d.access_token) {
-      saveSession(d);
-      return d.access_token;
-    }
-  } catch (e) {
-    console.error('Token refresh failed:', e);
-  }
-  return null;
+// ============================================================
+// Check if user is logged in using Supabase SDK
+// ============================================================
+async function checkAuth() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  return !!session;
 }
 
 async function detectDefaultCurrency(){
@@ -333,12 +341,14 @@ function renderSubs(plans, currency){
     </div>`).join('');
 }
 
-// ===== buyPack =====
+// ============================================================
+// ✅ FIXED: buyPack - uses Supabase SDK for auth check
+// ============================================================
 async function buyPack(packId){
   const token = await getValidToken();
   if (!token) {
     alert('Please sign in to purchase credits.');
-    window.location.href = '/login';
+    window.location.href = '/login?redirect=/pricing';
     return;
   }
   _pendingPackId = packId;
@@ -363,7 +373,9 @@ function closeGatewayModal(){
   _pendingPlanKey = null;
 }
 
-// ===== chooseGateway — handles both packs and subscriptions =====
+// ============================================================
+// ✅ FIXED: chooseGateway - uses Supabase SDK for auth
+// ============================================================
 async function chooseGateway(gateway) {
   let token = await getValidToken();
   const packId = _pendingPackId;
@@ -372,7 +384,7 @@ async function chooseGateway(gateway) {
 
   if (!token) {
     alert('Please log in to complete your purchase.');
-    window.location.href = '/login';
+    window.location.href = '/login?redirect=/pricing';
     return;
   }
 
@@ -419,12 +431,14 @@ async function chooseGateway(gateway) {
   }
 }
 
-// ===== subscribePlan =====
+// ============================================================
+// ✅ FIXED: subscribePlan - uses Supabase SDK for auth check
+// ============================================================
 async function subscribePlan(planKey){
   const token = await getValidToken();
   if (!token) {
     alert('Please log in to subscribe.');
-    window.location.href = '/login';
+    window.location.href = '/login?redirect=/pricing';
     return;
   }
   _pendingPlanKey = planKey;
@@ -432,7 +446,21 @@ async function subscribePlan(planKey){
   openGatewayModal();
 }
 
+// ============================================================
+// ✅ FIXED: Check if already logged in on page load
+// If user is already signed in, they can stay on pricing page
+// ============================================================
 (async () => {
+  // Check if user is already logged in - if not, redirect to login
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) {
+    // User is not logged in - they can still view pricing
+    // but will be prompted to login when they try to buy
+    console.log('User not signed in - pricing view only');
+  } else {
+    console.log('User signed in - ready to purchase');
+  }
+  
   const detected = await detectDefaultCurrency();
   switchCurrency(detected);
   document.querySelector(`.cur-btn[data-cur="${currentCurrency}"]`)?.classList.add('active');
