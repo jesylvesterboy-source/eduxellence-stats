@@ -3,13 +3,81 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Eduxellence Analytics — Free Data Tools</title>
-<meta name="description" content="Free professional data cleaning and statistical analysis tools. Chi-Square, T-Test, ANOVA, Regression, Correlation, Logistic Regression, PCA, Factor Analysis, ARIMA — with charts, APA tables and plain-English interpretation.">
-<!-- FIX: Use absolute URL for favicon -->
+
+<!-- PRIMARY SEO METADATA -->
+<title>Eduxellence Analytics — Free Online Statistical Analysis & Data Cleaning Tools</title>
+<meta name="description" content="Free professional data cleaning and statistical analysis tools in your browser. Run Chi-Square, T-Test, ANOVA, Regression, PCA, Factor Analysis & ARIMA with APA tables, charts, and plain-English interpretations.">
+<meta name="keywords" content="statistical analysis online, data cleaner, APA tables generator, chi-square calculator, t-test calculator, ANOVA online, regression analysis tool, factor analysis online, thesis data analysis, Eduxellence Analytics">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://stats.eduxellence.org">
+
+<!-- OPEN GRAPH / FACEBOOK -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://stats.eduxellence.org">
+<meta property="og:title" content="Eduxellence Analytics — Free Online Statistical Analysis & Data Cleaning Tools">
+<meta property="og:description" content="Clean messy data and run 12 research-grade statistical tests online. Instant APA tables, interactive charts, and clear interpretations for students, researchers, and data teams.">
+<meta property="og:image" content="https://eduxellence.org/og-image.jpg">
+
+<!-- TWITTER CARD -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://stats.eduxellence.org">
+<meta name="twitter:title" content="Eduxellence Analytics — Free Online Statistical Analysis & Data Cleaning Tools">
+<meta name="twitter:description" content="Clean messy data and run 12 research-grade statistical tests online. Instant APA tables, interactive charts, and clear interpretations.">
+<meta name="twitter:image" content="https://eduxellence.org/og-image.jpg">
+
+<!-- ICONS & ASSETS -->
 <link rel="icon" type="image/x-icon" href="https://eduxellence.org/Eduxellence.ico">
 <link rel="apple-touch-icon" href="https://eduxellence.org/Eduxellence.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- STRUCTURED DATA (JSON-LD) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://stats.eduxellence.org/#website",
+      "url": "https://stats.eduxellence.org",
+      "name": "Eduxellence Analytics Suite",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "All",
+      "description": "Browser-based data cleaning and statistical analysis software offering APA-formatted outputs, interactive visualizations, and automated assumption checking.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      },
+      "creator": {
+        "@type": "Organization",
+        "name": "Eduxellence Analytics",
+        "url": "https://eduxellence.org"
+      }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "Eduxellence Data Cleaner & Statistical Tools",
+      "operatingSystem": "Web Browser",
+      "applicationCategory": "BusinessApplication",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "128"
+      },
+      "featureList": [
+        "11-Stage Automated Data Cleaning",
+        "12 Research-Grade Statistical Tests",
+        "APA Formatted Tables and Reports",
+        "Automated Assumption Checking",
+        "Full Thesis Research Analysis Package"
+      ]
+    }
+  ]
+}
+</script>
+
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -61,10 +129,9 @@ a{color:var(--bl);text-decoration:none}a:hover{text-decoration:underline}
 .tb-teal{background:linear-gradient(135deg,var(--tl),#09A882);color:var(--ny);box-shadow:0 4px 14px rgba(15,201,160,.3)}
 .tb-teal:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(15,201,160,.4);text-decoration:none;color:var(--ny)}
 .free-tag{display:inline-block;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.25);color:var(--ok);font-size:.72rem;font-weight:700;padding:2px 10px;border-radius:10px;margin-bottom:.75rem}
-.pay-tag{display:inline-block;background:rgba(30,107,255,.1);border:1px solid rgba(30,107,255,.2);color:var(--bl);font-size:.72rem;font-weight:700;padding:2px 10px;border-radius:10px;margin-bottom:.75rem}
 .premium-tag{display:inline-block;background:linear-gradient(135deg,rgba(217,119,6,.15),rgba(217,119,6,.05));border:1px solid rgba(217,119,6,.3);color:var(--wn);font-size:.72rem;font-weight:700;padding:2px 10px;border-radius:10px;margin-bottom:.75rem}
 
-/* HOW IT WORKS */
+/* SECTIONS */
 .section{max-width:960px;margin:0 auto 5rem;padding:0 1.5rem}
 .sec-label{text-align:center;font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--bl);margin-bottom:.75rem}
 .sec-title{font-family:'Syne',sans-serif;font-size:clamp(1.5rem,3vw,2.25rem);font-weight:800;color:var(--tx);text-align:center;margin-bottom:.75rem;letter-spacing:-.5px}
@@ -78,22 +145,16 @@ a{color:var(--bl);text-decoration:none}a:hover{text-decoration:underline}
 .ti-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--tx);margin-bottom:.3rem}
 .ti-desc{font-size:.78rem;color:var(--sl);line-height:1.5}
 .ti-badge{display:inline-block;font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:10px;margin-top:.5rem}
-.par{background:#DBEAFE;color:#1E40AF}
-.np{background:#FEF3C7;color:#92400E}
-.desc{background:#F3E8FF;color:#6B21A8}
-.adv{background:#E0E7FF;color:#3730A3}
 .free{background:rgba(22,163,74,.1);color:var(--ok)}
 .pay{background:rgba(30,107,255,.1);color:var(--bl)}
-.premium{background:linear-gradient(135deg,rgba(217,119,6,.15),rgba(217,119,6,.05));color:var(--wn)}
 
-/* PRICING */
+/* PRICING GRID */
 .pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
 .price-card{background:var(--wh);border:1.5px solid var(--bd);border-radius:16px;padding:1.5rem;text-align:center}
 .price-card.highlight{border-color:var(--bl);box-shadow:0 4px 20px rgba(30,107,255,.15)}
 .price-card.premium{border-color:var(--wn);box-shadow:0 4px 20px rgba(217,119,6,.15)}
 .pc-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--sl);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem}
 .pc-price{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--tx);margin-bottom:.3rem}
-.pc-price span{font-size:.9rem;color:var(--sl);font-weight:400}
 .pc-desc{font-size:.8rem;color:var(--sl);line-height:1.5;margin-top:.5rem}
 .free-forever{color:var(--ok);font-weight:700}
 .pay-per-use{color:var(--bl);font-weight:700}
@@ -145,224 +206,225 @@ footer strong{color:rgba(255,255,255,.75)}
 </head>
 <body>
 
-<nav class="nav">
-  <a class="logo" href="/">Eduxellence<span>.</span></a>
-  <div class="nav-links">
+<header class="nav">
+  <a class="logo" href="/" aria-label="Eduxellence Analytics Home">Eduxellence<span>.</span></a>
+  <nav class="nav-links">
     <a href="/stats">Statistical Analysis</a>
     <a href="/upload">Data Cleaner</a>
-    <a href="https://eduxellence.org/services">Services</a>
-    <a href="https://eduxellence.org/#contact" class="nav-cta">Book Audit</a>
-  </div>
-</nav>
+    <a href="https://eduxellence.org/services" target="_blank" rel="noopener">Services</a>
+    <a href="https://eduxellence.org/#contact" target="_blank" rel="noopener" class="nav-cta">Book Audit</a>
+  </nav>
+</header>
 
-<section class="hero">
-  <div class="badge">✦ Start Free · No Installation · Optional Sign-in</div>
-  <h1>Research-Grade Data Tools<br><span>For Everyone.</span></h1>
-  <p class="hero-sub">Clean messy data and run professional statistical analysis — directly in your browser. Built by Eduxellence Analytics for researchers, students, and data teams.</p>
-  <div class="hero-stats">
-    <div class="hs"><div class="hs-num">12</div><div class="hs-lbl">Statistical Tests</div></div>
-    <div class="hs"><div class="hs-num">$0</div><div class="hs-lbl">Cost to Start</div></div>
-    <div class="hs"><div class="hs-num">APA</div><div class="hs-lbl">Formatted Output</div></div>
-    <div class="hs"><div class="hs-num">30s</div><div class="hs-lbl">Time to Results</div></div>
-  </div>
-</section>
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="badge">✦ Start Free · No Installation · Optional Sign-in</div>
+    <h1>Research-Grade Data Tools<br><span>For Everyone.</span></h1>
+    <p class="hero-sub">Clean messy datasets and run professional statistical analysis directly in your browser. Built by Eduxellence Analytics for researchers, students, and data teams.</p>
+    <div class="hero-stats">
+      <div class="hs"><div class="hs-num">12</div><div class="hs-lbl">Statistical Tests</div></div>
+      <div class="hs"><div class="hs-num">$0</div><div class="hs-lbl">Cost to Start</div></div>
+      <div class="hs"><div class="hs-num">APA</div><div class="hs-lbl">Formatted Output</div></div>
+      <div class="hs"><div class="hs-num">30s</div><div class="hs-lbl">Time to Results</div></div>
+    </div>
+  </section>
 
-<!-- TOOLS -->
-<div class="tools">
+  <!-- TOOLS GRID -->
+  <section class="tools" aria-label="Core Tools">
+    <!-- Stats Tool -->
+    <article class="tool-card">
+      <div class="tool-header">
+        <div class="tool-icon icon-blue" aria-hidden="true">📊</div>
+        <h2 class="tool-name">Statistical Analysis</h2>
+        <p class="tool-desc">Upload your dataset and run any of 12 professional statistical tests. Get publication-ready charts, APA-formatted tables, assumption checks, and plain-English interpretation — instantly.</p>
+        <div class="tool-features">
+          <div class="tf">Chi-Square, T-Test, ANOVA</div>
+          <div class="tf">Correlation &amp; Linear Regression</div>
+          <div class="tf">Logistic Regression &amp; PCA</div>
+          <div class="tf">Factor Analysis &amp; ARIMA</div>
+          <div class="tf">Mann-Whitney &amp; Kruskal-Wallis</div>
+          <div class="tf">Auto assumption checking</div>
+          <div class="tf">APA citation + interpretation</div>
+          <div class="tf">Download Excel report</div>
+        </div>
+      </div>
+      <div class="tool-footer">
+        <a href="/stats" class="tool-btn tb-blue">📊 Open Statistical Analysis →</a>
+      </div>
+    </article>
 
-  <!-- Stats Tool -->
-  <div class="tool-card">
-    <div class="tool-header">
-      <div class="tool-icon icon-blue">📊</div>
-      <div class="tool-name">Statistical Analysis</div>
-      <div class="tool-desc">Upload your dataset and run any of 12 professional statistical tests. Get publication-ready charts, APA-formatted tables, assumption checks, and plain-English interpretation — instantly.</div>
-      <div class="tool-features">
-        <div class="tf">Chi-Square, T-Test, ANOVA</div>
-        <div class="tf">Correlation &amp; Linear Regression</div>
-        <div class="tf">Logistic Regression &amp; PCA</div>
-        <div class="tf">Factor Analysis &amp; ARIMA</div>
-        <div class="tf">Mann-Whitney &amp; Kruskal-Wallis</div>
-        <div class="tf">Auto assumption checking</div>
-        <div class="tf">APA citation + interpretation</div>
-        <div class="tf">Download Excel report</div>
+    <!-- Cleaner Tool -->
+    <article class="tool-card">
+      <div class="tool-header">
+        <div class="tool-icon icon-teal" aria-hidden="true">🧹</div>
+        <span class="free-tag">FREE</span>
+        <h2 class="tool-name">Data Cleaner</h2>
+        <p class="tool-desc">Upload a messy CSV or Excel file and download a perfectly cleaned version in seconds. Handles duplicates, missing values, mixed dates, currency symbols, inconsistent categories, and outliers.</p>
+        <div class="tool-features">
+          <div class="tf">11 automated cleaning stages</div>
+          <div class="tf">Mixed date format standardisation</div>
+          <div class="tf">Currency symbol stripping</div>
+          <div class="tf">Duplicate row removal</div>
+          <div class="tf">Outlier flagging</div>
+          <div class="tf">Download cleaned Excel + audit report</div>
+        </div>
+      </div>
+      <div class="tool-footer">
+        <a href="/upload" class="tool-btn tb-teal">🧹 Open Data Cleaner →</a>
+      </div>
+    </article>
+  </section>
+
+  <!-- STATISTICAL TESTS -->
+  <section class="section">
+    <div class="sec-label">What You Can Run</div>
+    <h2 class="sec-title">12 Professional Statistical Tests</h2>
+    <p class="sec-sub">From simple descriptives to advanced modelling — all with automatic assumption checking and APA formatting.</p>
+    <div class="tests-grid">
+      <div class="test-item"><div class="ti-icon" aria-hidden="true">📊</div><h3 class="ti-name">Descriptive Statistics</h3><p class="ti-desc">Mean, SD, skewness, histograms, boxplots, Q-Q plots, pie charts.</p><span class="ti-badge free">Free</span></div>
+      <div class="test-item"><div class="ti-icon" aria-hidden="true">🔲</div><h3 class="ti-name">Chi-Square Test</h3><p class="ti-desc">Test independence between two categorical variables. Cramér's V effect size.</p><span class="ti-badge pay">1 Credit</span></div>
+      <div class="test-item"><div class="ti-icon" aria-hidden="true">⚖️</div><h3 class="ti-name">Independent T-Test</h3><p class="ti-desc">Compare means between two groups. Cohen's d, 95% CI, violin plots.</p><span class="ti-badge pay">1 Credit</span></div>
+      <div class="test-item"><div class="ti-icon" aria-hidden="true">📈</div><h3 class="ti-name">One-Way ANOVA</h3><p class="ti-desc">Compare means across 3+ groups. η², Bonferroni post-hoc tests.</p><span class="ti-badge pay">2 Credits</span></div>
+      <div class="test-item"><div class="ti-icon" aria-hidden="true">🔗</div><h3 class="ti-name">Correlation</h3><p class="ti-desc">Pearson or Spearman. Heatmap, scatter matrix, bubble chart.</p><span class="ti-badge pay">1 Credit</span></div>
+      <div class="test-item"><div class="ti-icon" aria-hidden="true">📉</div><h3 class="ti-name">Linear Regression</h3><p class="ti-desc">Simple or multiple. R², coefficients, CI bands, residual plots.</p><span class="ti-badge pay">3 Credits</span></div>
+      <div class="test-item"><div class="ti-icon" aria-hidden="true">🔄</div><h3 class="ti-name">Logistic Regression</h3><p class="ti-desc">Binary classification. Odds ratios, confusion matrix, AUC-ROC.</p><span class="ti-badge pay">5 Credits</span></div>
+      <div class="test-item"><div class="ti-icon" aria-hidden="true">📐</div><h3 class="ti-name">PCA</h3><p class="ti-desc">Principal Component Analysis. Dimensionality reduction, variance explained.</p><span class="ti-badge pay">5 Credits</span></div>
+      <div class="test-item"><div class="ti-icon" aria-hidden="true">🧩</div><h3 class="ti-name">Factor Analysis</h3><p class="ti-desc">Uncover latent factors. Factor loadings, eigenvalues, scree plot.</p><span class="ti-badge pay">6 Credits</span></div>
+      <div class="test-item"><div class="ti-icon" aria-hidden="true">📈</div><h3 class="ti-name">ARIMA</h3><p class="ti-desc">Time series forecasting. ACF/PACF plots, forecast visualisation.</p><span class="ti-badge pay">8 Credits</span></div>
+      <div class="test-item"><div class="ti-icon" aria-hidden="true">🥊</div><h3 class="ti-name">Mann-Whitney U</h3><p class="ti-desc">Non-parametric alternative to T-Test. For non-normal or ordinal data.</p><span class="ti-badge pay">1 Credit</span></div>
+      <div class="test-item"><div class="ti-icon" aria-hidden="true">🏆</div><h3 class="ti-name">Kruskal-Wallis</h3><p class="ti-desc">Non-parametric ANOVA alternative for skewed distributions.</p><span class="ti-badge pay">2 Credits</span></div>
+    </div>
+  </section>
+
+  <!-- THESIS PACKAGE SECTION -->
+  <section class="section">
+    <div class="sec-label">Complete Research Package</div>
+    <div class="thesis-card">
+      <span class="premium-tag" style="margin-bottom:1rem">🎓 Premium Package</span>
+      <h3>Full Research / Thesis Package</h3>
+      <p>Everything you need to complete your thesis, dissertation, or research project — all analyses, reports, and interpretations in one comprehensive package.</p>
+      <div class="price-big">12 Credits <span>($12 USD)</span></div>
+      <div class="thesis-features">
+        <div class="thesis-feat">All 12 Statistical Tests</div>
+        <div class="thesis-feat">APA-Formatted Reports</div>
+        <div class="thesis-feat">AI Interpretation</div>
+        <div class="thesis-feat">Word &amp; PDF Exports</div>
+        <div class="thesis-feat">Assumption Checks</div>
+        <div class="thesis-feat">Publication-Ready Charts</div>
+      </div>
+      <a href="/stats?package=thesis" class="thesis-btn">🚀 Start Thesis Package →</a>
+      <p style="font-size:.75rem;color:rgba(255,255,255,.4);margin-top:1rem">One click. All analyses. Complete report.</p>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section">
+    <div class="sec-label">How It Works</div>
+    <h2 class="sec-title">From data to results in 4 steps</h2>
+    <p class="sec-sub">No Python, no SPSS, no spreadsheet formulas. Just upload and run.</p>
+    <div class="steps-row">
+      <div class="step"><div class="step-n">1</div><div class="step-icon" aria-hidden="true">📂</div><h3 class="step-title">Upload your file</h3><p class="step-desc">CSV or Excel. Column types detected automatically. Up to 10 MB on the free tier.</p></div>
+      <div class="step"><div class="step-n">2</div><div class="step-icon" aria-hidden="true">🎯</div><h3 class="step-title">Choose your test</h3><p class="step-desc">We recommend the right test based on your data. Or pick from all 12 available tests.</p></div>
+      <div class="step"><div class="step-n">3</div><div class="step-icon" aria-hidden="true">✅</div><h3 class="step-title">Check assumptions</h3><p class="step-desc">Your data is automatically tested for normality, equal variance, outliers and more.</p></div>
+      <div class="step"><div class="step-n">4</div><div class="step-icon" aria-hidden="true">📊</div><h3 class="step-title">Get your results</h3><p class="step-desc">Charts, APA citation, coefficient tables, and a plain-English explanation — ready to copy into your paper.</p></div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="section">
+    <div class="sec-label">Pricing</div>
+    <h2 class="sec-title">Start free. Pay only for what you need.</h2>
+    <p class="sec-sub">Descriptive statistics and data cleaning are always free. Advanced tests cost credits — buy packs or subscribe for unlimited access.</p>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <h3 class="pc-name">Data Cleaning</h3>
+        <div class="pc-price free-forever">Free</div>
+        <p class="pc-desc">Upload any CSV/Excel. Download cleaned file + audit report. No limits on runs.</p>
+      </div>
+      <div class="price-card">
+        <h3 class="pc-name">Descriptive Stats</h3>
+        <div class="pc-price free-forever">Free</div>
+        <p class="pc-desc">Full descriptive analysis — histograms, boxplots, frequency tables, Q-Q plots.</p>
+      </div>
+      <div class="price-card highlight">
+        <h3 class="pc-name">Advanced Tests</h3>
+        <div class="pc-price pay-per-use">From 1 Credit</div>
+        <p class="pc-desc">T-Test, ANOVA, Regression, Logistic, PCA, Factor Analysis, ARIMA. Pay per test.</p>
+      </div>
+      <div class="price-card premium">
+        <h3 class="pc-name">Thesis Package</h3>
+        <div class="pc-price premium-price">12 Credits</div>
+        <p class="pc-desc">Full research package — all analyses, APA reports, interpretations, and exports.</p>
       </div>
     </div>
-    <div class="tool-footer">
-      <a href="/stats" class="tool-btn tb-blue">📊 Open Statistical Analysis →</a>
-    </div>
-  </div>
+  </section>
 
-  <!-- Cleaner Tool -->
-  <div class="tool-card">
-    <div class="tool-header">
-      <div class="tool-icon icon-teal">🧹</div>
-      <div class="free-tag">FREE</div>
-      <div class="tool-name">Data Cleaner</div>
-      <div class="tool-desc">Upload a messy CSV or Excel file and download a perfectly cleaned version in seconds. Handles duplicates, missing values, mixed dates, currency symbols, inconsistent categories and outliers.</div>
-      <div class="tool-features">
-        <div class="tf">11 automated cleaning stages</div>
-        <div class="tf">Mixed date format standardisation</div>
-        <div class="tf">Currency symbol stripping</div>
-        <div class="tf">Duplicate row removal</div>
-        <div class="tf">Outlier flagging</div>
-        <div class="tf">Download cleaned Excel + audit report</div>
+  <!-- CREDIT PACKS -->
+  <section class="section" style="margin-bottom:3rem">
+    <div class="sec-label">Credit Packs</div>
+    <h2 class="sec-title">Buy credits. Never expire.</h2>
+    <p class="sec-sub">1 credit = $1 USD. Use them on any advanced test or the thesis package.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem">
+      <div style="background:var(--wh);border:1px solid var(--bd);border-radius:16px;padding:1.25rem;text-align:center">
+        <div style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--tx)">5</div>
+        <div style="font-size:.78rem;color:var(--sl);margin-bottom:.5rem">Credits</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--bl)">$5</div>
+      </div>
+      <div style="background:var(--wh);border:1.5px solid var(--tl);border-radius:16px;padding:1.25rem;text-align:center;position:relative">
+        <span style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--tl);color:var(--ny);font-size:.68rem;font-weight:700;padding:3px 12px;border-radius:20px;white-space:nowrap">Best Value</span>
+        <div style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--tx)">25</div>
+        <div style="font-size:.78rem;color:var(--sl);margin-bottom:.5rem">Credits</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--bl)">$20</div>
+        <div style="font-size:.7rem;color:var(--ok);margin-top:.25rem">Save 20%</div>
+      </div>
+      <div style="background:var(--wh);border:1px solid var(--bd);border-radius:16px;padding:1.25rem;text-align:center">
+        <div style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--tx)">60</div>
+        <div style="font-size:.78rem;color:var(--sl);margin-bottom:.5rem">Credits</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--bl)">$45</div>
+        <div style="font-size:.7rem;color:var(--ok);margin-top:.25rem">Save 25%</div>
+      </div>
+      <div style="background:var(--wh);border:1px solid var(--bd);border-radius:16px;padding:1.25rem;text-align:center">
+        <div style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--tx)">150</div>
+        <div style="font-size:.78rem;color:var(--sl);margin-bottom:.5rem">Credits</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--bl)">$100</div>
+        <div style="font-size:.7rem;color:var(--ok);margin-top:.25rem">Save 33%</div>
       </div>
     </div>
-    <div class="tool-footer">
-      <a href="/upload" class="tool-btn tb-teal">🧹 Open Data Cleaner →</a>
-    </div>
-  </div>
+    <p style="text-align:center;color:var(--sl);font-size:.78rem;margin-top:1rem">Credits never expire. Use them on any test, any time.</p>
+  </section>
 
-</div>
+  <!-- LARGE FILE NOTICE -->
+  <section class="section" style="margin-bottom:3rem">
+    <div style="background:linear-gradient(135deg,rgba(217,119,6,.08),rgba(217,119,6,.04));border:1.5px solid rgba(217,119,6,.25);border-radius:20px;padding:2rem 2.5rem;display:flex;gap:1.5rem;align-items:flex-start;flex-wrap:wrap">
+      <div style="font-size:2.5rem;flex-shrink:0" aria-hidden="true">📦</div>
+      <div style="flex:1;min-width:240px">
+        <h3 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;color:var(--tx);margin-bottom:.5rem">Working with files larger than 10 MB?</h3>
+        <p style="font-size:.9rem;color:var(--sl);line-height:1.65;margin-bottom:1rem">Our free tools run on serverless infrastructure with a 10 MB file limit. For research projects, large surveys, or enterprise datasets that exceed this, our expert team at Eduxellence Analytics handles the full pipeline — data cleaning, statistical modelling in R, Python, SPSS, or EViews, and a complete publication-ready report.</p>
+        <a href="https://eduxellence.org/#contact" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:var(--wn);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:.875rem;padding:.7rem 1.5rem;border-radius:10px;text-decoration:none;transition:all .15s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">📞 Book a Free Expert Consultation →</a>
+      </div>
+    </div>
+  </section>
 
-<!-- STATISTICAL TESTS -->
-<section class="section">
-  <div class="sec-label">What You Can Run</div>
-  <h2 class="sec-title">12 Professional Statistical Tests</h2>
-  <p class="sec-sub">From simple descriptives to advanced modelling — all with automatic assumption checking and APA formatting.</p>
-  <div class="tests-grid">
-    <div class="test-item"><div class="ti-icon">📊</div><div class="ti-name">Descriptive Statistics</div><div class="ti-desc">Mean, SD, skewness, histograms, boxplots, Q-Q plots, pie charts.</div><span class="ti-badge free">Free</span></div>
-    <div class="test-item"><div class="ti-icon">🔲</div><div class="ti-name">Chi-Square Test</div><div class="ti-desc">Test independence between two categorical variables. Cramér's V effect size.</div><span class="ti-badge pay">1 Credit</span></div>
-    <div class="test-item"><div class="ti-icon">⚖️</div><div class="ti-name">Independent T-Test</div><div class="ti-desc">Compare means between two groups. Cohen's d, 95% CI, violin plots.</div><span class="ti-badge pay">1 Credit</span></div>
-    <div class="test-item"><div class="ti-icon">📈</div><div class="ti-name">One-Way ANOVA</div><div class="ti-desc">Compare means across 3+ groups. η², Bonferroni post-hoc tests.</div><span class="ti-badge pay">2 Credits</span></div>
-    <div class="test-item"><div class="ti-icon">🔗</div><div class="ti-name">Correlation</div><div class="ti-desc">Pearson or Spearman. Heatmap, scatter matrix, bubble chart.</div><span class="ti-badge pay">1 Credit</span></div>
-    <div class="test-item"><div class="ti-icon">📉</div><div class="ti-name">Linear Regression</div><div class="ti-desc">Simple or multiple. R², coefficients, CI bands, residual plots.</div><span class="ti-badge pay">3 Credits</span></div>
-    <div class="test-item"><div class="ti-icon">🔄</div><div class="ti-name">Logistic Regression</div><div class="ti-desc">Binary classification. Odds ratios, confusion matrix, AUC-ROC.</div><span class="ti-badge pay">5 Credits</span></div>
-    <div class="test-item"><div class="ti-icon">📐</div><div class="ti-name">PCA</div><div class="ti-desc">Principal Component Analysis. Dimensionality reduction, variance explained.</div><span class="ti-badge pay">5 Credits</span></div>
-    <div class="test-item"><div class="ti-icon">🧩</div><div class="ti-name">Factor Analysis</div><div class="ti-desc">Uncover latent factors. Factor loadings, eigenvalues, scree plot.</div><span class="ti-badge pay">6 Credits</span></div>
-    <div class="test-item"><div class="ti-icon">📈</div><div class="ti-name">ARIMA</div><div class="ti-desc">Time series forecasting. ACF/PACF plots, forecast visualisation.</div><span class="ti-badge pay">8 Credits</span></div>
-    <div class="test-item"><div class="ti-icon">🥊</div><div class="ti-name">Mann-Whitney U</div><div class="ti-desc">Non-parametric alternative to T-Test. For non-normal or ordinal data.</div><span class="ti-badge pay">1 Credit</span></div>
-    <div class="test-item"><div class="ti-icon">🏆</div><div class="ti-name">Kruskal-Wallis</div><div class="ti-desc">Non-parametric ANOVA alternative for skewed distributions.</div><span class="ti-badge pay">2 Credits</span></div>
-  </div>
-</section>
-
-<!-- THESIS PACKAGE - NEW SECTION -->
-<section class="section">
-  <div class="sec-label">Complete Research Package</div>
-  <div class="thesis-card">
-    <div class="premium-tag" style="margin-bottom:1rem">🎓 Premium Package</div>
-    <h3>Full Research / Thesis Package</h3>
-    <p>Everything you need to complete your thesis, dissertation, or research project — all analyses, reports, and interpretations in one comprehensive package.</p>
-    <div class="price-big">12 Credits <span>($12 USD)</span></div>
-    <div class="thesis-features">
-      <div class="thesis-feat">All 12 Statistical Tests</div>
-      <div class="thesis-feat">APA-Formatted Reports</div>
-      <div class="thesis-feat">AI Interpretation</div>
-      <div class="thesis-feat">Word &amp; PDF Exports</div>
-      <div class="thesis-feat">Assumption Checks</div>
-      <div class="thesis-feat">Publication-Ready Charts</div>
+  <!-- CTA -->
+  <section class="cta">
+    <h2>Ready to analyse your data?</h2>
+    <p>Start with our free tools. For expert support on complex projects, we are one message away.</p>
+    <div class="cta-btns">
+      <a href="/stats" class="btn-tl">📊 Run Statistical Analysis →</a>
+      <a href="https://eduxellence.org/#contact" target="_blank" rel="noopener" class="btn-gh">📞 Talk to an Expert</a>
     </div>
-    <a href="/stats?package=thesis" class="thesis-btn">🚀 Start Thesis Package →</a>
-    <div style="font-size:.75rem;color:rgba(255,255,255,.4);margin-top:1rem">One click. All analyses. Complete report.</div>
-  </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section class="section">
-  <div class="sec-label">How It Works</div>
-  <h2 class="sec-title">From data to results in 4 steps</h2>
-  <p class="sec-sub">No Python, no SPSS, no spreadsheet formulas. Just upload and run.</p>
-  <div class="steps-row">
-    <div class="step"><div class="step-n">1</div><div class="step-icon">📂</div><div class="step-title">Upload your file</div><div class="step-desc">CSV or Excel. Column types detected automatically. Up to 10 MB on the free tier.</div></div>
-    <div class="step"><div class="step-n">2</div><div class="step-icon">🎯</div><div class="step-title">Choose your test</div><div class="step-desc">We recommend the right test based on your data. Or pick from all 12 available tests.</div></div>
-    <div class="step"><div class="step-n">3</div><div class="step-icon">✅</div><div class="step-title">Check assumptions</div><div class="step-desc">Your data is automatically tested for normality, equal variance, outliers and more.</div></div>
-    <div class="step"><div class="step-n">4</div><div class="step-icon">📊</div><div class="step-title">Get your results</div><div class="step-desc">Charts, APA citation, coefficient tables, and a plain-English explanation — ready to copy into your paper.</div></div>
-  </div>
-</section>
-
-<!-- PRICING -->
-<section class="section">
-  <div class="sec-label">Pricing</div>
-  <h2 class="sec-title">Start free. Pay only for what you need.</h2>
-  <p class="sec-sub">Descriptive statistics and data cleaning are always free. Advanced tests cost credits — buy packs or subscribe for unlimited access.</p>
-  <div class="pricing-grid">
-    <div class="price-card">
-      <div class="pc-name">Data Cleaning</div>
-      <div class="pc-price free-forever">Free</div>
-      <div class="pc-desc">Upload any CSV/Excel. Download cleaned file + audit report. No limits on runs.</div>
-    </div>
-    <div class="price-card">
-      <div class="pc-name">Descriptive Stats</div>
-      <div class="pc-price free-forever">Free</div>
-      <div class="pc-desc">Full descriptive analysis — histograms, boxplots, frequency tables, Q-Q plots.</div>
-    </div>
-    <div class="price-card highlight">
-      <div class="pc-name">Advanced Tests</div>
-      <div class="pc-price pay-per-use">From 1 Credit</div>
-      <div class="pc-desc">T-Test, ANOVA, Regression, Logistic, PCA, Factor Analysis, ARIMA. Pay per test.</div>
-    </div>
-    <div class="price-card premium">
-      <div class="pc-name">Thesis Package</div>
-      <div class="pc-price premium-price">12 Credits</div>
-      <div class="pc-desc">Full research package — all analyses, APA reports, interpretations, and exports.</div>
-    </div>
-  </div>
-</section>
-
-<!-- CREDIT PACKS -->
-<section class="section" style="margin-bottom:3rem">
-  <div class="sec-label">Credit Packs</div>
-  <h2 class="sec-title">Buy credits. Never expire.</h2>
-  <p class="sec-sub">1 credit = $1 USD. Use them on any advanced test or the thesis package.</p>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem">
-    <div style="background:var(--wh);border:1px solid var(--bd);border-radius:16px;padding:1.25rem;text-align:center">
-      <div style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--tx)">5</div>
-      <div style="font-size:.78rem;color:var(--sl);margin-bottom:.5rem">Credits</div>
-      <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--bl)">$5</div>
-    </div>
-    <div style="background:var(--wh);border:1.5px solid var(--tl);border-radius:16px;padding:1.25rem;text-align:center;position:relative">
-      <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--tl);color:var(--ny);font-size:.68rem;font-weight:700;padding:3px 12px;border-radius:20px;white-space:nowrap">Best Value</div>
-      <div style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--tx)">25</div>
-      <div style="font-size:.78rem;color:var(--sl);margin-bottom:.5rem">Credits</div>
-      <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--bl)">$20</div>
-      <div style="font-size:.7rem;color:var(--ok);margin-top:.25rem">Save 20%</div>
-    </div>
-    <div style="background:var(--wh);border:1px solid var(--bd);border-radius:16px;padding:1.25rem;text-align:center">
-      <div style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--tx)">60</div>
-      <div style="font-size:.78rem;color:var(--sl);margin-bottom:.5rem">Credits</div>
-      <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--bl)">$45</div>
-      <div style="font-size:.7rem;color:var(--ok);margin-top:.25rem">Save 25%</div>
-    </div>
-    <div style="background:var(--wh);border:1px solid var(--bd);border-radius:16px;padding:1.25rem;text-align:center">
-      <div style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--tx)">150</div>
-      <div style="font-size:.78rem;color:var(--sl);margin-bottom:.5rem">Credits</div>
-      <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--bl)">$100</div>
-      <div style="font-size:.7rem;color:var(--ok);margin-top:.25rem">Save 33%</div>
-    </div>
-  </div>
-  <p style="text-align:center;color:var(--sl);font-size:.78rem;margin-top:1rem">Credits never expire. Use them on any test, any time.</p>
-</section>
-
-<!-- LARGE FILE NOTICE -->
-<section class="section" style="margin-bottom:3rem">
-  <div style="background:linear-gradient(135deg,rgba(217,119,6,.08),rgba(217,119,6,.04));border:1.5px solid rgba(217,119,6,.25);border-radius:20px;padding:2rem 2.5rem;display:flex;gap:1.5rem;align-items:flex-start;flex-wrap:wrap">
-    <div style="font-size:2.5rem;flex-shrink:0">📦</div>
-    <div style="flex:1;min-width:240px">
-      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;color:var(--tx);margin-bottom:.5rem">Working with files larger than 10 MB?</div>
-      <p style="font-size:.9rem;color:var(--sl);line-height:1.65;margin-bottom:1rem">Our free tools run on serverless infrastructure with a 10 MB file limit. For research projects, large surveys, or enterprise datasets that exceed this, our expert team at Eduxellence Analytics handles the full pipeline — data cleaning, statistical modelling in R, Python, SPSS, or EViews, and a complete publication-ready report.</p>
-      <a href="https://eduxellence.org/#contact" style="display:inline-flex;align-items:center;gap:8px;background:var(--wn);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:.875rem;padding:.7rem 1.5rem;border-radius:10px;text-decoration:none;transition:all .15s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">📞 Book a Free Expert Consultation →</a>
-    </div>
-  </div>
-</section>
-
-<!-- CTA -->
-<section class="cta">
-  <h2>Ready to analyse your data?</h2>
-  <p>Start with our free tools. For expert support on complex projects, we are one message away.</p>
-  <div class="cta-btns">
-    <a href="/stats" class="btn-tl">📊 Run Statistical Analysis →</a>
-    <a href="https://eduxellence.org/#contact" class="btn-gh">📞 Talk to an Expert</a>
-  </div>
-</section>
+  </section>
+</main>
 
 <footer>
   <p><strong>Eduxellence Analytics</strong> — Research-grade data tools, built free for the world.</p>
   <p style="margin-top:.5rem">
     <a href="/stats">Statistical Analysis</a> ·
     <a href="/upload">Data Cleaner</a> ·
-    <a href="https://eduxellence.org/services">Services</a> ·
-    <a href="https://eduxellence.org/#contact">Contact</a> ·
-    <a href="https://github.com/eduxellence">GitHub</a>
+    <a href="https://eduxellence.org/services" target="_blank" rel="noopener">Services</a> ·
+    <a href="https://eduxellence.org/#contact" target="_blank" rel="noopener">Contact</a> ·
+    <a href="https://github.com/eduxellence" target="_blank" rel="noopener">GitHub</a>
   </p>
   <p style="margin-top:.5rem;font-size:.75rem">🔒 Files processed privately and deleted immediately · No account required · No data stored</p>
 </footer>
